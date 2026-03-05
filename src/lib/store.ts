@@ -1,6 +1,7 @@
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
 import { calculate, DEFAULT_INPUTS, type Inputs, type CalcResult } from './calculator';
+import { type Lang } from './i18n';
 
 const STORAGE_KEY = 'sourdough_cal_inputs';
 
@@ -56,8 +57,22 @@ function createInputsStore() {
 
 export const inputs = createInputsStore();
 
-export const result = derived<typeof inputs, CalcResult>(inputs, ($inputs) => {
-	return calculate($inputs);
+// Language preference
+const LANG_KEY = 'sourdough_cal_lang';
+
+function loadLang(): Lang {
+	if (!browser) return 'en';
+	return (localStorage.getItem(LANG_KEY) as Lang) ?? 'en';
+}
+
+export const lang = writable<Lang>(loadLang());
+
+lang.subscribe((val) => {
+	if (browser) localStorage.setItem(LANG_KEY, val);
+});
+
+export const result = derived([inputs, lang], ([$inputs, $lang]) => {
+	return calculate($inputs, $lang);
 });
 
 // Drawer open state

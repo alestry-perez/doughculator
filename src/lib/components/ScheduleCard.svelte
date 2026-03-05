@@ -1,6 +1,10 @@
 <script lang="ts">
 	import type { ScheduleStep } from '$lib/calculator';
 	import { formatMins, addMinsToTime } from '$lib/calculator';
+	import { lang } from '$lib/store';
+	import { translations } from '$lib/i18n';
+
+	const t = $derived(translations[$lang]);
 
 	let { steps, scheduleMode, startTime }: {
 		steps: ScheduleStep[];
@@ -42,7 +46,7 @@
 </script>
 
 <div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5">
-	<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-4">Schedule</h2>
+	<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-4">{t.schedule}</h2>
 
 	<ol class="relative space-y-0">
 		{#each stepsWithTimes as { step, clockTime, endClockTime }, i}

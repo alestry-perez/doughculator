@@ -1,12 +1,16 @@
 <script lang="ts">
 	import type { WarningMessage } from '$lib/calculator';
+	import { lang } from '$lib/store';
+	import { translations } from '$lib/i18n';
+
+	const t = $derived(translations[$lang]);
 
 	let { warnings }: { warnings: WarningMessage[] } = $props();
 </script>
 
 {#if warnings.length > 0}
 	<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5 space-y-3">
-		<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">Notes & Warnings</h2>
+		<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">{t.notesWarnings}</h2>
 		{#each warnings as w}
 			<div
 				class="flex gap-3 rounded-xl px-4 py-3 text-sm"

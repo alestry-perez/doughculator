@@ -2,6 +2,8 @@
 // Sourdough Parameters Calculator — Core Logic
 // ============================================================
 
+import { type Lang, scheduleStrings, warningStrings, assumptionStrings } from './i18n';
+
 export type CrumbGoal = 'Tight' | 'Balanced' | 'Open';
 export type HydrationBand = 'Low' | 'Medium' | 'High';
 export type TempBand = 'Freezing' | 'Cold' | 'Standard' | 'Warm' | 'Hot';
@@ -318,42 +320,43 @@ function calcTiming(formula: FormulaResult): TimingResult {
 // Schedule Steps
 // ============================================================
 
-function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResult): ScheduleStep[] {
+function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResult, lang: Lang): ScheduleStep[] {
 	const { autolyseOn, autolyseMins, proofMethod } = inputs;
 	const { bulkMin, bulkMax, proofMin, proofMax, coldRetardMin, coldRetardMax, foldCount, foldIntervalMins } = timing;
+	const s = scheduleStrings[lang];
 	const steps: ScheduleStep[] = [];
 
 	// 1. Autolyse (if on)
 	if (autolyseOn) {
 		steps.push({
-			label: 'Autolyse',
+			label: s.autolyse,
 			durationMins: autolyseMins,
-			notes: `Mix flour and most of water (hold back ~50g water, all salt, all starter). Cover and rest.`
+			notes: s.autolyseNote()
 		});
 	}
 
 	// 2. Add starter + salt
 	steps.push({
-		label: 'Add Starter + Salt',
+		label: s.addStarterSalt,
 		durationMins: 5,
-		notes: 'Incorporate starter and salt, pinch and fold until fully integrated.'
+		notes: s.addStarterNote
 	});
 
 	// 3. Bulk fermentation start
 	steps.push({
-		label: 'Bulk Fermentation',
+		label: s.bulkFermentation,
 		durationMins: null,
 		rangeMinMins: Math.round(bulkMin * 60),
 		rangeMaxMins: Math.round(bulkMax * 60),
-		notes: `Ferment until dough has grown 50–75%, feels airy, passes float test. Adjust based on your environment.`
+		notes: s.bulkNote
 	});
 
 	// 4. Stretch & fold sets
 	for (let i = 1; i <= foldCount; i++) {
 		steps.push({
-			label: `Stretch & Fold ${i}`,
+			label: s.stretchFold(i),
 			durationMins: 5,
-			notes: `Set of 4 coil folds (${i * foldIntervalMins} min into bulk). Dough should start to hold tension.`
+			notes: s.stretchFoldNote(i, i * foldIntervalMins)
 		});
 	}
 
@@ -361,63 +364,63 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	const foldEndMins = foldCount * foldIntervalMins;
 	const remainingBulkMin = Math.max(0, Math.round(bulkMin * 60) - foldEndMins - 5);
 	steps.push({
-		label: 'Rest (Remaining Bulk)',
+		label: s.restBulk,
 		durationMins: remainingBulkMin > 0 ? remainingBulkMin : null,
-		notes: 'Cover and leave undisturbed. Watch for signs of fermentation (bubbles, jiggle, rise).'
+		notes: s.restNote
 	});
 
 	// 6. Pre-shape
 	steps.push({
-		label: 'Pre-shape',
+		label: s.preShape,
 		durationMins: 5,
-		notes: 'Gentle pre-shape, rest on counter uncovered.'
+		notes: s.preShapeNote
 	});
 
 	// 7. Bench rest
 	steps.push({
-		label: 'Bench Rest',
+		label: s.benchRest,
 		durationMins: 30,
-		notes: 'Allow gluten to relax before final shape.'
+		notes: s.benchRestNote
 	});
 
 	// 8. Final shape
 	steps.push({
-		label: 'Final Shape',
+		label: s.finalShape,
 		durationMins: 10,
-		notes: 'Shape into batard or boule. Build surface tension. Place seam-side up in floured banneton.'
+		notes: s.finalShapeNote
 	});
 
 	// 9. Proof
 	if (proofMethod === 'Room') {
 		steps.push({
-			label: 'Room Temperature Proof',
+			label: s.roomProof,
 			durationMins: null,
 			rangeMinMins: Math.round(proofMin * 60),
 			rangeMaxMins: Math.round(proofMax * 60),
-			notes: 'Cover banneton. Dough should puff and pass the poke test (slow spring-back).'
+			notes: s.roomProofNote
 		});
 	} else {
 		steps.push({
-			label: 'Cold Retard (Fridge)',
+			label: s.coldRetard,
 			durationMins: null,
 			rangeMinMins: coldRetardMin * 60,
 			rangeMaxMins: coldRetardMax * 60,
-			notes: `Place covered banneton in fridge at ${inputs.fridgeTempC}°C. Can bake directly from cold.`
+			notes: s.coldRetardNote(inputs.fridgeTempC)
 		});
 	}
 
 	// 10. Preheat oven
 	steps.push({
-		label: 'Preheat Oven + Dutch Oven',
+		label: s.preheatOven,
 		durationMins: 45,
-		notes: '500°F / 260°C with Dutch oven inside. Oven must be fully saturated with heat.'
+		notes: s.preheatNote
 	});
 
 	// 11. Score + Bake
 	steps.push({
-		label: 'Score + Bake',
+		label: s.scoreBake,
 		durationMins: 45,
-		notes: 'Score dough quickly. Bake covered 20 min, then uncover and bake 25 min more until deep golden.'
+		notes: s.scoreBakeNote
 	});
 
 	return steps;
@@ -427,72 +430,46 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 // Warnings
 // ============================================================
 
-function calcWarnings(inputs: Inputs, formula: FormulaResult): WarningMessage[] {
+function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): WarningMessage[] {
 	const warnings: WarningMessage[] = [];
 	const { effectiveTempC, hydrationBand, wwRatio } = formula;
 	const { autolyseOn, autolyseMins, crumbGoal } = inputs;
+	const w = warningStrings[lang];
 
 	if (effectiveTempC < 18) {
-		warnings.push({
-			level: 'danger',
-			message: 'Dough temp dangerously low — fermentation nearly dormant. Consider warming location.'
-		});
+		warnings.push({ level: 'danger', message: w.dangerLow });
 	}
 
 	if (effectiveTempC >= 30) {
-		warnings.push({
-			level: 'danger',
-			message: 'Above 30°C — overproofing risk and structural integrity drops. Use cold water, cool location, or fridge.'
-		});
+		warnings.push({ level: 'danger', message: w.dangerHigh });
 	}
 
 	if (effectiveTempC >= 27 && effectiveTempC < 30) {
-		warnings.push({
-			level: 'warn',
-			message: 'High temperature — watch dough closely, may ferment faster than estimated.'
-		});
+		warnings.push({ level: 'warn', message: w.warnHigh });
 	}
 
 	if (effectiveTempC >= 24 && effectiveTempC < 27) {
-		warnings.push({
-			level: 'info',
-			message: 'Sweet spot temperature — ideal for active fermentation.'
-		});
+		warnings.push({ level: 'info', message: w.infoSweet });
 	}
 
 	if (effectiveTempC >= 20 && effectiveTempC < 24) {
-		warnings.push({
-			level: 'info',
-			message: 'Slow & sour zone — excellent flavor development, longer timeline.'
-		});
+		warnings.push({ level: 'info', message: w.infoSlow });
 	}
 
 	if (hydrationBand === 'High' && effectiveTempC > 26) {
-		warnings.push({
-			level: 'warn',
-			message: 'High hydration + warm temp — runaway fermentation risk. Aim for cooler environment (~22–23°C).'
-		});
+		warnings.push({ level: 'warn', message: w.warnHydrationTemp });
 	}
 
 	if (hydrationBand === 'High') {
-		warnings.push({
-			level: 'info',
-			message: 'High hydration dough — requires strong bench technique. Wet hands, gentle folds.'
-		});
+		warnings.push({ level: 'info', message: w.infoHighHydration });
 	}
 
 	if (wwRatio > 0.3 && autolyseOn && autolyseMins > 30) {
-		warnings.push({
-			level: 'info',
-			message: 'High whole wheat % — consider shorter autolyse (20–25 min) or bassinage technique to improve handling.'
-		});
+		warnings.push({ level: 'info', message: w.infoWWAutolyse });
 	}
 
 	if (crumbGoal === 'Open') {
-		warnings.push({
-			level: 'warn',
-			message: 'Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs.'
-		});
+		warnings.push({ level: 'warn', message: w.warnOpenCrumb });
 	}
 
 	return warnings;
@@ -502,7 +479,7 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult): WarningMessage[] 
 // Assumptions
 // ============================================================
 
-function calcAssumptions(inputs: Inputs, formula: FormulaResult): Record<string, string> {
+function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Record<string, string> {
 	const { saltAutoCalc, saltPct, starterHydrationPct, autolyseOn, autolyseMins } = inputs;
 	const {
 		effectiveTempC,
@@ -513,18 +490,19 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult): Record<string,
 		autoSaltPct,
 		effectiveSaltPct
 	} = formula;
+	const a = assumptionStrings[lang];
 
 	return {
-		'Ambient temp': `${effectiveTempC.toFixed(1)}°C`,
-		'Salt': saltAutoCalc
-			? `${effectiveSaltPct.toFixed(2)}% (auto — ${autoSaltPct.toFixed(2)}% computed from flour blend)`
-			: `${saltPct}% (manual override)`,
-		'Starter hydration': `${starterHydrationPct}%`,
-		'Inoculation': `${inoculationPct.toFixed(1)}%`,
-		'Base hydration': `${baseHydrationPct}%`,
-		'WW hydration adjust': `+${wwHydrationAdjust.toFixed(1)}%`,
-		'Final hydration': `${finalHydrationPct.toFixed(1)}%`,
-		'Autolyse': autolyseOn ? `${autolyseMins} min` : 'Off'
+		[a.ambientTemp]: `${effectiveTempC.toFixed(1)}°C`,
+		[a.salt]: saltAutoCalc
+			? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2))
+			: a.saltManual(saltPct),
+		[a.starterHydration]: `${starterHydrationPct}%`,
+		[a.inoculation]: `${inoculationPct.toFixed(1)}%`,
+		[a.baseHydration]: `${baseHydrationPct}%`,
+		[a.wwHydrationAdjust]: `+${wwHydrationAdjust.toFixed(1)}%`,
+		[a.finalHydration]: `${finalHydrationPct.toFixed(1)}%`,
+		[a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off
 	};
 }
 
@@ -532,12 +510,12 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult): Record<string,
 // Main Export
 // ============================================================
 
-export function calculate(inputs: Inputs): CalcResult {
+export function calculate(inputs: Inputs, lang: Lang = 'en'): CalcResult {
 	const formula = calcFormula(inputs);
 	const timing = calcTiming(formula);
-	const schedule = calcSchedule(inputs, formula, timing);
-	const warnings = calcWarnings(inputs, formula);
-	const assumptions = calcAssumptions(inputs, formula);
+	const schedule = calcSchedule(inputs, formula, timing, lang);
+	const warnings = calcWarnings(inputs, formula, lang);
+	const assumptions = calcAssumptions(inputs, formula, lang);
 
 	return { formula, timing, schedule, warnings, assumptions };
 }

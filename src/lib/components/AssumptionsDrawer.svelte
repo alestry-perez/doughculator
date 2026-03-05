@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { assumptionsOpen } from '$lib/store';
+	import { assumptionsOpen, lang } from '$lib/store';
+	import { translations } from '$lib/i18n';
+
+	const t = $derived(translations[$lang]);
 
 	let { assumptions }: { assumptions: Record<string, string> } = $props();
 
@@ -22,10 +25,10 @@
 		class="fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white shadow-xl ring-1 ring-stone-200"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Assumptions"
+		aria-label={t.calculationAssumptions}
 	>
 		<div class="sticky top-0 flex items-center justify-between px-5 py-4 bg-white border-b border-stone-100">
-			<h2 class="text-base font-semibold text-stone-800">Calculation Assumptions</h2>
+			<h2 class="text-base font-semibold text-stone-800">{t.calculationAssumptions}</h2>
 			<button
 				type="button"
 				onclick={close}
@@ -40,7 +43,7 @@
 
 		<div class="px-5 py-4">
 			<p class="text-sm text-stone-500 mb-4">
-				These are the values used to calculate your formula, timing, and schedule.
+				{t.assumptionsDesc}
 			</p>
 			<dl class="space-y-2">
 				{#each Object.entries(assumptions) as [key, value]}
@@ -58,7 +61,7 @@
 				onclick={close}
 				class="w-full py-3 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 transition-colors"
 			>
-				Done
+				{t.done}
 			</button>
 		</div>
 	</div>

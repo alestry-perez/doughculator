@@ -1,16 +1,14 @@
 <script lang="ts">
 	import type { Inputs, CrumbGoal } from '$lib/calculator';
 	import { cToF, fToC } from '$lib/calculator';
-	import { inputs, result } from '$lib/store';
+	import { inputs, result, lang } from '$lib/store';
+	import { translations } from '$lib/i18n';
+
+	const t = $derived(translations[$lang]);
 
 	let advancedOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
-	const crumbDescriptions: Record<CrumbGoal, string> = {
-		Tight: 'Dense, uniform bubbles. Best for toast & sandwiches.',
-		Balanced: 'Medium bubbles, versatile crumb. Classic sourdough.',
-		Open: 'Large holes, translucent walls. Advanced technique required.'
-	};
 
 	// Derived flour gram display
 	let whiteFlourGrams = $derived(Math.round($inputs.totalFlourInputG * ($inputs.whitePct / 100)));
@@ -94,7 +92,7 @@
 <div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 overflow-hidden">
 	<!-- Header row with title and C/F toggle -->
 	<div class="flex items-center justify-between px-5 pt-5 pb-3">
-		<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">Parameters</h2>
+		<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">{t.parameters}</h2>
 		<button
 			type="button"
 			onclick={toggleUnit}
@@ -111,7 +109,7 @@
 		<!-- Total flour input -->
 		<div>
 			<label for="total-flour" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-				Total Flour (g)
+				{t.totalFlour}
 			</label>
 			<input
 				id="total-flour"
@@ -128,9 +126,9 @@
 		<!-- White flour % slider -->
 		<div>
 			<div class="flex items-center justify-between mb-1.5">
-				<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Flour Blend</span>
+				<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">{t.flourBlend}</span>
 				<span class="text-xs font-semibold text-stone-600">
-					{$inputs.whitePct}% White / {wwPct}% WW
+					{$inputs.whitePct}% {t.white} / {wwPct}% {t.wholeWheat}
 				</span>
 			</div>
 			<input
@@ -143,14 +141,14 @@
 				class="w-full h-2 bg-stone-200 rounded-full accent-amber-500 cursor-pointer"
 			/>
 			<div class="flex justify-between text-xs text-stone-400 mt-1.5">
-				<span class="tabular-nums">White: {whiteFlourGrams}g</span>
-				<span class="tabular-nums">Whole Wheat: {wwFlourGrams}g</span>
+				<span class="tabular-nums">{t.white}: {whiteFlourGrams}g</span>
+				<span class="tabular-nums">{t.wholeWheat}: {wwFlourGrams}g</span>
 			</div>
 		</div>
 
 		<!-- Crumb goal -->
 		<div>
-			<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Crumb Goal</p>
+			<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.crumbGoal}</p>
 			<div class="grid grid-cols-3 gap-2">
 				{#each crumbGoals as goal}
 					<button
@@ -164,11 +162,11 @@
 						class:text-stone-600={$inputs.crumbGoal !== goal}
 						class:hover:bg-stone-50={$inputs.crumbGoal !== goal}
 					>
-						<span class="text-sm font-bold">{goal}</span>
+						<span class="text-sm font-bold">{t.crumbGoalNames[goal]}</span>
 					</button>
 				{/each}
 			</div>
-			<p class="text-xs text-stone-500 mt-2 leading-snug">{crumbDescriptions[$inputs.crumbGoal]}</p>
+			<p class="text-xs text-stone-500 mt-2 leading-snug">{t.crumbDescriptions[$inputs.crumbGoal]}</p>
 		</div>
 
 		<!-- Advanced collapsible -->
@@ -178,7 +176,7 @@
 				onclick={() => (advancedOpen = !advancedOpen)}
 				class="flex items-center justify-between w-full text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors"
 			>
-				<span>Advanced Options</span>
+				<span>{t.advancedOptions}</span>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					class="h-4 w-4 transition-transform duration-200"
@@ -196,7 +194,7 @@
 					<!-- Ambient temp -->
 					<div>
 						<label for="ambient-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-							Ambient Temperature (°{$inputs.tempUnit})
+							{t.ambientTemp} (°{$inputs.tempUnit})
 						</label>
 						<input
 							id="ambient-temp"
@@ -213,7 +211,7 @@
 					<!-- Dough temp (optional) -->
 					<div>
 						<label for="dough-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-							Dough Temperature (°{$inputs.tempUnit}) <span class="font-normal text-stone-400">— optional</span>
+							{t.doughTemp} (°{$inputs.tempUnit}) <span class="font-normal text-stone-400">{t.optional}</span>
 						</label>
 						<input
 							id="dough-temp"
@@ -223,7 +221,7 @@
 							step="0.5"
 							value={doughDisplay}
 							oninput={onDoughInput}
-							placeholder="Leave blank to use ambient"
+							placeholder={t.leaveBlankAmbient}
 							class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent placeholder-stone-300"
 						/>
 					</div>
@@ -231,13 +229,13 @@
 					<!-- Salt — auto-computed with optional override -->
 					<div>
 						<div class="flex items-center justify-between mb-1.5">
-							<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Salt</span>
+							<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">{t.salt}</span>
 							<div class="flex items-center gap-2">
 								<span class="text-xs text-stone-400">
 									{#if $inputs.saltAutoCalc}
-										Auto: {autoSaltPct.toFixed(2)}% = {autoSaltG}g
+										{t.saltAutoLabel(autoSaltPct.toFixed(2), String(autoSaltG))}
 									{:else}
-										Manual
+										{t.saltManual}
 									{/if}
 								</span>
 								<button
@@ -256,7 +254,7 @@
 										class:translate-x-0.5={$inputs.saltAutoCalc}
 									></span>
 								</button>
-								<span class="text-xs text-stone-500">Override</span>
+								<span class="text-xs text-stone-500">{t.saltOverride}</span>
 							</div>
 						</div>
 						{#if !$inputs.saltAutoCalc}
@@ -271,14 +269,14 @@
 								class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
 								placeholder="2.0"
 							/>
-							<p class="text-xs text-stone-400 mt-1">Baker's % relative to total flour</p>
+							<p class="text-xs text-stone-400 mt-1">{t.saltBakersPct}</p>
 						{/if}
 					</div>
 
 					<!-- Starter hydration % -->
 					<div>
 						<label for="starter-hyd" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-							Starter Hydration (%)
+							{t.starterHydration}
 						</label>
 						<input
 							id="starter-hyd"
@@ -295,7 +293,7 @@
 					<!-- Autolyse toggle + slider -->
 					<div>
 						<div class="flex items-center justify-between mb-2">
-							<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">Autolyse</span>
+							<span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">{t.autolyse}</span>
 							<button
 								type="button"
 								onclick={() => updateField('autolyseOn', !$inputs.autolyseOn)}
@@ -316,7 +314,7 @@
 						{#if $inputs.autolyseOn}
 							<div>
 								<div class="flex justify-between text-xs text-stone-500 mb-1">
-									<span>Duration</span>
+									<span>{t.duration}</span>
 									<span class="font-semibold text-stone-700">{$inputs.autolyseMins} min</span>
 								</div>
 								<input
@@ -338,7 +336,7 @@
 
 					<!-- Proof method -->
 					<div>
-						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Proof Method</p>
+						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.proofMethod}</p>
 						<div class="grid grid-cols-2 gap-2">
 							{#each (['Room', 'ColdRetard'] as const) as method}
 								<button
@@ -352,7 +350,7 @@
 									class:text-stone-600={$inputs.proofMethod !== method}
 									class:hover:bg-stone-50={$inputs.proofMethod !== method}
 								>
-									{method === 'Room' ? 'Room Temp' : 'Cold Retard'}
+									{method === 'Room' ? t.roomTemp : t.coldRetard}
 								</button>
 							{/each}
 						</div>
@@ -362,7 +360,7 @@
 					{#if $inputs.proofMethod === 'ColdRetard'}
 						<div>
 							<label for="fridge-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-								Fridge Temperature (°{$inputs.tempUnit})
+								{t.fridgeTemp} (°{$inputs.tempUnit})
 							</label>
 							<input
 								id="fridge-temp"
@@ -379,7 +377,7 @@
 
 					<!-- Schedule mode -->
 					<div>
-						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">Schedule Mode</p>
+						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.scheduleMode}</p>
 						<div class="grid grid-cols-2 gap-2">
 							{#each (['relative', 'clock'] as const) as mode}
 								<button
@@ -393,7 +391,7 @@
 									class:text-stone-600={$inputs.scheduleMode !== mode}
 									class:hover:bg-stone-50={$inputs.scheduleMode !== mode}
 								>
-									{mode === 'relative' ? 'Relative' : 'Clock'}
+									{mode === 'relative' ? t.relative : t.clock}
 								</button>
 							{/each}
 						</div>
@@ -403,7 +401,7 @@
 					{#if $inputs.scheduleMode === 'clock'}
 						<div>
 							<label for="start-time" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-								Start Time (HH:MM)
+								{t.startTime}
 							</label>
 							<input
 								id="start-time"

@@ -1,6 +1,10 @@
 <script lang="ts">
 	import type { TimingResult, FormulaResult } from '$lib/calculator';
 	import { formatMins } from '$lib/calculator';
+	import { lang } from '$lib/store';
+	import { translations } from '$lib/i18n';
+
+	const t = $derived(translations[$lang]);
 
 	let { timing, formula, proofMethod }: {
 		timing: TimingResult;
@@ -31,25 +35,25 @@
 </script>
 
 <div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5 space-y-5">
-	<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">Timing</h2>
+	<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">{t.timing}</h2>
 
 	<!-- Badges -->
 	<div class="flex flex-wrap gap-2">
 		<span class="text-xs px-3 py-1 rounded-full font-medium {tempBandColors[formula.tempBand] ?? ''}">
-			{formula.tempBand} ({formula.effectiveTempC.toFixed(1)}°C)
+			{t.tempBands[formula.tempBand]} ({formula.effectiveTempC.toFixed(1)}°C)
 		</span>
 		<span class="text-xs px-3 py-1 rounded-full font-medium {hydrationBandColors[formula.hydrationBand] ?? ''}">
-			{formula.hydrationBand} Hydration ({formula.finalHydrationPct.toFixed(1)}%)
+			{t.hydrationBands[formula.hydrationBand]} {t.hydration} ({formula.finalHydrationPct.toFixed(1)}%)
 		</span>
 		<span class="text-xs px-3 py-1 rounded-full font-medium bg-amber-50 text-amber-700">
-			{formula.inoculationPct.toFixed(1)}% Inoculation
+			{formula.inoculationPct.toFixed(1)}% {t.inoculation}
 		</span>
 	</div>
 
 	<!-- Bulk fermentation -->
 	<div>
 		<div class="flex justify-between items-center mb-2">
-			<span class="text-sm font-semibold text-stone-700">Bulk Fermentation</span>
+			<span class="text-sm font-semibold text-stone-700">{t.bulkFermentation}</span>
 			<span class="text-sm tabular-nums font-bold text-amber-700">
 				{formatMins(timing.bulkMin * 60)} – {formatMins(timing.bulkMax * 60)}
 			</span>
@@ -65,17 +69,17 @@
 			></div>
 		</div>
 		<div class="flex justify-between text-xs text-stone-400 mt-1">
-			<span>Fastest</span>
-			<span>Slowest</span>
+			<span>{t.fastest}</span>
+			<span>{t.slowest}</span>
 		</div>
-		<p class="text-xs text-stone-500 mt-1">{timing.foldCount} stretch-and-fold sets, every {timing.foldIntervalMins} min</p>
+		<p class="text-xs text-stone-500 mt-1">{t.foldSchedule(timing.foldCount, timing.foldIntervalMins)}</p>
 	</div>
 
 	<!-- Proof -->
 	<div>
 		{#if proofMethod === 'Room'}
 			<div class="flex justify-between items-center mb-2">
-				<span class="text-sm font-semibold text-stone-700">Room Proof</span>
+				<span class="text-sm font-semibold text-stone-700">{t.roomProof}</span>
 				<span class="text-sm tabular-nums font-bold text-sky-700">
 					{formatMins(timing.proofMin * 60)} – {formatMins(timing.proofMax * 60)}
 				</span>
@@ -92,7 +96,7 @@
 			</div>
 		{:else}
 			<div class="flex justify-between items-center mb-2">
-				<span class="text-sm font-semibold text-stone-700">Cold Retard</span>
+				<span class="text-sm font-semibold text-stone-700">{t.coldRetardProof}</span>
 				<span class="text-sm tabular-nums font-bold text-indigo-700">
 					{timing.coldRetardMin}h – {timing.coldRetardMax}h
 				</span>
@@ -107,13 +111,13 @@
 					style="width: {widthPct(timing.coldRetardMin)}%"
 				></div>
 			</div>
-			<p class="text-xs text-stone-500 mt-1">Can bake directly from fridge.</p>
+			<p class="text-xs text-stone-500 mt-1">{t.bakeColdNote}</p>
 		{/if}
 	</div>
 
 	<!-- Total estimate -->
 	<div class="rounded-xl bg-stone-50 px-4 py-3 text-sm">
-		<span class="text-stone-500">Estimated total active time (excl. bake):</span>
+		<span class="text-stone-500">{t.totalActiveTime}</span>
 		<span class="font-bold text-stone-800 ml-1">
 			{formatMins((timing.bulkMin + (proofMethod === 'Room' ? timing.proofMin : timing.coldRetardMin)) * 60 + 85)} –
 			{formatMins((timing.bulkMax + (proofMethod === 'Room' ? timing.proofMax : timing.coldRetardMax)) * 60 + 95)}
