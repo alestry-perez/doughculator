@@ -287,6 +287,21 @@ const en = {
 	off: 'Off',
 	auto: 'Auto',
 	duration: 'Duration',
+	autolyseModalTitle: 'Autolyse Guide',
+	autolyseModalIntro:
+		'Autolyse is a short rest after mixing flour and water, before adding starter and salt. It improves hydration and starts gluten development with less mixing.',
+	autolyseModalUseTitle: 'When to use it',
+	autolyseModalUseItems: [
+		'High-hydration doughs where you want better extensibility and easier shaping.',
+		'Doughs with whole wheat or thirsty flours that benefit from fuller hydration.',
+		'When the dough feels tight during mixing and you want gentler gluten development.'
+	],
+	autolyseModalAvoidTitle: 'When to skip or shorten',
+	autolyseModalAvoidItems: [
+		'Very warm kitchen or dough conditions (around 29°C / 84°F and above); keep it short or leave it off.',
+		'If your dough already gets slack or sticky quickly; long autolyse can reduce strength.',
+		'When you need a fast mix-and-go workflow and prefer speed over marginal handling gains.'
+	],
 	fermentationPhilosophyLabel: 'Fermentation Philosophy',
 	philosophyPredictability: 'Predictability',
 	philosophyFlavorDev: 'Flavor Development',
@@ -448,6 +463,21 @@ const es: Translations = {
 	off: 'Apagada',
 	auto: 'Auto',
 	duration: 'Duración',
+	autolyseModalTitle: 'Guía de Autólisis',
+	autolyseModalIntro:
+		'La autólisis es un reposo corto tras mezclar harina y agua, antes de añadir iniciador y sal. Mejora la hidratación y comienza el desarrollo de gluten con menos amasado.',
+	autolyseModalUseTitle: 'Cuándo usarla',
+	autolyseModalUseItems: [
+		'Masas de alta hidratación cuando buscas más extensibilidad y formado más fácil.',
+		'Masas con harina integral o harinas muy absorbentes que se benefician de una hidratación completa.',
+		'Cuando la masa se siente tensa al mezclar y quieres desarrollar gluten de forma más suave.'
+	],
+	autolyseModalAvoidTitle: 'Cuándo evitarla o acortarla',
+	autolyseModalAvoidItems: [
+		'Cocina o masa muy cálida (aprox. 29°C / 84°F o más); acórtala o déjala apagada.',
+		'Si la masa ya se vuelve floja o pegajosa con rapidez; una autólisis larga puede debilitar estructura.',
+		'Cuando necesitas un flujo rápido de mezclar y seguir, y priorizas velocidad.'
+	],
 	fermentationPhilosophyLabel: 'Filosofía de Fermentación',
 	philosophyPredictability: 'Consistencia',
 	philosophyFlavorDev: 'Sabor',
@@ -609,6 +639,21 @@ const sv: Translations = {
 	off: 'Av',
 	auto: 'Auto',
 	duration: 'Varaktighet',
+	autolyseModalTitle: 'Autolysguide',
+	autolyseModalIntro:
+		'Autolys är en kort vila efter att mjöl och vatten blandats, innan surdeg och salt tillsätts. Den förbättrar hydreringen och startar glutenutvecklingen med mindre bearbetning.',
+	autolyseModalUseTitle: 'När du bör använda den',
+	autolyseModalUseItems: [
+		'Degar med hög hydrering där du vill ha bättre tänjbarhet och enklare formning.',
+		'Degar med fullkorn eller törstiga mjölsorter som mår bra av mer fullständig hydrering.',
+		'När degen känns stram tidigt i blandningen och du vill ha skonsammare glutenutveckling.'
+	],
+	autolyseModalAvoidTitle: 'När du bör hoppa över eller korta ner',
+	autolyseModalAvoidItems: [
+		'Mycket varm köks- eller degtemperatur (runt 29°C / 84°F eller högre); håll den kort eller stäng av.',
+		'Om degen redan blir slapp eller kladdig snabbt; lång autolys kan minska styrkan.',
+		'När du behöver ett snabbt arbetsflöde och prioriterar tempo över små hanteringsvinster.'
+	],
 	fermentationPhilosophyLabel: 'Jäsningsfilosofi',
 	philosophyPredictability: 'Förutsägbarhet',
 	philosophyFlavorDev: 'Smakutveckling',

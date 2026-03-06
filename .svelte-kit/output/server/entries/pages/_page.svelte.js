@@ -216,6 +216,20 @@ const en = {
   off: "Off",
   auto: "Auto",
   duration: "Duration",
+  autolyseModalTitle: "Autolyse Guide",
+  autolyseModalIntro: "Autolyse is a short rest after mixing flour and water, before adding starter and salt. It improves hydration and starts gluten development with less mixing.",
+  autolyseModalUseTitle: "When to use it",
+  autolyseModalUseItems: [
+    "High-hydration doughs where you want better extensibility and easier shaping.",
+    "Doughs with whole wheat or thirsty flours that benefit from fuller hydration.",
+    "When the dough feels tight during mixing and you want gentler gluten development."
+  ],
+  autolyseModalAvoidTitle: "When to skip or shorten",
+  autolyseModalAvoidItems: [
+    "Very warm kitchen or dough conditions (around 29°C / 84°F and above); keep it short or leave it off.",
+    "If your dough already gets slack or sticky quickly; long autolyse can reduce strength.",
+    "When you need a fast mix-and-go workflow and prefer speed over marginal handling gains."
+  ],
   fermentationPhilosophyLabel: "Fermentation Philosophy",
   philosophyPredictability: "Predictability",
   philosophyFlavorDev: "Flavor Development",
@@ -370,6 +384,20 @@ const es = {
   off: "Apagada",
   auto: "Auto",
   duration: "Duración",
+  autolyseModalTitle: "Guía de Autólisis",
+  autolyseModalIntro: "La autólisis es un reposo corto tras mezclar harina y agua, antes de añadir iniciador y sal. Mejora la hidratación y comienza el desarrollo de gluten con menos amasado.",
+  autolyseModalUseTitle: "Cuándo usarla",
+  autolyseModalUseItems: [
+    "Masas de alta hidratación cuando buscas más extensibilidad y formado más fácil.",
+    "Masas con harina integral o harinas muy absorbentes que se benefician de una hidratación completa.",
+    "Cuando la masa se siente tensa al mezclar y quieres desarrollar gluten de forma más suave."
+  ],
+  autolyseModalAvoidTitle: "Cuándo evitarla o acortarla",
+  autolyseModalAvoidItems: [
+    "Cocina o masa muy cálida (aprox. 29°C / 84°F o más); acórtala o déjala apagada.",
+    "Si la masa ya se vuelve floja o pegajosa con rapidez; una autólisis larga puede debilitar estructura.",
+    "Cuando necesitas un flujo rápido de mezclar y seguir, y priorizas velocidad."
+  ],
   fermentationPhilosophyLabel: "Filosofía de Fermentación",
   philosophyPredictability: "Consistencia",
   philosophyFlavorDev: "Sabor",
@@ -520,6 +548,20 @@ const sv = {
   off: "Av",
   auto: "Auto",
   duration: "Varaktighet",
+  autolyseModalTitle: "Autolysguide",
+  autolyseModalIntro: "Autolys är en kort vila efter att mjöl och vatten blandats, innan surdeg och salt tillsätts. Den förbättrar hydreringen och startar glutenutvecklingen med mindre bearbetning.",
+  autolyseModalUseTitle: "När du bör använda den",
+  autolyseModalUseItems: [
+    "Degar med hög hydrering där du vill ha bättre tänjbarhet och enklare formning.",
+    "Degar med fullkorn eller törstiga mjölsorter som mår bra av mer fullständig hydrering.",
+    "När degen känns stram tidigt i blandningen och du vill ha skonsammare glutenutveckling."
+  ],
+  autolyseModalAvoidTitle: "När du bör hoppa över eller korta ner",
+  autolyseModalAvoidItems: [
+    "Mycket varm köks- eller degtemperatur (runt 29°C / 84°F eller högre); håll den kort eller stäng av.",
+    "Om degen redan blir slapp eller kladdig snabbt; lång autolys kan minska styrkan.",
+    "När du behöver ett snabbt arbetsflöde och prioriterar tempo över små hanteringsvinster."
+  ],
   fermentationPhilosophyLabel: "Jäsningsfilosofi",
   philosophyPredictability: "Förutsägbarhet",
   philosophyFlavorDev: "Smakutveckling",
@@ -1135,7 +1177,7 @@ function InputSection($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <div class="flex items-center gap-2"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/40" : "text-xs text-base-content/70 font-semibold"))}>${escape_html(t().off)}</span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn, true)} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse auto mode"/> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/70 font-semibold" : "text-xs text-base-content/40"))}>${escape_html(t().auto)}</span></div></div> `);
+    $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-1.5"><div class="flex items-center gap-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0" aria-label="Learn about autolyse"><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="flex items-center gap-2"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/40" : "text-xs text-base-content/70 font-semibold"))}>${escape_html(t().off)}</span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn, true)} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse auto mode"/> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/70 font-semibold" : "text-xs text-base-content/40"))}>${escape_html(t().auto)}</span></div></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div><div class="flex justify-between text-xs text-base-content/70 mb-1"><span>${escape_html(t().duration)}</span> <span class="font-semibold text-base-content">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} min</span></div> <progress class="progress progress-secondary progress-sm w-full"${attr("value", autolyseProgressValue())}${attr("max", autolyseProgressMax)} aria-label="Autolyse duration progress"></progress> <div class="flex justify-between text-xs text-base-content/50 mt-0.5"><span>20 min</span> <span>60 min</span></div></div>`);
@@ -1143,6 +1185,10 @@ function InputSection($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></div></div></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }

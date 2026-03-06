@@ -7,6 +7,7 @@
 	const t = $derived(translations[$lang]);
 
 	let philosophyModalOpen = $state(false);
+	let autolyseModalOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
 
@@ -431,7 +432,19 @@
 			<!-- Autolyse toggle + progress -->
 			<div>
 				<div class="flex items-center justify-between mb-1.5">
-					<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.autolyse}</span>
+					<div class="flex items-center gap-1.5">
+						<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.autolyse}</span>
+						<button
+							type="button"
+							onclick={() => (autolyseModalOpen = true)}
+							class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+							aria-label="Learn about autolyse"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+								<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+							</svg>
+						</button>
+					</div>
 					<div class="flex items-center gap-2">
 						<span class={$inputs.autolyseOn ? 'text-xs text-base-content/40' : 'text-xs text-base-content/70 font-semibold'}>
 							{t.off}
@@ -530,7 +543,72 @@
 			</div>
 		</div>
 	</div>
-{/if}
+	{/if}
+
+	<!-- Autolyse info modal -->
+	{#if autolyseModalOpen}
+		<div class="modal modal-open">
+			<button
+				type="button"
+				class="modal-backdrop"
+				onclick={() => (autolyseModalOpen = false)}
+				aria-label="Close autolyse info modal"
+			></button>
+
+			<div
+				class="modal-box w-full max-w-md p-0 overflow-hidden"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="autolyse-modal-title"
+			>
+				<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+					<h2 id="autolyse-modal-title" class="text-base font-semibold text-base-content">{t.autolyseModalTitle}</h2>
+					<button
+						type="button"
+						onclick={() => (autolyseModalOpen = false)}
+						class="btn btn-ghost btn-sm btn-circle"
+						aria-label="Close"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+
+				<div class="px-5 py-4 space-y-4">
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.autolyseModalIntro}</p>
+
+					<div>
+						<p class="text-xs font-semibold text-success uppercase tracking-wide mb-1">{t.autolyseModalUseTitle}</p>
+						<ul class="list-disc pl-5 space-y-1 text-sm text-base-content/70 leading-relaxed">
+							{#each t.autolyseModalUseItems as item}
+								<li>{item}</li>
+							{/each}
+						</ul>
+					</div>
+
+					<div class="border-t border-base-200 pt-4">
+						<p class="text-xs font-semibold text-warning uppercase tracking-wide mb-1">{t.autolyseModalAvoidTitle}</p>
+						<ul class="list-disc pl-5 space-y-1 text-sm text-base-content/70 leading-relaxed">
+							{#each t.autolyseModalAvoidItems as item}
+								<li>{item}</li>
+							{/each}
+						</ul>
+					</div>
+				</div>
+
+				<div class="px-5 pb-5">
+					<button
+						type="button"
+						onclick={() => (autolyseModalOpen = false)}
+						class="btn btn-primary w-full"
+					>
+						{t.done}
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 
 <style lang="scss">
 	// No extra styles needed — daisyUI handles range and toggle styling

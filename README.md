@@ -1,236 +1,266 @@
-# Sourdough Parameters Calculator
+# DoughCulator
 
-A fully static SvelteKit web app that calculates formula, timing, and bake schedule for sourdough bread based on your flour amounts, crumb goal, and environment.
+Sourdough formula, timing, and schedule calculator built with SvelteKit, Tailwind CSS v4, daisyUI, and SCSS.
+
+The app is static-build friendly and tuned for practical home baking inputs: flour blend, temperature, crumb goal, proof method, and schedule mode.
+
+## What Changed Recently
+
+- Added artisan-bakery warm light/dark styling on top of daisyUI (`bumblebee` + `dark`) with a cleaner header toggle.
+- `Autolyse` is now `Off/Auto` and **temperature-driven** when enabled.
+- Autolyse duration is display-only (progress bar), not manually draggable.
+- `Starter Hydration (%)` now matches Salt behavior: default auto value (`100%`) with optional manual override.
+- Schedule step helper text updated to: `Press to mark completed step`.
 
 ## Quick Start
 
 ```bash
-# Install dependencies
-bun install
-
-# Run dev server
-bun dev
-
-# Build for production (static output)
-bun build
-
-# Preview the production build
-bun preview
+npm install
+npm run dev
 ```
 
-The production output is written to `build/` and is fully static — deploy anywhere (Netlify, Vercel, GitHub Pages, Cloudflare Pages).
+Checks and production build:
 
----
+```bash
+npm run check
+npm run build
+npm run preview
+```
+
+If you prefer Bun:
+
+```bash
+bun install
+bun run dev
+bun run check
+bun run build
+bun run preview
+```
+
+Production output is written to `build/`.
 
 ## Tech Stack
 
 | Tool | Purpose |
-|------|---------|
-| Bun | Package manager + scripts |
-| Vite | Build tool |
-| SvelteKit + adapter-static | UI framework, static output |
-| Tailwind CSS v4 + SCSS | Styling |
+| --- | --- |
+| SvelteKit + `@sveltejs/adapter-static` | App framework + static output |
+| Vite | Build/dev server |
+| Tailwind CSS v4 + daisyUI | Design system + component classes |
+| SCSS | Small custom style layers |
 | TypeScript | Type safety |
 
----
+## Feature Summary
 
-## Calculation Model
+- Formula engine (hydration, inoculation, salt, starter accounting)
+- Timing engine (bulk, room proof, cold retard, folds)
+- Auto-generated schedule in `relative` or `clock` mode
+- Warnings + assumptions drawer
+- Localized UI (`en`, `es`, `sv`)
+- Local persistence for user inputs
 
-### 1. Hydration
+## Calculation Model (Current)
 
-**Base hydration by crumb goal:**
+### 1) Hydration
+
+Base hydration by crumb goal:
 
 | Goal | Base Hydration |
-|------|---------------|
+| --- | --- |
 | Tight | 65% |
 | Balanced | 73% |
 | Open | 82% |
 
-**Whole-wheat (WW) adjustment:**
-```
-wwHydrationAdjust = clamp(0, 5, wwRatio * 100 * 0.12)
-```
-Example: 30% WW -> +3.6%, 42% WW -> +5% (clamped at 5%).
+Whole wheat hydration adjustment:
 
-**Final hydration:**
-```
+```txt
+wwHydrationAdjust = clamp(0, 5, wwRatio * 100 * 0.12)
 finalHydrationPct = baseHydrationPct + wwHydrationAdjust
 ```
 
-**Hydration band classification:**
-- `Low`: finalHydrationPct < 70%
-- `Medium`: 70% <= finalHydrationPct <= 75%
-- `High`: finalHydrationPct > 75%
+Hydration band:
 
----
+- `Low`: `< 70%`
+- `Medium`: `70% - 75%`
+- `High`: `> 75%`
 
-### 2. Temperature Bands
+### 2) Effective Temperature
 
-Effective temperature is computed as:
-```
-effectiveTempC = (ambientTempC + doughTempC) / 2   // if doughTempC provided
-effectiveTempC = ambientTempC                        // otherwise
+```txt
+effectiveTempC = (ambientTempC + doughTempC) / 2   // if dough temp provided
+effectiveTempC = ambientTempC                       // otherwise
 ```
 
-| Band | Range | Effect |
-|------|-------|--------|
-| Cold | < 18 C | Very slow / near dormant |
-| Freezing | 18-21 C | Extremely slow fermentation |
-| Standard | 21-24 C | Slow and sour, great flavor |
-| Warm | 24-27 C | Active, sweet spot |
-| Hot | > 27 C | Fast, risk of overproofing |
+Temperature bands:
 
----
+| Band | Range |
+| --- | --- |
+| Freezing | `< 18C` |
+| Cold | `18C - <21C` |
+| Standard | `21C - <24C` |
+| Warm | `24C - <27C` |
+| Hot | `>= 27C` |
 
-### 3. Inoculation (Starter %)
+### 3) Inoculation (Starter %)
 
-**Base inoculation by crumb goal:**
+The app supports two fermentation philosophies.
+
+Predictability base inoculation:
 
 | Goal | Base % |
-|------|--------|
+| --- | --- |
 | Tight | 18% |
 | Balanced | 20% |
 | Open | 16% |
 
-**Temperature adjustment:**
+Flavor Development base inoculation:
 
-| Effective Temp | Adjustment |
-|----------------|-----------|
-| < 21 C | +4% |
-| 21-24 C | +/-0% |
-| 24-27 C | -2% |
-| 27-29 C | -4% |
-| > 29 C | -6% |
+| Goal | Base % |
+| --- | --- |
+| Tight | 12% |
+| Balanced | 14% |
+| Open | 10% |
 
-**Hydration band adjustment:**
+Temperature adjustments:
 
-| Band | Adjustment |
-|------|-----------|
-| Low | +2% |
-| Medium | +/-0% |
-| High | -2% |
+- Predictability: `<21 +4`, `21-24 +0`, `24-27 -2`, `27-29 -4`, `>29 -6`
+- Flavor Development: `<21 -4`, `21-24 +0`, `24-27 -3`, `27-29 -5`, `>29 -6`
 
-**WW ratio adjustment:**
-- wwRatio >= 0.30 -> -1%
+Shared adjustments:
 
-**Clamping:**
+- Hydration band: `Low +2`, `High -2`
+- Whole wheat ratio: if `wwRatio >= 0.30`, then `-1`
+
+Clamps:
+
+- Predictability: `clamp(10, 26, inoculationPct)`
+- Flavor Development: `clamp(5, 12.5, inoculationPct)`
+
+### 4) Salt and Starter Hydration Controls
+
+Salt:
+
+```txt
+autoSaltPct = clamp(1.8, 2.2, 1.9 + wwRatio * 0.3)
+effectiveSaltPct = saltAutoCalc ? autoSaltPct : saltPct
 ```
-inoculationPct = clamp(10, 26, rawInoculationPct)
-```
 
-**Starter breakdown:**
-```
+Starter hydration:
+
+- Default (auto): `100%`
+- Manual override available when toggle is enabled
+- Effective starter hydration is clamped to `50-200%`
+
+### 5) Starter Accounting
+
+Starter is included in formula totals, not added on top.
+
+```txt
 starterFlourG = totalFlourG * (inoculationPct / 100)
 starterTotalG = starterFlourG * (1 + starterHydrationPct / 100)
 starterWaterG = starterTotalG - starterFlourG
-```
 
-The starter flour and starter water are **included in** the total formula flour and water. The "Mix additions" shown to the user are what they physically add from the bag/tap (excluding what's already in the starter).
-
-```
 mixFlourG = totalFlourG - starterFlourG
 mixWaterG = totalWaterG - starterWaterG
 ```
 
----
+### 6) Timing Model
 
-### 4. Timing Model
+Bulk baseline (hours):
 
-**Bulk fermentation baseline (hours) by effective temp:**
+| Effective Temp | Min | Max |
+| --- | --- | --- |
+| `<21C` | 8 | 12 |
+| `21-24C` | 5 | 8 |
+| `24-27C` | 3.5 | 6 |
+| `27-29C` | 3 | 5 |
+| `>29C` | 2 | 4 |
 
-| Temp | Min | Max |
-|------|-----|-----|
-| < 21 C | 8h | 12h |
-| 21-24 C | 5h | 8h |
-| 24-27 C | 3.5h | 6h |
-| 27-29 C | 3h | 5h |
-| > 29 C | 2h | 4h |
+Multipliers:
 
-**Multipliers applied to both min and max:**
-
-1. Hydration multiplier:
-   - Low -> x1.15
-   - Medium -> x1.0
-   - High -> x0.85
-
-2. Inoculation scaling:
-   ```
-   inocScale = (20 / inoculationPct) ^ 0.35
-   ```
-
-3. WW ratio (if wwRatio >= 0.30) -> x0.95
-
-**Final bulk range:**
+```txt
+hydrationMult = Low:1.15, Medium:1.0, High:0.85
+inocScale = (20 / inoculationPct) ^ 0.35
+wwMult = wwRatio >= 0.30 ? 0.95 : 1.0
 ```
+
+```txt
 bulkMin = bulkBaseMin * hydrationMult * inocScale * wwMult
 bulkMax = bulkBaseMax * hydrationMult * inocScale * wwMult
 ```
 
-**Room proof:** baseline [1.5h, 3h] at 24-26 C, then apply a temp multiplier relative to that baseline, plus hydration and inoculation multipliers.
+Room proof baseline is `[1.5h, 3h]` (24-26C reference), then scaled by temperature + hydration + inoculation multipliers.
 
-**Cold retard:** always [8h, 16h] -- simple guidance range regardless of other factors.
+Cold retard is fixed guidance: `[8h, 16h]`.
 
-**Stretch-and-fold folds:**
-```
+Folds:
+
+```txt
 foldCount = min(4, floor(bulkMin * 60 / 30))
 foldIntervalMins = 30
 ```
 
----
+### 7) Autolyse (Off/Auto)
 
-### 5. Starter Accounting in the Total Formula
+When `Autolyse` is toggled to `Auto`, minutes are derived from effective temperature.
 
-The starter is **not additive on top of the flour/water**. Instead:
+| Effective Temp | Autolyse |
+| --- | --- |
+| `>=29C` | 20 min |
+| `>=27C` | 25 min |
+| `>=24C` | 30 min |
+| `>=21C` | 35 min |
+| `>=18C` | 40 min |
+| `<18C` | 45 min |
 
-- `totalFlourG` = whiteFlouG + wwFlourG (the flour weight you target)
-- The starter provides `starterFlourG` grams of that flour and `starterWaterG` of that water
-- You add the remainder (`mixFlourG`, `mixWaterG`) from the bag and tap
+In UI, this is shown as a non-editable progress bar.
 
-This keeps baker's percentages consistent: everything divides by `totalFlourG`.
+### 8) Schedule Order
 
----
-
-### 6. Schedule
-
-Steps are generated in this order:
 1. Autolyse (if enabled)
 2. Add starter + salt
 3. Bulk fermentation (range)
-4. Stretch and fold sets (1-4, every 30 min)
+4. Stretch and fold sets
 5. Rest (remaining bulk)
 6. Pre-shape
-7. Bench rest (30 min)
+7. Bench rest
 8. Final shape
 9. Proof (room or cold retard)
-10. Preheat oven (45 min)
-11. Score + Bake (45 min total: 20 min covered + 25 min uncovered)
+10. Preheat oven
+11. Score + bake
 
-In **clock mode**, each step shows an absolute start time calculated from your chosen start time. In **relative mode**, each step shows a duration or range.
+## Theme and UI Notes
 
----
+- Theme is toggled with `data-theme` and persisted in `localStorage` (`theme`).
+- Default is `bumblebee` (light), dark mode is `dark`.
+- Color tokens are customized in [`src/app.css`](src/app.css) using daisyUI CSS variables.
+
+## Persistence and Localization
+
+- Inputs are persisted in `localStorage` under `sourdough_cal_inputs`.
+- Language is persisted under `sourdough_cal_lang`.
+- `tempUnit` is intentionally not persisted and resets to default on reload.
 
 ## Project Structure
 
-```
+```txt
 src/
   lib/
-    calculator.ts        -- core calculation logic, types, utilities
-    store.ts             -- Svelte stores, localStorage persistence
+    calculator.ts
+    store.ts
+    i18n.ts
     components/
-      InputSection.svelte   -- flour inputs, crumb goal, advanced options
-      FormulaCard.svelte    -- baker's percentage table
-      TimingCard.svelte     -- bulk/proof timing with visual bar
-      ScheduleCard.svelte   -- step-by-step schedule
-      WarningsCard.svelte   -- alerts (info/warn/danger)
-      GuidanceCard.svelte   -- reading your crumb
-      AssumptionsDrawer.svelte -- slide-up drawer with assumptions
+      InputSection.svelte
+      FormulaCard.svelte
+      TimingCard.svelte
+      ScheduleCard.svelte
+      WarningsCard.svelte
+      GuidanceCard.svelte
+      AssumptionsDrawer.svelte
   routes/
-    +layout.svelte       -- imports app.css
-    +page.svelte         -- main page wiring all components
-  app.css                -- Tailwind v4 import
+    +layout.svelte
+    +page.svelte
+  app.css
 ```
-
----
 
 ## License
 
