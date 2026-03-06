@@ -36,6 +36,6 @@ declare module "$app/types" {
 		};
 		Pathname(): "/";
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
-		Asset(): "/favicon.svg" | "/robots.txt" | string & {};
+		Asset(): "/favicon.svg" | "/icon-192.png" | "/icon-512.png" | "/manifest.webmanifest" | "/robots.txt" | string & {};
 	}
 }

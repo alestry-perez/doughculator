@@ -239,6 +239,15 @@ export const assumptionStrings = {
 const en = {
 	// App / header
 	appSubtitle: 'Formula, timing & schedule',
+	saveToHomeScreen: 'Save to Home Screen',
+	savedToHomeScreen: 'Saved to Home Screen',
+	installHelpTitle: 'Add DoughCulator to your home screen',
+	installHelpIntro: 'If no install prompt appears, use your browser menu:',
+	installHelpIOS: 'iPhone/iPad (Safari): Tap Share, then "Add to Home Screen".',
+	installHelpAndroid:
+		'Android (Chrome): Open the menu, then tap "Install app" or "Add to Home screen".',
+	installHelpDesktop: 'Desktop (Chrome/Edge): Use the install icon in the address bar or browser menu.',
+	close: 'Close',
 	assumptions: 'Assumptions',
 	copyRecipe: 'Copy Recipe',
 	copied: 'Copied!',
@@ -411,6 +420,17 @@ export type Translations = typeof en;
 const es: Translations = {
 	// App / header
 	appSubtitle: 'Fórmula, tiempos y programa',
+	saveToHomeScreen: 'Guardar en inicio',
+	savedToHomeScreen: 'Guardado en inicio',
+	installHelpTitle: 'Añadir DoughCulator a la pantalla de inicio',
+	installHelpIntro: 'Si no aparece el aviso de instalación, usa el menú del navegador:',
+	installHelpIOS:
+		'iPhone/iPad (Safari): toca Compartir y luego "Añadir a pantalla de inicio".',
+	installHelpAndroid:
+		'Android (Chrome): abre el menú y toca "Instalar app" o "Añadir a pantalla de inicio".',
+	installHelpDesktop:
+		'Escritorio (Chrome/Edge): usa el icono de instalación en la barra de direcciones o el menú del navegador.',
+	close: 'Cerrar',
 	assumptions: 'Supuestos',
 	copyRecipe: 'Copiar Receta',
 	copied: '¡Copiado!',
@@ -591,6 +611,16 @@ const es: Translations = {
 const sv: Translations = {
 	// App / header
 	appSubtitle: 'Formel, timing & schema',
+	saveToHomeScreen: 'Spara på hemskärmen',
+	savedToHomeScreen: 'Sparad på hemskärmen',
+	installHelpTitle: 'Lägg till DoughCulator på hemskärmen',
+	installHelpIntro: 'Om ingen installationsruta visas, använd webbläsarens meny:',
+	installHelpIOS: 'iPhone/iPad (Safari): tryck på Dela och sedan "Lägg till på hemskärmen".',
+	installHelpAndroid:
+		'Android (Chrome): öppna menyn och tryck på "Installera app" eller "Lägg till på hemskärmen".',
+	installHelpDesktop:
+		'Desktop (Chrome/Edge): använd installationsikonen i adressfältet eller webbläsarmenyn.',
+	close: 'Stäng',
 	assumptions: 'Antaganden',
 	copyRecipe: 'Kopiera Recept',
 	copied: 'Kopierat!',
