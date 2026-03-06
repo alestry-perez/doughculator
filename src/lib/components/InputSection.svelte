@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Inputs, CrumbGoal } from '$lib/calculator';
+	import type { Inputs, CrumbGoal, FermentationPhilosophy } from '$lib/calculator';
 	import { cToF, fToC } from '$lib/calculator';
 	import { inputs, result, lang } from '$lib/store';
 	import { translations } from '$lib/i18n';
@@ -169,8 +169,112 @@
 			<p class="text-xs text-stone-500 mt-2 leading-snug">{t.crumbDescriptions[$inputs.crumbGoal]}</p>
 		</div>
 
-		<!-- Advanced collapsible -->
-		<div class="border-t border-stone-100 pt-4">
+			<!-- Fermentation philosophy -->
+			<div>
+				<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.fermentationPhilosophyLabel}</p>
+				<div class="grid grid-cols-2 gap-2">
+				{#each (['Predictability', 'FlavorDevelopment'] as const) as philosophy}
+					<button
+						type="button"
+						onclick={() => updateField('fermentationPhilosophy', philosophy)}
+						class="rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all"
+						class:border-amber-400={$inputs.fermentationPhilosophy === philosophy}
+						class:bg-amber-50={$inputs.fermentationPhilosophy === philosophy}
+						class:text-amber-800={$inputs.fermentationPhilosophy === philosophy}
+						class:border-stone-200={$inputs.fermentationPhilosophy !== philosophy}
+						class:text-stone-600={$inputs.fermentationPhilosophy !== philosophy}
+						class:hover:bg-stone-50={$inputs.fermentationPhilosophy !== philosophy}
+					>
+						{philosophy === 'Predictability' ? t.philosophyPredictability : t.philosophyFlavorDev}
+					</button>
+				{/each}
+			</div>
+				<p class="text-xs text-stone-500 mt-2 leading-snug">
+					{$inputs.fermentationPhilosophy === 'Predictability' ? t.philosophyPredictabilityDesc : t.philosophyFlavorDevDesc}
+				</p>
+			</div>
+
+			<!-- Proof method -->
+			<div>
+				<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.proofMethod}</p>
+				<div class="grid grid-cols-2 gap-2">
+					{#each (['Room', 'ColdRetard'] as const) as method}
+						<button
+							type="button"
+							onclick={() => updateField('proofMethod', method)}
+							class="rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all"
+							class:border-amber-400={$inputs.proofMethod === method}
+							class:bg-amber-50={$inputs.proofMethod === method}
+							class:text-amber-800={$inputs.proofMethod === method}
+							class:border-stone-200={$inputs.proofMethod !== method}
+							class:text-stone-600={$inputs.proofMethod !== method}
+							class:hover:bg-stone-50={$inputs.proofMethod !== method}
+						>
+							{method === 'Room' ? t.roomTemp : t.coldRetard}
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Fridge temp (only for cold retard) -->
+			{#if $inputs.proofMethod === 'ColdRetard'}
+				<div>
+					<label for="fridge-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
+						{t.fridgeTemp} (°{$inputs.tempUnit})
+					</label>
+					<input
+						id="fridge-temp"
+						type="number"
+						min={fridgeTempMin}
+						max={fridgeTempMax}
+						step="0.5"
+						value={fridgeDisplay}
+						oninput={onFridgeTempInput}
+						class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+					/>
+				</div>
+			{/if}
+
+			<!-- Schedule mode -->
+			<div>
+				<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.scheduleMode}</p>
+				<div class="grid grid-cols-2 gap-2">
+					{#each (['relative', 'clock'] as const) as mode}
+						<button
+							type="button"
+							onclick={() => updateField('scheduleMode', mode)}
+							class="rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all"
+							class:border-amber-400={$inputs.scheduleMode === mode}
+							class:bg-amber-50={$inputs.scheduleMode === mode}
+							class:text-amber-800={$inputs.scheduleMode === mode}
+							class:border-stone-200={$inputs.scheduleMode !== mode}
+							class:text-stone-600={$inputs.scheduleMode !== mode}
+							class:hover:bg-stone-50={$inputs.scheduleMode !== mode}
+						>
+							{mode === 'relative' ? t.relative : t.clock}
+						</button>
+					{/each}
+				</div>
+			</div>
+
+			<!-- Start time (clock mode) -->
+			{#if $inputs.scheduleMode === 'clock'}
+				<div>
+					<label for="start-time" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
+						{t.startTime}
+					</label>
+					<input
+						id="start-time"
+						type="time"
+						value={$inputs.startTime ?? '08:00'}
+						oninput={(e) => updateField('startTime', (e.target as HTMLInputElement).value || null)}
+						class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+					/>
+				</div>
+			{/if}
+
+			<!-- Advanced collapsible -->
+			<div class="border-t border-stone-100 pt-4">
 			<button
 				type="button"
 				onclick={() => (advancedOpen = !advancedOpen)}
@@ -334,87 +438,9 @@
 						{/if}
 					</div>
 
-					<!-- Proof method -->
-					<div>
-						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.proofMethod}</p>
-						<div class="grid grid-cols-2 gap-2">
-							{#each (['Room', 'ColdRetard'] as const) as method}
-								<button
-									type="button"
-									onclick={() => updateField('proofMethod', method)}
-									class="rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all"
-									class:border-amber-400={$inputs.proofMethod === method}
-									class:bg-amber-50={$inputs.proofMethod === method}
-									class:text-amber-800={$inputs.proofMethod === method}
-									class:border-stone-200={$inputs.proofMethod !== method}
-									class:text-stone-600={$inputs.proofMethod !== method}
-									class:hover:bg-stone-50={$inputs.proofMethod !== method}
-								>
-									{method === 'Room' ? t.roomTemp : t.coldRetard}
-								</button>
-							{/each}
-						</div>
 					</div>
-
-					<!-- Fridge temp (only for cold retard) -->
-					{#if $inputs.proofMethod === 'ColdRetard'}
-						<div>
-							<label for="fridge-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-								{t.fridgeTemp} (°{$inputs.tempUnit})
-							</label>
-							<input
-								id="fridge-temp"
-								type="number"
-								min={fridgeTempMin}
-								max={fridgeTempMax}
-								step="0.5"
-								value={fridgeDisplay}
-								oninput={onFridgeTempInput}
-								class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-							/>
-						</div>
-					{/if}
-
-					<!-- Schedule mode -->
-					<div>
-						<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.scheduleMode}</p>
-						<div class="grid grid-cols-2 gap-2">
-							{#each (['relative', 'clock'] as const) as mode}
-								<button
-									type="button"
-									onclick={() => updateField('scheduleMode', mode)}
-									class="rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all"
-									class:border-amber-400={$inputs.scheduleMode === mode}
-									class:bg-amber-50={$inputs.scheduleMode === mode}
-									class:text-amber-800={$inputs.scheduleMode === mode}
-									class:border-stone-200={$inputs.scheduleMode !== mode}
-									class:text-stone-600={$inputs.scheduleMode !== mode}
-									class:hover:bg-stone-50={$inputs.scheduleMode !== mode}
-								>
-									{mode === 'relative' ? t.relative : t.clock}
-								</button>
-							{/each}
-						</div>
-					</div>
-
-					<!-- Start time (clock mode) -->
-					{#if $inputs.scheduleMode === 'clock'}
-						<div>
-							<label for="start-time" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">
-								{t.startTime}
-							</label>
-							<input
-								id="start-time"
-								type="time"
-								value={$inputs.startTime ?? '08:00'}
-								oninput={(e) => updateField('startTime', (e.target as HTMLInputElement).value || null)}
-								class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
-							/>
-						</div>
-					{/if}
-				</div>
-			{/if}
-		</div>
+				{/if}
+			</div>
 	</div>
 </div>
 

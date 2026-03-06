@@ -67,7 +67,7 @@
 			<tr>
 				<td class="px-5 py-2.5 text-stone-700 font-medium">{t.starter}</td>
 				<td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">{round(formula.starterTotalG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-stone-500">{pct(formula.starterTotalG, formula.totalFlourG)}</td>
+				<td class="px-5 py-2.5 text-right tabular-nums text-stone-500">{pct(formula.starterFlourG, formula.totalFlourG)}</td>
 			</tr>
 		</tbody>
 		<tfoot>

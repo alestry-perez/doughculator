@@ -205,6 +205,11 @@ const en = {
   starterHydration: "Starter Hydration (%)",
   autolyse: "Autolyse",
   duration: "Duration",
+  fermentationPhilosophyLabel: "Fermentation Philosophy",
+  philosophyPredictability: "Predictability",
+  philosophyFlavorDev: "Flavor Development",
+  philosophyPredictabilityDesc: "More starter when cold — consistent timing.",
+  philosophyFlavorDevDesc: "Less starter when cold — slower fermentation builds complexity.",
   proofMethod: "Proof Method",
   roomTemp: "Room Temp",
   coldRetard: "Cold Retard",
@@ -346,6 +351,11 @@ const es = {
   starterHydration: "Hidratación del Iniciador (%)",
   autolyse: "Autólisis",
   duration: "Duración",
+  fermentationPhilosophyLabel: "Filosofía de Fermentación",
+  philosophyPredictability: "Consistencia",
+  philosophyFlavorDev: "Sabor",
+  philosophyPredictabilityDesc: "Más levadura en frío — tiempos consistentes.",
+  philosophyFlavorDevDesc: "Menos levadura en frío — fermentación más lenta para mayor sabor.",
   proofMethod: "Método de Fermentación Final",
   roomTemp: "Temp. Ambiente",
   coldRetard: "Frío (Nevera)",
@@ -483,6 +493,11 @@ const sv = {
   starterHydration: "Surdeghydratation (%)",
   autolyse: "Autolys",
   duration: "Varaktighet",
+  fermentationPhilosophyLabel: "Jäsningsfilosofi",
+  philosophyPredictability: "Förutsägbarhet",
+  philosophyFlavorDev: "Smakutveckling",
+  philosophyPredictabilityDesc: "Mer surdeg vid kyla — konsekvent timing.",
+  philosophyFlavorDevDesc: "Mindre surdeg vid kyla — långsammare jäsning ger mer smak.",
   proofMethod: "Jäsningsmetod",
   roomTemp: "Rumstemperatur",
   coldRetard: "Kall Jäsning",
@@ -612,9 +627,9 @@ function calcFormula(inputs2) {
   const effectiveTempC = doughTempC !== null ? (ambientTempC + doughTempC) / 2 : ambientTempC;
   let tempBand;
   if (effectiveTempC < 18) {
-    tempBand = "Cold";
-  } else if (effectiveTempC < 21) {
     tempBand = "Freezing";
+  } else if (effectiveTempC < 21) {
+    tempBand = "Cold";
   } else if (effectiveTempC < 24) {
     tempBand = "Standard";
   } else if (effectiveTempC < 27) {
@@ -622,38 +637,70 @@ function calcFormula(inputs2) {
   } else {
     tempBand = "Hot";
   }
-  const inocBase = {
-    Tight: 18,
-    Balanced: 20,
-    Open: 16
-  };
-  let inoculationPct = inocBase[crumbGoal];
-  if (effectiveTempC < 21) {
-    inoculationPct += 4;
-  } else if (effectiveTempC < 24) {
-    inoculationPct += 0;
-  } else if (effectiveTempC < 27) {
-    inoculationPct -= 2;
-  } else if (effectiveTempC < 29) {
-    inoculationPct -= 4;
+  const { fermentationPhilosophy } = inputs2;
+  let inoculationPct;
+  if (fermentationPhilosophy === "FlavorDevelopment") {
+    const inocBase = {
+      Tight: 12,
+      Balanced: 14,
+      Open: 10
+    };
+    inoculationPct = inocBase[crumbGoal];
+    if (effectiveTempC < 21) {
+      inoculationPct -= 4;
+    } else if (effectiveTempC < 24) {
+      inoculationPct += 0;
+    } else if (effectiveTempC < 27) {
+      inoculationPct -= 3;
+    } else if (effectiveTempC <= 29) {
+      inoculationPct -= 5;
+    } else {
+      inoculationPct -= 6;
+    }
+    if (hydrationBand === "Low") {
+      inoculationPct += 2;
+    } else if (hydrationBand === "High") {
+      inoculationPct -= 2;
+    }
+    if (wwRatio >= 0.3) {
+      inoculationPct -= 1;
+    }
+    inoculationPct = clamp(5, 12.5, inoculationPct);
   } else {
-    inoculationPct -= 6;
+    const inocBase = {
+      Tight: 18,
+      Balanced: 20,
+      Open: 16
+    };
+    inoculationPct = inocBase[crumbGoal];
+    if (effectiveTempC < 21) {
+      inoculationPct += 4;
+    } else if (effectiveTempC < 24) {
+      inoculationPct += 0;
+    } else if (effectiveTempC < 27) {
+      inoculationPct -= 2;
+    } else if (effectiveTempC <= 29) {
+      inoculationPct -= 4;
+    } else {
+      inoculationPct -= 6;
+    }
+    if (hydrationBand === "Low") {
+      inoculationPct += 2;
+    } else if (hydrationBand === "High") {
+      inoculationPct -= 2;
+    }
+    if (wwRatio >= 0.3) {
+      inoculationPct -= 1;
+    }
+    inoculationPct = clamp(10, 26, inoculationPct);
   }
-  if (hydrationBand === "Low") {
-    inoculationPct += 2;
-  } else if (hydrationBand === "High") {
-    inoculationPct -= 2;
-  }
-  if (wwRatio >= 0.3) {
-    inoculationPct -= 1;
-  }
-  inoculationPct = clamp(10, 26, inoculationPct);
   const totalWaterG = finalHydrationPct / 100 * totalFlourG;
   const autoSaltPct = clamp(1.8, 2.2, 1.9 + wwRatio * 0.3);
   const effectiveSaltPct = saltAutoCalc ? autoSaltPct : saltPct;
   const saltG = effectiveSaltPct / 100 * totalFlourG;
+  const clampedStarterHydrationPct = clamp(50, 200, starterHydrationPct);
   const starterFlourG = totalFlourG * (inoculationPct / 100);
-  const starterTotalG = starterFlourG * (1 + starterHydrationPct / 100);
+  const starterTotalG = starterFlourG * (1 + clampedStarterHydrationPct / 100);
   const starterWaterG = starterTotalG - starterFlourG;
   const mixFlourG = totalFlourG - starterFlourG;
   const mixWaterG = totalWaterG - starterWaterG;
@@ -884,6 +931,9 @@ function calculate(inputs2, lang2 = "en") {
   const assumptions = calcAssumptions(inputs2, formula, lang2);
   return { formula, timing, schedule, warnings, assumptions };
 }
+function cToF(c) {
+  return Math.round(c * 9 / 5 + 32);
+}
 function formatMins(mins) {
   const h = Math.floor(mins / 60);
   const m = Math.round(mins % 60);
@@ -914,6 +964,7 @@ const DEFAULT_INPUTS = {
   // default off
   proofMethod: "ColdRetard",
   // default overnight cold proof
+  fermentationPhilosophy: "Predictability",
   scheduleMode: "relative",
   startTime: null,
   fridgeTempC: 4,
@@ -961,6 +1012,12 @@ function InputSection($$renderer, $$props) {
     let whiteFlourGrams = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * (store_get($$store_subs ??= {}, "$inputs", inputs).whitePct / 100)));
     let wwFlourGrams = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG - whiteFlourGrams());
     let wwPct = derived$1(() => 100 - store_get($$store_subs ??= {}, "$inputs", inputs).whitePct);
+    let fridgeDisplay = derived$1(() => {
+      if (store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F") return Math.round(cToF(store_get($$store_subs ??= {}, "$inputs", inputs).fridgeTempC));
+      return store_get($$store_subs ??= {}, "$inputs", inputs).fridgeTempC;
+    });
+    const fridgeTempMin = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 28 : -2);
+    const fridgeTempMax = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 50 : 10);
     $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors" aria-label="Toggle temperature unit"><span${attr_class("", void 0, {
       "text-amber-600": store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C"
     })}>°C</span> <span class="text-stone-300">/</span> <span${attr_class("", void 0, {
@@ -978,7 +1035,60 @@ function InputSection($$renderer, $$props) {
         "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal !== goal
       })}><span class="text-sm font-bold">${escape_html(t().crumbGoalNames[goal])}</span></button>`);
     }
-    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div class="border-t border-stone-100 pt-4"><button type="button" class="flex items-center justify-between w-full text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors"><span>${escape_html(t().advancedOptions)}</span> <svg xmlns="http://www.w3.org/2000/svg"${attr_class("h-4 w-4 transition-transform duration-200", void 0, { "rotate-180": advancedOpen })} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button> `);
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().fermentationPhilosophyLabel)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    const each_array_1 = ensure_array_like(["Predictability", "FlavorDevelopment"]);
+    for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+      let philosophy = each_array_1[$$index_1];
+      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
+        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
+        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
+        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
+        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy,
+        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy,
+        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy
+      })}>${escape_html(philosophy === "Predictability" ? t().philosophyPredictability : t().philosophyFlavorDev)}</button>`);
+    }
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().proofMethod)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    const each_array_2 = ensure_array_like(["Room", "ColdRetard"]);
+    for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+      let method = each_array_2[$$index_2];
+      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
+        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
+        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
+        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
+        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method,
+        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method,
+        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method
+      })}>${escape_html(method === "Room" ? t().roomTemp : t().coldRetard)}</button>`);
+    }
+    $$renderer2.push(`<!--]--></div></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === "ColdRetard") {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div><label for="fridge-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().fridgeTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</label> <input id="fridge-temp" type="number"${attr("min", fridgeTempMin())}${attr("max", fridgeTempMax())} step="0.5"${attr("value", fridgeDisplay())} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().scheduleMode)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    const each_array_3 = ensure_array_like(["relative", "clock"]);
+    for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+      let mode = each_array_3[$$index_3];
+      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
+        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
+        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
+        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
+        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode,
+        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode,
+        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode
+      })}>${escape_html(mode === "relative" ? t().relative : t().clock)}</button>`);
+    }
+    $$renderer2.push(`<!--]--></div></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === "clock") {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div><label for="start-time" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().startTime)}</label> <input id="start-time" type="time"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00")} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <div class="border-t border-stone-100 pt-4"><button type="button" class="flex items-center justify-between w-full text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors"><span>${escape_html(t().advancedOptions)}</span> <svg xmlns="http://www.w3.org/2000/svg"${attr_class("h-4 w-4 transition-transform duration-200", void 0, { "rotate-180": advancedOpen })} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button> `);
     {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1007,7 +1117,7 @@ function FormulaCard($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.starterTotalG, formula.totalFlourG))}</td></tr></tbody><tfoot><tr class="border-t-2 border-stone-200 bg-amber-50"><td class="px-5 py-3 font-bold text-stone-800">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-stone-800">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-stone-100 bg-stone-50/60"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-amber-700">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-stone-100"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-stone-400 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
+    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))}</td></tr></tbody><tfoot><tr class="border-t-2 border-stone-200 bg-amber-50"><td class="px-5 py-3 font-bold text-stone-800">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-stone-800">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-stone-100 bg-stone-50/60"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-amber-700">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-stone-100"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-stone-400 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }

@@ -8,6 +8,7 @@ export type CrumbGoal = 'Tight' | 'Balanced' | 'Open';
 export type HydrationBand = 'Low' | 'Medium' | 'High';
 export type TempBand = 'Freezing' | 'Cold' | 'Standard' | 'Warm' | 'Hot';
 export type ProofMethod = 'Room' | 'ColdRetard';
+export type FermentationPhilosophy = 'Predictability' | 'FlavorDevelopment';
 
 export interface Inputs {
 	totalFlourInputG: number;    // total flour grams (primary input)
@@ -22,6 +23,7 @@ export interface Inputs {
 	autolyseMins: number;        // default 30
 	autolyseOn: boolean;         // default false
 	proofMethod: ProofMethod;    // default 'ColdRetard'
+	fermentationPhilosophy: FermentationPhilosophy; // default 'Predictability'
 	scheduleMode: 'relative' | 'clock'; // default 'relative'
 	startTime: string | null;    // HH:MM if clock mode
 	fridgeTempC: number;         // default 4
@@ -146,9 +148,9 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	// Temp band
 	let tempBand: TempBand;
 	if (effectiveTempC < 18) {
-		tempBand = 'Cold';
-	} else if (effectiveTempC < 21) {
 		tempBand = 'Freezing';
+	} else if (effectiveTempC < 21) {
+		tempBand = 'Cold';
 	} else if (effectiveTempC < 24) {
 		tempBand = 'Standard';
 	} else if (effectiveTempC < 27) {
@@ -158,39 +160,79 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	}
 
 	// Inoculation calculation
-	const inocBase: Record<CrumbGoal, number> = {
-		Tight: 18,
-		Balanced: 20,
-		Open: 16
-	};
-	let inoculationPct = inocBase[crumbGoal];
+	const { fermentationPhilosophy } = inputs;
 
-	// Temp adjustment
-	if (effectiveTempC < 21) {
-		inoculationPct += 4;
-	} else if (effectiveTempC < 24) {
-		inoculationPct += 0;
-	} else if (effectiveTempC < 27) {
-		inoculationPct -= 2;
-	} else if (effectiveTempC < 29) {
-		inoculationPct -= 4;
+	let inoculationPct: number;
+
+	if (fermentationPhilosophy === 'FlavorDevelopment') {
+		// FlavorDevelopment: lower base, inverted temp delta, tighter clamp
+		const inocBase: Record<CrumbGoal, number> = {
+			Tight: 12,
+			Balanced: 14,
+			Open: 10
+		};
+		inoculationPct = inocBase[crumbGoal];
+
+		if (effectiveTempC < 21) {
+			inoculationPct -= 4;
+		} else if (effectiveTempC < 24) {
+			inoculationPct += 0;
+		} else if (effectiveTempC < 27) {
+			inoculationPct -= 3;
+		} else if (effectiveTempC <= 29) {
+			inoculationPct -= 5;
+		} else {
+			inoculationPct -= 6;
+		}
+
+		// Hydration band adjustment (same for both)
+		if (hydrationBand === 'Low') {
+			inoculationPct += 2;
+		} else if (hydrationBand === 'High') {
+			inoculationPct -= 2;
+		}
+
+		// WW ratio adjustment (same for both)
+		if (wwRatio >= 0.3) {
+			inoculationPct -= 1;
+		}
+
+		inoculationPct = clamp(5, 12.5, inoculationPct);
 	} else {
-		inoculationPct -= 6;
-	}
+		// Predictability (default): original logic
+		const inocBase: Record<CrumbGoal, number> = {
+			Tight: 18,
+			Balanced: 20,
+			Open: 16
+		};
+		inoculationPct = inocBase[crumbGoal];
 
-	// Hydration band adjustment
-	if (hydrationBand === 'Low') {
-		inoculationPct += 2;
-	} else if (hydrationBand === 'High') {
-		inoculationPct -= 2;
-	}
+		if (effectiveTempC < 21) {
+			inoculationPct += 4;
+		} else if (effectiveTempC < 24) {
+			inoculationPct += 0;
+		} else if (effectiveTempC < 27) {
+			inoculationPct -= 2;
+		} else if (effectiveTempC <= 29) {
+			inoculationPct -= 4;
+		} else {
+			inoculationPct -= 6;
+		}
 
-	// WW ratio adjustment
-	if (wwRatio >= 0.3) {
-		inoculationPct -= 1;
-	}
+		// Hydration band adjustment
+		if (hydrationBand === 'Low') {
+			inoculationPct += 2;
+		} else if (hydrationBand === 'High') {
+			inoculationPct -= 2;
+		}
 
-	inoculationPct = clamp(10, 26, inoculationPct);
+		// WW ratio adjustment
+		if (wwRatio >= 0.3) {
+			inoculationPct -= 1;
+		}
+
+		inoculationPct = clamp(10, 26, inoculationPct);
+	}
 
 	// Water and salt
 	const totalWaterG = (finalHydrationPct / 100) * totalFlourG;
@@ -200,8 +242,9 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	const saltG = (effectiveSaltPct / 100) * totalFlourG;
 
 	// Starter
+	const clampedStarterHydrationPct = clamp(50, 200, starterHydrationPct);
 	const starterFlourG = totalFlourG * (inoculationPct / 100);
-	const starterTotalG = starterFlourG * (1 + starterHydrationPct / 100);
+	const starterTotalG = starterFlourG * (1 + clampedStarterHydrationPct / 100);
 	const starterWaterG = starterTotalG - starterFlourG;
 
 	// Mix additions
@@ -569,6 +612,7 @@ export const DEFAULT_INPUTS: Inputs = {
 	autolyseMins: 30,
 	autolyseOn: false,          // default off
 	proofMethod: 'ColdRetard',  // default overnight cold proof
+	fermentationPhilosophy: 'Predictability',
 	scheduleMode: 'relative',
 	startTime: null,
 	fridgeTempC: 4,
