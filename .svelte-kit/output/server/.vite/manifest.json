@@ -121,6 +121,9 @@
     "imports": [
       "_index2.js",
       "_index.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.t79TeBJw.css"
     ]
   }
 }

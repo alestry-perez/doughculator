@@ -183,22 +183,21 @@
 <div class="min-h-screen bg-gradient-to-b from-base-200 via-base-200 to-base-300/40">
 	<!-- Header -->
 	<header class="bg-neutral/95 text-neutral-content border-b border-primary/25 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-neutral/90 sticky top-0 z-30">
-		<div class="border-b border-neutral-content/15 bg-neutral/70">
-			<div class="max-w-2xl mx-auto px-4 py-2 flex justify-end">
-				<button
-					type="button"
-					onclick={promptInstall}
-					disabled={installState === 'installed'}
-					class="btn btn-xs sm:btn-sm rounded-full shadow-sm {installState === 'installed'
-						? 'btn-success btn-disabled'
-						: deferredInstallPrompt
+		{#if installState !== 'installed'}
+			<div class="install-cta-row border-b border-neutral-content/15 bg-neutral/70">
+				<div class="max-w-2xl mx-auto px-4 py-2 flex justify-end">
+					<button
+						type="button"
+						onclick={promptInstall}
+						class="btn btn-xs sm:btn-sm rounded-full shadow-sm {deferredInstallPrompt
 							? 'btn-primary'
 							: 'btn-outline border-neutral-content/30 text-neutral-content hover:border-neutral-content/45 hover:bg-neutral-content/10 hover:text-neutral-content'}"
-				>
-					{installState === 'installed' ? t.savedToHomeScreen : t.saveToHomeScreen}
-				</button>
+					>
+						{t.saveToHomeScreen}
+					</button>
+				</div>
 			</div>
-		</div>
+		{/if}
 		<div class="max-w-2xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-y-3">
 			<div class="flex items-center gap-3 min-w-0">
 				<span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-xl text-primary ring-1 ring-primary/35" aria-hidden="true">🍞</span>
@@ -337,5 +336,9 @@
 <AssumptionsDrawer assumptions={$result.assumptions} />
 
 <style lang="scss">
-	// No extra styles needed — Tailwind handles everything
+	@media (display-mode: standalone) {
+		.install-cta-row {
+			display: none;
+		}
+	}
 </style>
