@@ -192,6 +192,8 @@ export const assumptionStrings = {
 		saltAuto: (pct: string, computed: string) =>
 			`${pct}% (auto — ${computed}% computed from flour blend)`,
 		saltManual: (pct: number) => `${pct}% (manual override)`,
+		starterHydrationAuto: (pct: number) => `${pct}% (default)`,
+		starterHydrationManual: (pct: number) => `${pct}% (manual override)`,
 		autolyseMins: (mins: number) => `${mins} min`
 	},
 	es: {
@@ -207,6 +209,8 @@ export const assumptionStrings = {
 		saltAuto: (pct: string, computed: string) =>
 			`${pct}% (auto — ${computed}% calculado desde la mezcla de harina)`,
 		saltManual: (pct: number) => `${pct}% (ajuste manual)`,
+		starterHydrationAuto: (pct: number) => `${pct}% (predeterminado)`,
+		starterHydrationManual: (pct: number) => `${pct}% (ajuste manual)`,
 		autolyseMins: (mins: number) => `${mins} min`
 	},
 	sv: {
@@ -222,6 +226,8 @@ export const assumptionStrings = {
 		saltAuto: (pct: string, computed: string) =>
 			`${pct}% (auto — ${computed}% beräknat från mjölblandningen)`,
 		saltManual: (pct: number) => `${pct}% (manuell inställning)`,
+		starterHydrationAuto: (pct: number) => `${pct}% (standard)`,
+		starterHydrationManual: (pct: number) => `${pct}% (manuell inställning)`,
 		autolyseMins: (mins: number) => `${mins} min`
 	}
 };
@@ -274,6 +280,9 @@ const en = {
 	saltOverride: 'Override',
 	saltBakersPct: "Baker's % relative to total flour",
 	starterHydration: 'Starter Hydration (%)',
+	starterHydrationDefaultLabel: 'Default: 100%',
+	starterHydrationManual: 'Manual',
+	starterHydrationOverride: 'Override',
 	autolyse: 'Autolyse',
 	duration: 'Duration',
 	fermentationPhilosophyLabel: 'Fermentation Philosophy',
@@ -430,6 +439,9 @@ const es: Translations = {
 	saltOverride: 'Personalizar',
 	saltBakersPct: '% de panadero relativo a la harina total',
 	starterHydration: 'Hidratación del Iniciador (%)',
+	starterHydrationDefaultLabel: 'Predeterminado: 100%',
+	starterHydrationManual: 'Manual',
+	starterHydrationOverride: 'Personalizar',
 	autolyse: 'Autólisis',
 	duration: 'Duración',
 	fermentationPhilosophyLabel: 'Filosofía de Fermentación',
@@ -586,6 +598,9 @@ const sv: Translations = {
 	saltOverride: 'Anpassa',
 	saltBakersPct: "Bagarprocent relativt totalt mjöl",
 	starterHydration: 'Surdeghydratation (%)',
+	starterHydrationDefaultLabel: 'Standard: 100%',
+	starterHydrationManual: 'Manuell',
+	starterHydrationOverride: 'Anpassa',
 	autolyse: 'Autolys',
 	duration: 'Varaktighet',
 	fermentationPhilosophyLabel: 'Jäsningsfilosofi',

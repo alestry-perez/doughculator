@@ -392,21 +392,40 @@
 				{/if}
 			</div>
 
-			<!-- Starter hydration % -->
-			<div class="form-control">
-				<label for="starter-hyd" class="label">
-					<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.starterHydration}</span>
-				</label>
-				<input
-					id="starter-hyd"
-					type="number"
-					min="50"
-					max="200"
-					step="5"
-					value={$inputs.starterHydrationPct}
-					oninput={(e) => updateField('starterHydrationPct', parseFloat((e.target as HTMLInputElement).value) || 100)}
-					class="input input-bordered w-full"
-				/>
+			<!-- Starter hydration — default 100% with optional override -->
+			<div>
+				<div class="flex items-center justify-between mb-1.5">
+					<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.starterHydration}</span>
+					<div class="flex items-center gap-2">
+						<span class="text-xs text-base-content/50">
+							{$inputs.starterHydrationAutoCalc ? t.starterHydrationDefaultLabel : t.starterHydrationManual}
+						</span>
+						<input
+							type="checkbox"
+							class="toggle toggle-secondary toggle-sm"
+							checked={!$inputs.starterHydrationAutoCalc}
+							onchange={() => updateField('starterHydrationAutoCalc', !$inputs.starterHydrationAutoCalc)}
+							role="switch"
+							aria-checked={!$inputs.starterHydrationAutoCalc}
+							aria-label="Override starter hydration"
+						/>
+						<span class="text-xs text-base-content/70">{t.starterHydrationOverride}</span>
+					</div>
+				</div>
+				{#if !$inputs.starterHydrationAutoCalc}
+					<div class="form-control">
+						<input
+							id="starter-hyd"
+							type="number"
+							min="50"
+							max="200"
+							step="5"
+							value={$inputs.starterHydrationPct}
+							oninput={(e) => updateField('starterHydrationPct', parseFloat((e.target as HTMLInputElement).value) || 100)}
+							class="input input-bordered w-full"
+						/>
+					</div>
+				{/if}
 			</div>
 
 			<!-- Autolyse toggle + slider -->

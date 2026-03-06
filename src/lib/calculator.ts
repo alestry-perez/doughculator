@@ -19,6 +19,7 @@ export interface Inputs {
 	doughTempC: number | null;   // default null => use ambient
 	saltAutoCalc: boolean;       // default true — auto-compute salt from flour composition
 	saltPct: number;             // used only when saltAutoCalc is false; default 2.0
+	starterHydrationAutoCalc: boolean; // default true — use 100% unless manually overridden
 	starterHydrationPct: number; // default 100
 	autolyseMins: number;        // default 30
 	autolyseOn: boolean;         // default false
@@ -43,6 +44,7 @@ export interface FormulaResult {
 	autoSaltPct: number;            // auto-computed salt %
 	effectiveSaltPct: number;       // actual salt % used (auto or override)
 	saltG: number;
+	effectiveStarterHydrationPct: number; // actual starter hydration used (auto 100% or override)
 	inoculationPct: number;         // clamped
 	starterFlourG: number;
 	starterWaterG: number;
@@ -123,6 +125,7 @@ function calcFormula(inputs: Inputs): FormulaResult {
 		doughTempC,
 		saltAutoCalc,
 		saltPct,
+		starterHydrationAutoCalc,
 		starterHydrationPct
 	} = inputs;
 
@@ -254,7 +257,8 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	const saltG = (effectiveSaltPct / 100) * totalFlourG;
 
 	// Starter
-	const clampedStarterHydrationPct = clamp(50, 200, starterHydrationPct);
+	const effectiveStarterHydrationPct = starterHydrationAutoCalc ? 100 : starterHydrationPct;
+	const clampedStarterHydrationPct = clamp(50, 200, effectiveStarterHydrationPct);
 	const starterFlourG = totalFlourG * (inoculationPct / 100);
 	const starterTotalG = starterFlourG * (1 + clampedStarterHydrationPct / 100);
 	const starterWaterG = starterTotalG - starterFlourG;
@@ -281,6 +285,7 @@ function calcFormula(inputs: Inputs): FormulaResult {
 		autoSaltPct,
 		effectiveSaltPct,
 		saltG,
+		effectiveStarterHydrationPct: clampedStarterHydrationPct,
 		inoculationPct,
 		starterFlourG,
 		starterWaterG,
@@ -535,7 +540,13 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 // ============================================================
 
 function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Record<string, string> {
-	const { saltAutoCalc, saltPct, starterHydrationPct, autolyseOn, autolyseMins } = inputs;
+	const {
+		saltAutoCalc,
+		saltPct,
+		starterHydrationAutoCalc,
+		autolyseOn,
+		autolyseMins
+	} = inputs;
 	const {
 		effectiveTempC,
 		inoculationPct,
@@ -543,7 +554,8 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 		wwHydrationAdjust,
 		finalHydrationPct,
 		autoSaltPct,
-		effectiveSaltPct
+		effectiveSaltPct,
+		effectiveStarterHydrationPct
 	} = formula;
 	const a = assumptionStrings[lang];
 
@@ -552,7 +564,9 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 		[a.salt]: saltAutoCalc
 			? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2))
 			: a.saltManual(saltPct),
-		[a.starterHydration]: `${starterHydrationPct}%`,
+		[a.starterHydration]: starterHydrationAutoCalc
+			? a.starterHydrationAuto(effectiveStarterHydrationPct)
+			: a.starterHydrationManual(effectiveStarterHydrationPct),
 		[a.inoculation]: `${inoculationPct.toFixed(1)}%`,
 		[a.baseHydration]: `${baseHydrationPct}%`,
 		[a.wwHydrationAdjust]: `+${wwHydrationAdjust.toFixed(1)}%`,
@@ -620,6 +634,7 @@ export const DEFAULT_INPUTS: Inputs = {
 	doughTempC: null,
 	saltAutoCalc: true,
 	saltPct: 2.0,
+	starterHydrationAutoCalc: true,
 	starterHydrationPct: 100,
 	autolyseMins: 30,
 	autolyseOn: false,          // default off
