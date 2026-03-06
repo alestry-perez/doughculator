@@ -428,19 +428,27 @@
 				{/if}
 			</div>
 
-			<!-- Autolyse toggle + slider -->
+			<!-- Autolyse toggle + progress -->
 			<div>
-				<div class="flex items-center justify-between mb-2">
+				<div class="flex items-center justify-between mb-1.5">
 					<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.autolyse}</span>
+					<div class="flex items-center gap-2">
+						<span class={$inputs.autolyseOn ? 'text-xs text-base-content/40' : 'text-xs text-base-content/70 font-semibold'}>
+							{t.off}
+						</span>
 						<input
 							type="checkbox"
-							class="toggle toggle-secondary"
+							class="toggle toggle-secondary toggle-sm"
 							checked={$inputs.autolyseOn}
 							onchange={toggleAutolyse}
 							role="switch"
 							aria-checked={$inputs.autolyseOn}
-							aria-label="Toggle autolyse"
+							aria-label="Toggle autolyse auto mode"
 						/>
+						<span class={$inputs.autolyseOn ? 'text-xs text-base-content/70 font-semibold' : 'text-xs text-base-content/40'}>
+							{t.auto}
+						</span>
+					</div>
 				</div>
 				{#if $inputs.autolyseOn}
 					<div>

@@ -128,6 +128,8 @@ const assumptionStrings = {
     off: "Off",
     saltAuto: (pct, computed) => `${pct}% (auto — ${computed}% computed from flour blend)`,
     saltManual: (pct) => `${pct}% (manual override)`,
+    starterHydrationAuto: (pct) => `${pct}% (default)`,
+    starterHydrationManual: (pct) => `${pct}% (manual override)`,
     autolyseMins: (mins) => `${mins} min`
   },
   es: {
@@ -142,6 +144,8 @@ const assumptionStrings = {
     off: "Apagada",
     saltAuto: (pct, computed) => `${pct}% (auto — ${computed}% calculado desde la mezcla de harina)`,
     saltManual: (pct) => `${pct}% (ajuste manual)`,
+    starterHydrationAuto: (pct) => `${pct}% (predeterminado)`,
+    starterHydrationManual: (pct) => `${pct}% (ajuste manual)`,
     autolyseMins: (mins) => `${mins} min`
   },
   sv: {
@@ -156,6 +160,8 @@ const assumptionStrings = {
     off: "Av",
     saltAuto: (pct, computed) => `${pct}% (auto — ${computed}% beräknat från mjölblandningen)`,
     saltManual: (pct) => `${pct}% (manuell inställning)`,
+    starterHydrationAuto: (pct) => `${pct}% (standard)`,
+    starterHydrationManual: (pct) => `${pct}% (manuell inställning)`,
     autolyseMins: (mins) => `${mins} min`
   }
 };
@@ -203,7 +209,12 @@ const en = {
   saltOverride: "Override",
   saltBakersPct: "Baker's % relative to total flour",
   starterHydration: "Starter Hydration (%)",
+  starterHydrationDefaultLabel: "Default: 100%",
+  starterHydrationManual: "Manual",
+  starterHydrationOverride: "Override",
   autolyse: "Autolyse",
+  off: "Off",
+  auto: "Auto",
   duration: "Duration",
   fermentationPhilosophyLabel: "Fermentation Philosophy",
   philosophyPredictability: "Predictability",
@@ -352,7 +363,12 @@ const es = {
   saltOverride: "Personalizar",
   saltBakersPct: "% de panadero relativo a la harina total",
   starterHydration: "Hidratación del Iniciador (%)",
+  starterHydrationDefaultLabel: "Predeterminado: 100%",
+  starterHydrationManual: "Manual",
+  starterHydrationOverride: "Personalizar",
   autolyse: "Autólisis",
+  off: "Apagada",
+  auto: "Auto",
   duration: "Duración",
   fermentationPhilosophyLabel: "Filosofía de Fermentación",
   philosophyPredictability: "Consistencia",
@@ -497,7 +513,12 @@ const sv = {
   saltOverride: "Anpassa",
   saltBakersPct: "Bagarprocent relativt totalt mjöl",
   starterHydration: "Surdeghydratation (%)",
+  starterHydrationDefaultLabel: "Standard: 100%",
+  starterHydrationManual: "Manuell",
+  starterHydrationOverride: "Anpassa",
   autolyse: "Autolys",
+  off: "Av",
+  auto: "Auto",
   duration: "Varaktighet",
   fermentationPhilosophyLabel: "Jäsningsfilosofi",
   philosophyPredictability: "Förutsägbarhet",
@@ -611,6 +632,7 @@ function calcFormula(inputs2) {
     doughTempC,
     saltAutoCalc,
     saltPct,
+    starterHydrationAutoCalc,
     starterHydrationPct
   } = inputs2;
   const totalFlourG = totalFlourInputG;
@@ -707,7 +729,8 @@ function calcFormula(inputs2) {
   const autoSaltPct = clamp(1.8, 2.2, 1.9 + wwRatio * 0.3);
   const effectiveSaltPct = saltAutoCalc ? autoSaltPct : saltPct;
   const saltG = effectiveSaltPct / 100 * totalFlourG;
-  const clampedStarterHydrationPct = clamp(50, 200, starterHydrationPct);
+  const effectiveStarterHydrationPct = starterHydrationAutoCalc ? 100 : starterHydrationPct;
+  const clampedStarterHydrationPct = clamp(50, 200, effectiveStarterHydrationPct);
   const starterFlourG = totalFlourG * (inoculationPct / 100);
   const starterTotalG = starterFlourG * (1 + clampedStarterHydrationPct / 100);
   const starterWaterG = starterTotalG - starterFlourG;
@@ -729,6 +752,7 @@ function calcFormula(inputs2) {
     autoSaltPct,
     effectiveSaltPct,
     saltG,
+    effectiveStarterHydrationPct: clampedStarterHydrationPct,
     inoculationPct,
     starterFlourG,
     starterWaterG,
@@ -910,7 +934,13 @@ function calcWarnings(inputs2, formula, lang2) {
   return warnings;
 }
 function calcAssumptions(inputs2, formula, lang2) {
-  const { saltAutoCalc, saltPct, starterHydrationPct, autolyseOn, autolyseMins } = inputs2;
+  const {
+    saltAutoCalc,
+    saltPct,
+    starterHydrationAutoCalc,
+    autolyseOn,
+    autolyseMins
+  } = inputs2;
   const {
     effectiveTempC,
     inoculationPct,
@@ -918,13 +948,14 @@ function calcAssumptions(inputs2, formula, lang2) {
     wwHydrationAdjust,
     finalHydrationPct,
     autoSaltPct,
-    effectiveSaltPct
+    effectiveSaltPct,
+    effectiveStarterHydrationPct
   } = formula;
   const a = assumptionStrings[lang2];
   return {
     [a.ambientTemp]: `${effectiveTempC.toFixed(1)}°C`,
     [a.salt]: saltAutoCalc ? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2)) : a.saltManual(saltPct),
-    [a.starterHydration]: `${starterHydrationPct}%`,
+    [a.starterHydration]: starterHydrationAutoCalc ? a.starterHydrationAuto(effectiveStarterHydrationPct) : a.starterHydrationManual(effectiveStarterHydrationPct),
     [a.inoculation]: `${inoculationPct.toFixed(1)}%`,
     [a.baseHydration]: `${baseHydrationPct}%`,
     [a.wwHydrationAdjust]: `+${wwHydrationAdjust.toFixed(1)}%`,
@@ -967,6 +998,7 @@ const DEFAULT_INPUTS = {
   doughTempC: null,
   saltAutoCalc: true,
   saltPct: 2,
+  starterHydrationAutoCalc: true,
   starterHydrationPct: 100,
   autolyseMins: 30,
   autolyseOn: false,
@@ -1096,7 +1128,14 @@ function InputSection($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div> <div class="form-control"><label for="starter-hyd" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().starterHydration)}</span></label> <input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="input input-bordered w-full"/></div> <div><div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <input type="checkbox" class="toggle toggle-secondary"${attr("checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn, true)} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse"/></div> `);
+    $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().starterHydration)}</span> <div class="flex items-center gap-2"><span class="text-xs text-base-content/50">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc ? t().starterHydrationDefaultLabel : t().starterHydrationManual)}</span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", !store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc, true)} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc)} aria-label="Override starter hydration"/> <span class="text-xs text-base-content/70">${escape_html(t().starterHydrationOverride)}</span></div></div> `);
+    if (!store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="form-control"><input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="input input-bordered w-full"/></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <div class="flex items-center gap-2"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/40" : "text-xs text-base-content/70 font-semibold"))}>${escape_html(t().off)}</span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn, true)} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse auto mode"/> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn ? "text-xs text-base-content/70 font-semibold" : "text-xs text-base-content/40"))}>${escape_html(t().auto)}</span></div></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div><div class="flex justify-between text-xs text-base-content/70 mb-1"><span>${escape_html(t().duration)}</span> <span class="font-semibold text-base-content">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} min</span></div> <progress class="progress progress-secondary progress-sm w-full"${attr("value", autolyseProgressValue())}${attr("max", autolyseProgressMax)} aria-label="Autolyse duration progress"></progress> <div class="flex justify-between text-xs text-base-content/50 mt-0.5"><span>20 min</span> <span>60 min</span></div></div>`);
