@@ -1160,6 +1160,7 @@ function ScheduleCard($$renderer, $$props) {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
     let { steps, scheduleMode, startTime } = $$props;
+    let completedSteps = /* @__PURE__ */ new Set();
     const stepsWithTimes = derived$1(() => {
       if (scheduleMode !== "clock" || !startTime) {
         return steps.map((s) => ({ step: s, clockTime: null, endClockTime: null }));
@@ -1182,36 +1183,44 @@ function ScheduleCard($$renderer, $$props) {
       }
       return "";
     }
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-4">${escape_html(t().schedule)}</h2> <ol class="relative space-y-0"><!--[-->`);
+    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-stone-400 mb-3">press to complete</p> <ol class="relative space-y-0"><!--[-->`);
     const each_array = ensure_array_like(stepsWithTimes());
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let { step, clockTime, endClockTime } = each_array[i];
-      $$renderer2.push(`<li class="flex gap-4 pb-5 relative">`);
+      $$renderer2.push(`<li class="flex gap-4 pb-5 relative group cursor-pointer select-none" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0">`);
       if (i < stepsWithTimes().length - 1) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<div class="absolute left-4 top-8 bottom-0 w-px bg-stone-100"></div>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <div class="shrink-0 w-8 h-8 rounded-full bg-amber-100 text-amber-700 font-bold text-xs flex items-center justify-center z-10">${escape_html(i + 1)}</div> <div class="flex-1 min-w-0"><div class="flex items-start justify-between gap-2"><span class="text-sm font-semibold text-stone-800 leading-tight">${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
+      $$renderer2.push(`<!--]--> <div${attr_class(`shrink-0 w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center z-10 transition-colors ${stringify(completedSteps.has(i) ? "bg-stone-200 text-stone-400" : "bg-amber-100 text-amber-700 group-hover:bg-amber-200")}`)}>`);
+      if (completedSteps.has(i)) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`✓`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`${escape_html(i + 1)}`);
+      }
+      $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-stone-800")}`)}>${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
       if (scheduleMode === "clock" && clockTime) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div class="text-xs font-bold text-amber-700 tabular-nums">${escape_html(clockTime)}</div> `);
+        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-amber-700")}`)}>${escape_html(clockTime)}</div> `);
         if (endClockTime && endClockTime !== clockTime) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="text-xs text-stone-400 tabular-nums">→ ${escape_html(endClockTime)}</div>`);
+          $$renderer2.push(`<div${attr_class(`text-xs text-stone-400 tabular-nums ${stringify(completedSteps.has(i) ? "line-through" : "")}`)}>→ ${escape_html(endClockTime)}</div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]-->`);
       } else {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<div class="text-xs font-bold text-amber-700 tabular-nums">${escape_html(durationLabel(step))}</div>`);
+        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-amber-700")}`)}>${escape_html(durationLabel(step))}</div>`);
       }
       $$renderer2.push(`<!--]--></div></div> `);
       if (step.notes) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<p class="text-xs text-stone-500 mt-1 leading-snug">${escape_html(step.notes)}</p>`);
+        $$renderer2.push(`<p${attr_class(`text-xs mt-1 leading-snug ${stringify(completedSteps.has(i) ? "text-stone-300 line-through" : "text-stone-500")}`)}>${escape_html(step.notes)}</p>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
