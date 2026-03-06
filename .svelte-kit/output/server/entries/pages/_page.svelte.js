@@ -1016,15 +1016,27 @@ function InputSection($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
-    let advancedOpen = false;
     const crumbGoals = ["Tight", "Balanced", "Open"];
     let whiteFlourGrams = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * (store_get($$store_subs ??= {}, "$inputs", inputs).whitePct / 100)));
     let wwFlourGrams = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG - whiteFlourGrams());
     let wwPct = derived$1(() => 100 - store_get($$store_subs ??= {}, "$inputs", inputs).whitePct);
+    let autoSaltPct = derived$1(() => store_get($$store_subs ??= {}, "$result", result).formula.autoSaltPct);
+    let autoSaltG = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$result", result).formula.saltG));
+    let ambientDisplay = derived$1(() => {
+      if (store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F") return Math.round(cToF(store_get($$store_subs ??= {}, "$inputs", inputs).ambientTempC));
+      return store_get($$store_subs ??= {}, "$inputs", inputs).ambientTempC;
+    });
+    let doughDisplay = derived$1(() => {
+      if (store_get($$store_subs ??= {}, "$inputs", inputs).doughTempC === null) return "";
+      if (store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F") return Math.round(cToF(store_get($$store_subs ??= {}, "$inputs", inputs).doughTempC));
+      return store_get($$store_subs ??= {}, "$inputs", inputs).doughTempC;
+    });
     let fridgeDisplay = derived$1(() => {
       if (store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F") return Math.round(cToF(store_get($$store_subs ??= {}, "$inputs", inputs).fridgeTempC));
       return store_get($$store_subs ??= {}, "$inputs", inputs).fridgeTempC;
     });
+    const tempMin = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 32 : 0);
+    const tempMax = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 120 : 50);
     const fridgeTempMin = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 28 : -2);
     const fridgeTempMax = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 50 : 10);
     $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors" aria-label="Toggle temperature unit"><span${attr_class("", void 0, {
@@ -1097,11 +1109,41 @@ function InputSection($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="border-t border-stone-100 pt-4"><button type="button" class="flex items-center justify-between w-full text-sm font-semibold text-stone-600 hover:text-stone-800 transition-colors"><span>${escape_html(t().advancedOptions)}</span> <svg xmlns="http://www.w3.org/2000/svg"${attr_class("h-4 w-4 transition-transform duration-200", void 0, { "rotate-180": advancedOpen })} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></button> `);
-    {
+    $$renderer2.push(`<!--]--> <div class="border-t border-stone-100 pt-4 space-y-4"><div><label for="ambient-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().ambientTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</label> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div> <div><label for="dough-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().doughTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)}) <span class="font-normal text-stone-400">${escape_html(t().optional)}</span></label> <input id="dough-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", doughDisplay())}${attr("placeholder", t().leaveBlankAmbient)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent placeholder-stone-300"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().salt)}</span> <div class="flex items-center gap-2"><span class="text-xs text-stone-400">`);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`${escape_html(t().saltAutoLabel(autoSaltPct().toFixed(2), String(autoSaltG())))}`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+      $$renderer2.push(`${escape_html(t().saltManual)}`);
+    }
+    $$renderer2.push(`<!--]--></span> <button type="button"${attr_class("relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0", void 0, {
+      "bg-amber-400": !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc,
+      "bg-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc
+    })} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc)} aria-label="Override salt"><span${attr_class("inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform", void 0, {
+      "translate-x-4": !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc,
+      "translate-x-0.5": store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc
+    })}></span></button> <span class="text-xs text-stone-500">${escape_html(t().saltOverride)}</span></div></div> `);
+    if (!store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<input id="salt-pct" type="number" min="1" max="3" step="0.1"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).saltPct)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="2.0"/> <p class="text-xs text-stone-400 mt-1">${escape_html(t().saltBakersPct)}</p>`);
+    } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div></div></div> `);
+    $$renderer2.push(`<!--]--></div> <div><label for="starter-hyd" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().starterHydration)}</label> <input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div> <div><div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <button type="button"${attr_class("relative inline-flex h-6 w-11 items-center rounded-full transition-colors", void 0, {
+      "bg-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn,
+      "bg-stone-200": !store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn
+    })} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse"><span${attr_class("inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform", void 0, {
+      "translate-x-6": store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn,
+      "translate-x-1": !store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn
+    })}></span></button></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div><div class="flex justify-between text-xs text-stone-500 mb-1"><span>${escape_html(t().duration)}</span> <span class="font-semibold text-stone-700">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} min</span></div> <input type="range" min="20" max="60" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} class="w-full h-2 bg-stone-200 rounded-full accent-amber-500 cursor-pointer svelte-e6qthp"/> <div class="flex justify-between text-xs text-stone-400 mt-0.5"><span>20 min</span> <span>60 min</span></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div></div></div></div> `);
     {
       $$renderer2.push("<!--[-1-->");
     }
