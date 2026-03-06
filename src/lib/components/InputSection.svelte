@@ -7,6 +7,7 @@
 	const t = $derived(translations[$lang]);
 
 	let advancedOpen = $state(false);
+	let philosophyModalOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
 
@@ -171,7 +172,19 @@
 
 			<!-- Fermentation philosophy -->
 			<div>
-				<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">{t.fermentationPhilosophyLabel}</p>
+				<div class="flex items-center gap-1.5 mb-2">
+					<p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">{t.fermentationPhilosophyLabel}</p>
+					<button
+						type="button"
+						onclick={() => (philosophyModalOpen = true)}
+						class="flex items-center justify-center w-[1.3rem] h-[1.3rem] rounded-full text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex-shrink-0"
+						aria-label="Learn about fermentation philosophy options"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
 				<div class="grid grid-cols-2 gap-2">
 				{#each (['Predictability', 'FlavorDevelopment'] as const) as philosophy}
 					<button
@@ -443,6 +456,65 @@
 			</div>
 	</div>
 </div>
+
+<!-- Fermentation Philosophy info modal -->
+{#if philosophyModalOpen}
+	<!-- Backdrop -->
+	<button
+		type="button"
+		class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+		onclick={() => (philosophyModalOpen = false)}
+		aria-label="Close fermentation philosophy modal"
+	></button>
+
+	<!-- Modal panel -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center px-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="philosophy-modal-title"
+	>
+		<div class="w-full max-w-sm rounded-2xl bg-white shadow-xl ring-1 ring-stone-200 overflow-hidden">
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b border-stone-100">
+				<h2 id="philosophy-modal-title" class="text-base font-semibold text-stone-800">{t.philosophyModalTitle}</h2>
+				<button
+					type="button"
+					onclick={() => (philosophyModalOpen = false)}
+					class="text-stone-400 hover:text-stone-700 transition-colors p-1 rounded-lg hover:bg-stone-100"
+					aria-label="Close"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<!-- Body -->
+			<div class="px-5 py-4 space-y-4">
+				<div>
+					<p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">{t.philosophyPredictability}</p>
+					<p class="text-sm text-stone-600 leading-relaxed">{t.philosophyModalPredictabilityBody}</p>
+				</div>
+				<div class="border-t border-stone-100 pt-4">
+					<p class="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">{t.philosophyFlavorDev}</p>
+					<p class="text-sm text-stone-600 leading-relaxed">{t.philosophyModalFlavorDevBody}</p>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<div class="px-5 pb-5">
+				<button
+					type="button"
+					onclick={() => (philosophyModalOpen = false)}
+					class="w-full py-2.5 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 transition-colors"
+				>
+					{t.done}
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	input[type='range'] {

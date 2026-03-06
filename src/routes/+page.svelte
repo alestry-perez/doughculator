@@ -52,12 +52,35 @@
 	}
 
 	async function copyRecipe() {
+		const text = buildCopyText();
 		try {
-			await navigator.clipboard.writeText(buildCopyText());
+			if (!navigator.clipboard?.writeText) {
+				throw new Error('Clipboard API unavailable');
+			}
+			await navigator.clipboard.writeText(text);
 			copied = true;
 			setTimeout(() => (copied = false), 2500);
 		} catch {
-			// fallback: select a hidden textarea
+			// Mobile fallback for browsers where navigator.clipboard is blocked/unavailable.
+			const textarea = document.createElement('textarea');
+			textarea.value = text;
+			textarea.setAttribute('readonly', '');
+			textarea.style.position = 'fixed';
+			textarea.style.opacity = '0';
+			textarea.style.pointerEvents = 'none';
+			document.body.appendChild(textarea);
+			textarea.focus();
+			textarea.select();
+
+			try {
+				const copiedWithFallback = document.execCommand('copy');
+				if (copiedWithFallback) {
+					copied = true;
+					setTimeout(() => (copied = false), 2500);
+				}
+			} finally {
+				document.body.removeChild(textarea);
+			}
 		}
 	}
 

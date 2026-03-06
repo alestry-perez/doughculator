@@ -210,6 +210,9 @@ const en = {
   philosophyFlavorDev: "Flavor Development",
   philosophyPredictabilityDesc: "More starter when cold — consistent timing.",
   philosophyFlavorDevDesc: "Less starter when cold — slower fermentation builds complexity.",
+  philosophyModalTitle: "Fermentation Philosophy",
+  philosophyModalPredictabilityBody: "Predictability uses a higher inoculation rate when temperatures drop. This keeps fermentation on a reliable schedule regardless of season or kitchen conditions — ideal when you want consistent results and a repeatable bake-day routine.",
+  philosophyModalFlavorDevBody: "Flavor Development lowers inoculation in cold conditions, letting the dough ferment slowly over a longer window. Extended time produces more acetic and lactic acids, yielding a more complex, tangy flavor — great for cold retard bakes or when you can be flexible with timing.",
   proofMethod: "Proof Method",
   roomTemp: "Room Temp",
   coldRetard: "Cold Retard",
@@ -356,6 +359,9 @@ const es = {
   philosophyFlavorDev: "Sabor",
   philosophyPredictabilityDesc: "Más levadura en frío — tiempos consistentes.",
   philosophyFlavorDevDesc: "Menos levadura en frío — fermentación más lenta para mayor sabor.",
+  philosophyModalTitle: "Filosofía de Fermentación",
+  philosophyModalPredictabilityBody: "Consistencia usa una tasa de inoculación más alta cuando bajan las temperaturas. Esto mantiene la fermentación en un calendario fiable independientemente de la estación o las condiciones de cocina — ideal si buscas resultados consistentes y una rutina de horneado reproducible.",
+  philosophyModalFlavorDevBody: "Sabor reduce la inoculación en condiciones frías, dejando que la masa fermente lentamente durante más tiempo. Este proceso produce más ácidos acético y láctico, generando un sabor más complejo y ácido — ideal para fermentaciones en frío o cuando tienes flexibilidad de tiempo.",
   proofMethod: "Método de Fermentación Final",
   roomTemp: "Temp. Ambiente",
   coldRetard: "Frío (Nevera)",
@@ -498,6 +504,9 @@ const sv = {
   philosophyFlavorDev: "Smakutveckling",
   philosophyPredictabilityDesc: "Mer surdeg vid kyla — konsekvent timing.",
   philosophyFlavorDevDesc: "Mindre surdeg vid kyla — långsammare jäsning ger mer smak.",
+  philosophyModalTitle: "Jäsningsfilosofi",
+  philosophyModalPredictabilityBody: "Förutsägbarhet använder en högre inokulationsgrad när temperaturen sjunker. Det håller jäsningen på ett pålitligt schema oavsett årstid eller köksförhållanden — idealiskt när du vill ha konsekventa resultat och en repeterbar bakrutin.",
+  philosophyModalFlavorDevBody: "Smakutveckling sänker inokulationen i kalla förhållanden och låter degen jäsa långsamt under längre tid. Den förlängda tiden producerar mer ättiksyra och mjölksyra, vilket ger en mer komplex och syrlig smak — perfekt för kall jäsning eller när du har flexibel timing.",
   proofMethod: "Jäsningsmetod",
   roomTemp: "Rumstemperatur",
   coldRetard: "Kall Jäsning",
@@ -1035,7 +1044,7 @@ function InputSection($$renderer, $$props) {
         "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal !== goal
       })}><span class="text-sm font-bold">${escape_html(t().crumbGoalNames[goal])}</span></button>`);
     }
-    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().fermentationPhilosophyLabel)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><div class="flex items-center gap-1.5 mb-2"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().fermentationPhilosophyLabel)}</p> <button type="button" class="flex items-center justify-center w-[1.3rem] h-[1.3rem] rounded-full text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex-shrink-0" aria-label="Learn about fermentation philosophy options"><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="grid grid-cols-2 gap-2"><!--[-->`);
     const each_array_1 = ensure_array_like(["Predictability", "FlavorDevelopment"]);
     for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
       let philosophy = each_array_1[$$index_1];
@@ -1092,7 +1101,11 @@ function InputSection($$renderer, $$props) {
     {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div></div></div>`);
+    $$renderer2.push(`<!--]--></div></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }

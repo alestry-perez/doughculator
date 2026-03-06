@@ -281,6 +281,11 @@ const en = {
 	philosophyFlavorDev: 'Flavor Development',
 	philosophyPredictabilityDesc: 'More starter when cold — consistent timing.',
 	philosophyFlavorDevDesc: 'Less starter when cold — slower fermentation builds complexity.',
+	philosophyModalTitle: 'Fermentation Philosophy',
+	philosophyModalPredictabilityBody:
+		'Predictability uses a higher inoculation rate when temperatures drop. This keeps fermentation on a reliable schedule regardless of season or kitchen conditions — ideal when you want consistent results and a repeatable bake-day routine.',
+	philosophyModalFlavorDevBody:
+		'Flavor Development lowers inoculation in cold conditions, letting the dough ferment slowly over a longer window. Extended time produces more acetic and lactic acids, yielding a more complex, tangy flavor — great for cold retard bakes or when you can be flexible with timing.',
 	proofMethod: 'Proof Method',
 	roomTemp: 'Room Temp',
 	coldRetard: 'Cold Retard',
@@ -432,6 +437,11 @@ const es: Translations = {
 	philosophyFlavorDev: 'Sabor',
 	philosophyPredictabilityDesc: 'Más levadura en frío — tiempos consistentes.',
 	philosophyFlavorDevDesc: 'Menos levadura en frío — fermentación más lenta para mayor sabor.',
+	philosophyModalTitle: 'Filosofía de Fermentación',
+	philosophyModalPredictabilityBody:
+		'Consistencia usa una tasa de inoculación más alta cuando bajan las temperaturas. Esto mantiene la fermentación en un calendario fiable independientemente de la estación o las condiciones de cocina — ideal si buscas resultados consistentes y una rutina de horneado reproducible.',
+	philosophyModalFlavorDevBody:
+		'Sabor reduce la inoculación en condiciones frías, dejando que la masa fermente lentamente durante más tiempo. Este proceso produce más ácidos acético y láctico, generando un sabor más complejo y ácido — ideal para fermentaciones en frío o cuando tienes flexibilidad de tiempo.',
 	proofMethod: 'Método de Fermentación Final',
 	roomTemp: 'Temp. Ambiente',
 	coldRetard: 'Frío (Nevera)',
@@ -583,6 +593,11 @@ const sv: Translations = {
 	philosophyFlavorDev: 'Smakutveckling',
 	philosophyPredictabilityDesc: 'Mer surdeg vid kyla — konsekvent timing.',
 	philosophyFlavorDevDesc: 'Mindre surdeg vid kyla — långsammare jäsning ger mer smak.',
+	philosophyModalTitle: 'Jäsningsfilosofi',
+	philosophyModalPredictabilityBody:
+		'Förutsägbarhet använder en högre inokulationsgrad när temperaturen sjunker. Det håller jäsningen på ett pålitligt schema oavsett årstid eller köksförhållanden — idealiskt när du vill ha konsekventa resultat och en repeterbar bakrutin.',
+	philosophyModalFlavorDevBody:
+		'Smakutveckling sänker inokulationen i kalla förhållanden och låter degen jäsa långsamt under längre tid. Den förlängda tiden producerar mer ättiksyra och mjölksyra, vilket ger en mer komplex och syrlig smak — perfekt för kall jäsning eller när du har flexibel timing.',
 	proofMethod: 'Jäsningsmetod',
 	roomTemp: 'Rumstemperatur',
 	coldRetard: 'Kall Jäsning',
