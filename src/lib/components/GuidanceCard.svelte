@@ -11,26 +11,28 @@
 	const translatedGoal = $derived(t.crumbGoalNames[crumbGoal]);
 </script>
 
-<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5">
-	<h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-3">{t.readingYourCrumb}</h2>
-	<div class="text-sm text-stone-700 space-y-2">
-		<p>
-			<span class="font-semibold text-amber-700">{t.target(translatedGoal)}</span>
-			{info.description}
-		</p>
-		<p>
-			<span class="font-semibold text-blue-700">{t.underFermented}</span>
-			{info.underFermented}
-		</p>
-		<p>
-			<span class="font-semibold text-red-700">{t.overFermented}</span>
-			{info.overFermented}
-		</p>
-	</div>
-	<div class="mt-4 pt-4 border-t border-stone-100 text-xs text-stone-500 space-y-1">
-		<p><strong>{t.floatTest}</strong> {t.floatTestDesc}</p>
-		<p><strong>{t.pokeTest}</strong> {t.pokeTestDesc}</p>
-		<p><strong>{t.jiggleTest}</strong> {t.jiggleTestDesc}</p>
+<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70">
+	<div class="card-body p-5">
+		<h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-3">{t.readingYourCrumb}</h2>
+		<div class="text-sm text-base-content space-y-2">
+			<p>
+				<span class="font-semibold text-secondary">{t.target(translatedGoal)}</span>
+				{info.description}
+			</p>
+			<p>
+				<span class="font-semibold text-warning">{t.underFermented}</span>
+				{info.underFermented}
+			</p>
+			<p>
+				<span class="font-semibold text-error">{t.overFermented}</span>
+				{info.overFermented}
+			</p>
+		</div>
+		<div class="mt-4 pt-4 border-t border-base-200 text-xs text-base-content/70 space-y-1">
+			<p><strong>{t.floatTest}</strong> {t.floatTestDesc}</p>
+			<p><strong>{t.pokeTest}</strong> {t.pokeTestDesc}</p>
+			<p><strong>{t.jiggleTest}</strong> {t.jiggleTestDesc}</p>
+		</div>
 	</div>
 </div>
 

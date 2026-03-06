@@ -2943,10 +2943,6 @@ function attr_class(value, hash, directives) {
   var result = to_class(value, hash, directives);
   return result ? ` class="${escape_html(result, true)}"` : "";
 }
-function attr_style(value, directives) {
-  var result = to_style(value, directives);
-  return result ? ` style="${escape_html(result, true)}"` : "";
-}
 function store_get(store_values, store_name, store) {
   if (store_name in store_values && store_values[store_name][0] === store) {
     return store_values[store_name][2];
@@ -3032,12 +3028,12 @@ export {
   setContext as a4,
   derived as a5,
   attr_class as a6,
-  store_get as a7,
-  attr as a8,
-  ensure_array_like as a9,
-  unsubscribe_stores as aa,
+  clsx as a7,
+  store_get as a8,
+  attr as a9,
+  ensure_array_like as aa,
   stringify as ab,
-  attr_style as ac,
+  unsubscribe_stores as ac,
   safe_not_equal as ad,
   subscribe_to_store as ae,
   run_all as af,

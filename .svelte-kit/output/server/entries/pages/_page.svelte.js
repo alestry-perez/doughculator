@@ -1,4 +1,4 @@
-import { e as escape_html, a6 as attr_class, a7 as store_get, a8 as attr, a9 as ensure_array_like, aa as unsubscribe_stores, a5 as derived$1, ab as stringify, ac as attr_style, h as head } from "../../chunks/index2.js";
+import { e as escape_html, a6 as attr_class, a7 as clsx, a8 as store_get, a9 as attr, aa as ensure_array_like, ab as stringify, ac as unsubscribe_stores, a5 as derived$1, h as head } from "../../chunks/index2.js";
 import { d as derived, w as writable } from "../../chunks/index.js";
 const scheduleStrings = {
   en: {
@@ -1039,77 +1039,49 @@ function InputSection($$renderer, $$props) {
     const tempMax = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 120 : 50);
     const fridgeTempMin = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 28 : -2);
     const fridgeTempMax = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? 50 : 10);
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors" aria-label="Toggle temperature unit"><span${attr_class("", void 0, {
-      "text-amber-600": store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C"
-    })}>°C</span> <span class="text-stone-300">/</span> <span${attr_class("", void 0, {
-      "text-amber-600": store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F"
-    })}>°F</span></button></div> <div class="px-5 pb-5 space-y-5"><div><label for="total-flour" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().totalFlour)}</label> <input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="500"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().flourBlend)}</span> <span class="text-xs font-semibold text-stone-600">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)}% ${escape_html(t().white)} / ${escape_html(wwPct())}% ${escape_html(t().wholeWheat)}</span></div> <input type="range" min="0" max="100" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)} class="w-full h-2 bg-stone-200 rounded-full accent-amber-500 cursor-pointer svelte-e6qthp"/> <div class="flex justify-between text-xs text-stone-400 mt-1.5"><span class="tabular-nums">${escape_html(t().white)}: ${escape_html(whiteFlourGrams())}g</span> <span class="tabular-nums">${escape_html(t().wholeWheat)}: ${escape_html(wwFlourGrams())}g</span></div></div> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().crumbGoal)}</p> <div class="grid grid-cols-3 gap-2"><!--[-->`);
+    const autolyseMinMins = 20;
+    const autolyseMaxMins = 60;
+    const autolyseProgressMax = autolyseMaxMins - autolyseMinMins;
+    const autolyseProgressValue = derived$1(() => Math.max(0, Math.min(autolyseProgressMax, store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins - autolyseMinMins)));
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="btn btn-ghost btn-sm rounded-full border border-base-300 bg-base-100" aria-label="Toggle temperature unit"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <div class="px-5 pb-5 space-y-5"><div class="form-control"><label for="total-flour" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().totalFlour)}</span></label> <input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="input input-bordered w-full" placeholder="500"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().flourBlend)}</span> <span class="text-xs font-semibold text-base-content/70">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)}% ${escape_html(t().white)} / ${escape_html(wwPct())}% ${escape_html(t().wholeWheat)}</span></div> <input type="range" min="0" max="100" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)} class="range range-secondary range-sm w-full"/> <div class="flex justify-between text-xs text-base-content/50 mt-1.5"><span class="tabular-nums">${escape_html(t().white)}: ${escape_html(whiteFlourGrams())}g</span> <span class="tabular-nums">${escape_html(t().wholeWheat)}: ${escape_html(wwFlourGrams())}g</span></div></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().crumbGoal)}</p> <div class="grid grid-cols-3 gap-2"><!--[-->`);
     const each_array = ensure_array_like(crumbGoals);
     for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
       let goal = each_array[$$index];
-      $$renderer2.push(`<button type="button"${attr_class("flex flex-col items-center rounded-xl border-2 px-2 py-3 text-center transition-all", void 0, {
-        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal === goal,
-        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal === goal,
-        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal === goal,
-        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal !== goal,
-        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal !== goal,
-        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal !== goal
-      })}><span class="text-sm font-bold">${escape_html(t().crumbGoalNames[goal])}</span></button>`);
+      $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 flex-col h-auto py-3 px-2 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal === goal ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}><span class="text-sm font-bold">${escape_html(t().crumbGoalNames[goal])}</span></button>`);
     }
-    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><div class="flex items-center gap-1.5 mb-2"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().fermentationPhilosophyLabel)}</p> <button type="button" class="flex items-center justify-center w-[1.3rem] h-[1.3rem] rounded-full text-stone-400 hover:text-amber-600 hover:bg-amber-50 transition-colors flex-shrink-0" aria-label="Learn about fermentation philosophy options"><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><div class="flex items-center gap-1.5 mb-2"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fermentationPhilosophyLabel)}</p> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0" aria-label="Learn about fermentation philosophy options"><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="grid grid-cols-2 gap-2"><!--[-->`);
     const each_array_1 = ensure_array_like(["Predictability", "FlavorDevelopment"]);
     for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
       let philosophy = each_array_1[$$index_1];
-      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
-        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
-        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
-        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy,
-        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy,
-        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy,
-        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy !== philosophy
-      })}>${escape_html(philosophy === "Predictability" ? t().philosophyPredictability : t().philosophyFlavorDev)}</button>`);
+      $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(philosophy === "Predictability" ? t().philosophyPredictability : t().philosophyFlavorDev)}</button>`);
     }
-    $$renderer2.push(`<!--]--></div> <p class="text-xs text-stone-500 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().proofMethod)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().proofMethod)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
     const each_array_2 = ensure_array_like(["Room", "ColdRetard"]);
     for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
       let method = each_array_2[$$index_2];
-      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
-        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
-        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
-        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method,
-        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method,
-        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method,
-        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod !== method
-      })}>${escape_html(method === "Room" ? t().roomTemp : t().coldRetard)}</button>`);
+      $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(method === "Room" ? t().roomTemp : t().coldRetard)}</button>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === "ColdRetard") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div><label for="fridge-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().fridgeTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</label> <input id="fridge-temp" type="number"${attr("min", fridgeTempMin())}${attr("max", fridgeTempMax())} step="0.5"${attr("value", fridgeDisplay())} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div>`);
+      $$renderer2.push(`<div class="form-control"><label for="fridge-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fridgeTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <input id="fridge-temp" type="number"${attr("min", fridgeTempMin())}${attr("max", fridgeTempMax())} step="0.5"${attr("value", fridgeDisplay())} class="input input-bordered w-full"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().scheduleMode)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    $$renderer2.push(`<!--]--> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().scheduleMode)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
     const each_array_3 = ensure_array_like(["relative", "clock"]);
     for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
       let mode = each_array_3[$$index_3];
-      $$renderer2.push(`<button type="button"${attr_class("rounded-xl border-2 px-3 py-2.5 text-sm font-semibold transition-all", void 0, {
-        "border-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
-        "bg-amber-50": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
-        "text-amber-800": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode,
-        "border-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode,
-        "text-stone-600": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode,
-        "hover:bg-stone-50": store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode !== mode
-      })}>${escape_html(mode === "relative" ? t().relative : t().clock)}</button>`);
+      $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(mode === "relative" ? t().relative : t().clock)}</button>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === "clock") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div><label for="start-time" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().startTime)}</label> <input id="start-time" type="time"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00")} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div>`);
+      $$renderer2.push(`<div class="form-control"><label for="start-time" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().startTime)}</span></label> <input id="start-time" type="time"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00")} class="input input-bordered w-full"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--> <div class="border-t border-stone-100 pt-4 space-y-4"><div><label for="ambient-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().ambientTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</label> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div> <div><label for="dough-temp" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().doughTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)}) <span class="font-normal text-stone-400">${escape_html(t().optional)}</span></label> <input id="dough-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", doughDisplay())}${attr("placeholder", t().leaveBlankAmbient)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent placeholder-stone-300"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().salt)}</span> <div class="flex items-center gap-2"><span class="text-xs text-stone-400">`);
+    $$renderer2.push(`<!--]--> <div class="border-t border-base-200 pt-4 space-y-4"><div class="form-control"><label for="ambient-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().ambientTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="input input-bordered w-full"/></div> <div class="form-control"><label for="dough-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().doughTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)}) <span class="font-normal text-base-content/50">${escape_html(t().optional)}</span></span></label> <input id="dough-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", doughDisplay())}${attr("placeholder", t().leaveBlankAmbient)} class="input input-bordered w-full placeholder:text-base-content/30"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().salt)}</span> <div class="flex items-center gap-2"><span class="text-xs text-base-content/50">`);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`${escape_html(t().saltAutoLabel(autoSaltPct().toFixed(2), String(autoSaltG())))}`);
@@ -1117,29 +1089,17 @@ function InputSection($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`${escape_html(t().saltManual)}`);
     }
-    $$renderer2.push(`<!--]--></span> <button type="button"${attr_class("relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0", void 0, {
-      "bg-amber-400": !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc,
-      "bg-stone-200": store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc
-    })} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc)} aria-label="Override salt"><span${attr_class("inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform", void 0, {
-      "translate-x-4": !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc,
-      "translate-x-0.5": store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc
-    })}></span></button> <span class="text-xs text-stone-500">${escape_html(t().saltOverride)}</span></div></div> `);
+    $$renderer2.push(`<!--]--></span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc, true)} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc)} aria-label="Override salt"/> <span class="text-xs text-base-content/70">${escape_html(t().saltOverride)}</span></div></div> `);
     if (!store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<input id="salt-pct" type="number" min="1" max="3" step="0.1"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).saltPct)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent" placeholder="2.0"/> <p class="text-xs text-stone-400 mt-1">${escape_html(t().saltBakersPct)}</p>`);
+      $$renderer2.push(`<div class="form-control"><input id="salt-pct" type="number" min="1" max="3" step="0.1"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).saltPct)} class="input input-bordered w-full" placeholder="2.0"/></div> <p class="text-xs text-base-content/50 mt-1">${escape_html(t().saltBakersPct)}</p>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div> <div><label for="starter-hyd" class="block text-xs font-semibold text-stone-500 uppercase tracking-wide mb-1.5">${escape_html(t().starterHydration)}</label> <input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="w-full rounded-xl border border-stone-200 px-3 py-2.5 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"/></div> <div><div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-stone-500 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <button type="button"${attr_class("relative inline-flex h-6 w-11 items-center rounded-full transition-colors", void 0, {
-      "bg-amber-400": store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn,
-      "bg-stone-200": !store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn
-    })} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse"><span${attr_class("inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform", void 0, {
-      "translate-x-6": store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn,
-      "translate-x-1": !store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn
-    })}></span></button></div> `);
+    $$renderer2.push(`<!--]--></div> <div class="form-control"><label for="starter-hyd" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().starterHydration)}</span></label> <input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="input input-bordered w-full"/></div> <div><div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().autolyse)}</span> <input type="checkbox" class="toggle toggle-secondary"${attr("checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn, true)} role="switch"${attr("aria-checked", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn)} aria-label="Toggle autolyse"/></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).autolyseOn) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div><div class="flex justify-between text-xs text-stone-500 mb-1"><span>${escape_html(t().duration)}</span> <span class="font-semibold text-stone-700">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} min</span></div> <input type="range" min="20" max="60" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} class="w-full h-2 bg-stone-200 rounded-full accent-amber-500 cursor-pointer svelte-e6qthp"/> <div class="flex justify-between text-xs text-stone-400 mt-0.5"><span>20 min</span> <span>60 min</span></div></div>`);
+      $$renderer2.push(`<div><div class="flex justify-between text-xs text-base-content/70 mb-1"><span>${escape_html(t().duration)}</span> <span class="font-semibold text-base-content">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins)} min</span></div> <progress class="progress progress-secondary progress-sm w-full"${attr("value", autolyseProgressValue())}${attr("max", autolyseProgressMax)} aria-label="Autolyse duration progress"></progress> <div class="flex justify-between text-xs text-base-content/50 mt-0.5"><span>20 min</span> <span>60 min</span></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1165,14 +1125,14 @@ function FormulaCard($$renderer, $$props) {
     function round(n) {
       return Math.round(n).toString();
     }
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().formula)}</h2> <p class="text-xs text-stone-400 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <table class="w-full text-sm"><thead><tr class="border-b border-stone-100"><th class="text-left px-5 py-2 text-xs font-semibold text-stone-400 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-stone-400 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-stone-400 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-stone-50"><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().totalFlourRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">100%</td></tr><tr class="bg-stone-50/50"><td class="px-5 py-2 text-stone-500 text-xs pl-8">${escape_html(t().whiteFlouRow)}</td><td class="px-5 py-2 text-right tabular-nums text-stone-500 text-xs">${escape_html(round(whiteFlouG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-stone-400 text-xs">${escape_html(pct(whiteFlouG(), formula.totalFlourG))}</td></tr>`);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><tr class="bg-base-200/50"><td class="px-5 py-2 text-base-content/70 text-xs pl-8">${escape_html(t().whiteFlouRow)}</td><td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(whiteFlouG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">${escape_html(pct(whiteFlouG(), formula.totalFlourG))}</td></tr>`);
     if (wwFlourG() > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<tr class="bg-stone-50/50"><td class="px-5 py-2 text-stone-500 text-xs pl-8">${escape_html(t().wwFlourRow)}</td><td class="px-5 py-2 text-right tabular-nums text-stone-500 text-xs">${escape_html(round(wwFlourG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-stone-400 text-xs">${escape_html(pct(wwFlourG(), formula.totalFlourG))}</td></tr>`);
+      $$renderer2.push(`<tr class="bg-base-200/50"><td class="px-5 py-2 text-base-content/70 text-xs pl-8">${escape_html(t().wwFlourRow)}</td><td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(wwFlourG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">${escape_html(pct(wwFlourG(), formula.totalFlourG))}</td></tr>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-stone-700 font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-800 font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-stone-500">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))}</td></tr></tbody><tfoot><tr class="border-t-2 border-stone-200 bg-amber-50"><td class="px-5 py-3 font-bold text-stone-800">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-stone-800">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-stone-100 bg-stone-50/60"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-amber-700">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-stone-100"><p class="text-xs font-semibold text-stone-500 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-stone-50 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-stone-800">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-stone-500 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-stone-400 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
+    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))}</td></tr></tbody><tfoot><tr class="border-t-2 border-secondary/30 bg-secondary/10"><td class="px-5 py-3 font-bold text-secondary">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-secondary">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-base-200 bg-base-200/60"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-base-200"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-base-content/50 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
@@ -1185,28 +1145,33 @@ function TimingCard($$renderer, $$props) {
     function widthPct(hours) {
       return Math.min(100, hours / maxPossibleBulk * 100);
     }
-    const tempBandColors = {
-      Cold: "text-blue-700 bg-blue-50",
-      Freezing: "text-indigo-700 bg-indigo-50",
-      Standard: "text-emerald-700 bg-emerald-50",
-      Warm: "text-amber-700 bg-amber-50",
-      Hot: "text-red-700 bg-red-50"
+    const tempBandVariant = {
+      Cold: "badge-info",
+      Freezing: "badge-info",
+      Standard: "badge-success",
+      Warm: "badge-warning",
+      Hot: "badge-error"
     };
-    const hydrationBandColors = {
-      Low: "text-sky-700 bg-sky-50",
-      Medium: "text-teal-700 bg-teal-50",
-      High: "text-violet-700 bg-violet-50"
+    const hydrationBandVariant = {
+      Low: "badge-warning",
+      Medium: "badge-success",
+      High: "badge-info"
     };
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5 space-y-5"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().timing)}</h2> <div class="flex flex-wrap gap-2"><span${attr_class(`text-xs px-3 py-1 rounded-full font-medium ${stringify(tempBandColors[formula.tempBand] ?? "")}`)}>${escape_html(t().tempBands[formula.tempBand])} (${escape_html(formula.effectiveTempC.toFixed(1))}°C)</span> <span${attr_class(`text-xs px-3 py-1 rounded-full font-medium ${stringify(hydrationBandColors[formula.hydrationBand] ?? "")}`)}>${escape_html(t().hydrationBands[formula.hydrationBand])} ${escape_html(t().hydration)} (${escape_html(formula.finalHydrationPct.toFixed(1))}%)</span> <span class="text-xs px-3 py-1 rounded-full font-medium bg-amber-50 text-amber-700">${escape_html(formula.inoculationPct.toFixed(1))}% ${escape_html(t().inoculation)}</span></div> <div><div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-stone-700">${escape_html(t().bulkFermentation)}</span> <span class="text-sm tabular-nums font-bold text-amber-700">${escape_html(formatMins(timing.bulkMin * 60))} – ${escape_html(formatMins(timing.bulkMax * 60))}</span></div> <div class="relative h-3 rounded-full bg-stone-100 overflow-hidden"><div class="absolute left-0 h-full rounded-full bg-amber-200"${attr_style(`width: ${stringify(widthPct(timing.bulkMax))}%`)}></div> <div class="absolute left-0 h-full rounded-full bg-amber-400"${attr_style(`width: ${stringify(widthPct(timing.bulkMin))}%`)}></div></div> <div class="flex justify-between text-xs text-stone-400 mt-1"><span>${escape_html(t().fastest)}</span> <span>${escape_html(t().slowest)}</span></div> <p class="text-xs text-stone-500 mt-1">${escape_html(t().foldSchedule(timing.foldCount, timing.foldIntervalMins))}</p></div> <div>`);
+    const bulkMaxPct = derived$1(() => widthPct(timing.bulkMax));
+    const bulkMinPct = derived$1(() => widthPct(timing.bulkMin));
+    const proofMaxPct = derived$1(() => widthPct(timing.proofMax));
+    const proofMinPct = derived$1(() => widthPct(timing.proofMin));
+    const coldMinPct = derived$1(() => widthPct(timing.coldRetardMin));
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body gap-5 p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().timing)}</h2> <div class="flex flex-wrap gap-2"><span${attr_class(`badge badge-soft ${stringify(tempBandVariant[formula.tempBand] ?? "badge-ghost")} badge-md font-medium`)}>${escape_html(t().tempBands[formula.tempBand])} (${escape_html(formula.effectiveTempC.toFixed(1))}°C)</span> <span${attr_class(`badge badge-soft ${stringify(hydrationBandVariant[formula.hydrationBand] ?? "badge-ghost")} badge-md font-medium`)}>${escape_html(t().hydrationBands[formula.hydrationBand])} ${escape_html(t().hydration)} (${escape_html(formula.finalHydrationPct.toFixed(1))}%)</span> <span class="badge badge-soft badge-accent badge-md font-medium">${escape_html(formula.inoculationPct.toFixed(1))}% ${escape_html(t().inoculation)}</span></div> <div><div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-base-content">${escape_html(t().bulkFermentation)}</span> <span class="text-sm tabular-nums font-bold text-secondary">${escape_html(formatMins(timing.bulkMin * 60))} – ${escape_html(formatMins(timing.bulkMax * 60))}</span></div> <div class="relative h-3"><progress class="progress progress-warning w-full absolute inset-0"${attr("value", bulkMaxPct())} max="100"></progress> <progress class="progress progress-secondary w-full absolute inset-0 opacity-80"${attr("value", bulkMinPct())} max="100"></progress></div> <div class="flex justify-between text-xs text-base-content/50 mt-1"><span>${escape_html(t().fastest)}</span> <span>${escape_html(t().slowest)}</span></div> <p class="text-xs text-base-content/70 mt-1">${escape_html(t().foldSchedule(timing.foldCount, timing.foldIntervalMins))}</p></div> <div>`);
     if (proofMethod === "Room") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-stone-700">${escape_html(t().roomProof)}</span> <span class="text-sm tabular-nums font-bold text-sky-700">${escape_html(formatMins(timing.proofMin * 60))} – ${escape_html(formatMins(timing.proofMax * 60))}</span></div> <div class="relative h-3 rounded-full bg-stone-100 overflow-hidden"><div class="absolute left-0 h-full rounded-full bg-sky-200"${attr_style(`width: ${stringify(widthPct(timing.proofMax))}%`)}></div> <div class="absolute left-0 h-full rounded-full bg-sky-400"${attr_style(`width: ${stringify(widthPct(timing.proofMin))}%`)}></div></div>`);
+      $$renderer2.push(`<div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-base-content">${escape_html(t().roomProof)}</span> <span class="text-sm tabular-nums font-bold text-info">${escape_html(formatMins(timing.proofMin * 60))} – ${escape_html(formatMins(timing.proofMax * 60))}</span></div> <div class="relative h-3"><progress class="progress progress-info w-full absolute inset-0 opacity-50"${attr("value", proofMaxPct())} max="100"></progress> <progress class="progress progress-info w-full absolute inset-0"${attr("value", proofMinPct())} max="100"></progress></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-stone-700">${escape_html(t().coldRetardProof)}</span> <span class="text-sm tabular-nums font-bold text-indigo-700">${escape_html(timing.coldRetardMin)}h – ${escape_html(timing.coldRetardMax)}h</span></div> <div class="relative h-3 rounded-full bg-stone-100 overflow-hidden"><div class="absolute left-0 h-full rounded-full bg-indigo-200" style="width: 100%"></div> <div class="absolute left-0 h-full rounded-full bg-indigo-400"${attr_style(`width: ${stringify(widthPct(timing.coldRetardMin))}%`)}></div></div> <p class="text-xs text-stone-500 mt-1">${escape_html(t().bakeColdNote)}</p>`);
+      $$renderer2.push(`<div class="flex justify-between items-center mb-2"><span class="text-sm font-semibold text-base-content">${escape_html(t().coldRetardProof)}</span> <span class="text-sm tabular-nums font-bold text-secondary">${escape_html(timing.coldRetardMin)}h – ${escape_html(timing.coldRetardMax)}h</span></div> <div class="relative h-3"><progress class="progress progress-secondary w-full absolute inset-0 opacity-50" value="100" max="100"></progress> <progress class="progress progress-secondary w-full absolute inset-0"${attr("value", coldMinPct())} max="100"></progress></div> <p class="text-xs text-base-content/70 mt-1">${escape_html(t().bakeColdNote)}</p>`);
     }
-    $$renderer2.push(`<!--]--></div> <div class="rounded-xl bg-stone-50 px-4 py-3 text-sm"><span class="text-stone-500">${escape_html(t().totalActiveTime)}</span> <span class="font-bold text-stone-800 ml-1">${escape_html(formatMins((timing.bulkMin + (proofMethod === "Room" ? timing.proofMin : timing.coldRetardMin)) * 60 + 85))} –
-			${escape_html(formatMins((timing.bulkMax + (proofMethod === "Room" ? timing.proofMax : timing.coldRetardMax)) * 60 + 95))}</span></div></div>`);
+    $$renderer2.push(`<!--]--></div> <div class="rounded-xl bg-secondary/10 ring-1 ring-secondary/20 px-4 py-3 text-sm"><span class="text-base-content/70">${escape_html(t().totalActiveTime)}</span> <span class="font-bold text-base-content ml-1">${escape_html(formatMins((timing.bulkMin + (proofMethod === "Room" ? timing.proofMin : timing.coldRetardMin)) * 60 + 85))} –
+				${escape_html(formatMins((timing.bulkMax + (proofMethod === "Room" ? timing.proofMax : timing.coldRetardMax)) * 60 + 95))}</span></div></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
@@ -1238,18 +1203,18 @@ function ScheduleCard($$renderer, $$props) {
       }
       return "";
     }
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-stone-400 mb-3">press to complete</p> <ol class="relative space-y-0"><!--[-->`);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-base-content/60 mb-3">press to complete</p> <ol class="relative space-y-0"><!--[-->`);
     const each_array = ensure_array_like(stepsWithTimes());
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let { step, clockTime, endClockTime } = each_array[i];
       $$renderer2.push(`<li class="flex gap-4 pb-5 relative group cursor-pointer select-none" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0">`);
       if (i < stepsWithTimes().length - 1) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div class="absolute left-4 top-8 bottom-0 w-px bg-stone-100"></div>`);
+        $$renderer2.push(`<div class="absolute left-4 top-8 bottom-0 w-px bg-secondary/20"></div>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--> <div${attr_class(`shrink-0 w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center z-10 transition-colors ${stringify(completedSteps.has(i) ? "bg-stone-200 text-stone-400" : "bg-amber-100 text-amber-700 group-hover:bg-amber-200")}`)}>`);
+      $$renderer2.push(`<!--]--> <div${attr_class(`shrink-0 w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center z-10 transition-colors ${stringify(completedSteps.has(i) ? "bg-success/15 text-success" : "bg-secondary/15 text-secondary group-hover:bg-secondary/25")}`)}>`);
       if (completedSteps.has(i)) {
         $$renderer2.push("<!--[0-->");
         $$renderer2.push(`✓`);
@@ -1257,31 +1222,31 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`${escape_html(i + 1)}`);
       }
-      $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-stone-800")}`)}>${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
+      $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-base-content")}`)}>${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
       if (scheduleMode === "clock" && clockTime) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-amber-700")}`)}>${escape_html(clockTime)}</div> `);
+        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-secondary")}`)}>${escape_html(clockTime)}</div> `);
         if (endClockTime && endClockTime !== clockTime) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div${attr_class(`text-xs text-stone-400 tabular-nums ${stringify(completedSteps.has(i) ? "line-through" : "")}`)}>→ ${escape_html(endClockTime)}</div>`);
+          $$renderer2.push(`<div${attr_class(`text-xs text-base-content/50 tabular-nums ${stringify(completedSteps.has(i) ? "line-through" : "")}`)}>→ ${escape_html(endClockTime)}</div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
         $$renderer2.push(`<!--]-->`);
       } else {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-stone-400 line-through" : "text-amber-700")}`)}>${escape_html(durationLabel(step))}</div>`);
+        $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-secondary")}`)}>${escape_html(durationLabel(step))}</div>`);
       }
       $$renderer2.push(`<!--]--></div></div> `);
       if (step.notes) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<p${attr_class(`text-xs mt-1 leading-snug ${stringify(completedSteps.has(i) ? "text-stone-300 line-through" : "text-stone-500")}`)}>${escape_html(step.notes)}</p>`);
+        $$renderer2.push(`<p${attr_class(`text-xs mt-1 leading-snug ${stringify(completedSteps.has(i) ? "text-base-content/30 line-through" : "text-base-content/70")}`)}>${escape_html(step.notes)}</p>`);
       } else {
         $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--></div></li>`);
     }
-    $$renderer2.push(`<!--]--></ol></div>`);
+    $$renderer2.push(`<!--]--></ol></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
@@ -1290,20 +1255,18 @@ function WarningsCard($$renderer, $$props) {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
     let { warnings } = $$props;
+    const alertVariant = {
+      info: "alert-info alert-soft",
+      warn: "alert-warning alert-soft",
+      danger: "alert-error alert-soft"
+    };
     if (warnings.length > 0) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5 space-y-3"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide">${escape_html(t().notesWarnings)}</h2> <!--[-->`);
+      $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5 gap-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().notesWarnings)}</h2> <!--[-->`);
       const each_array = ensure_array_like(warnings);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let w = each_array[$$index];
-        $$renderer2.push(`<div${attr_class("flex gap-3 rounded-xl px-4 py-3 text-sm", void 0, {
-          "bg-blue-50": w.level === "info",
-          "text-blue-800": w.level === "info",
-          "bg-amber-50": w.level === "warn",
-          "text-amber-800": w.level === "warn",
-          "bg-red-50": w.level === "danger",
-          "text-red-800": w.level === "danger"
-        })}><span class="mt-0.5 shrink-0 text-base leading-none">`);
+        $$renderer2.push(`<div${attr_class(`alert ${stringify(alertVariant[w.level] ?? "alert-info")} text-sm py-3 px-4`)}><span class="shrink-0 text-base leading-none">`);
         if (w.level === "info") {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`ℹ`);
@@ -1316,7 +1279,7 @@ function WarningsCard($$renderer, $$props) {
         }
         $$renderer2.push(`<!--]--></span> <p class="leading-snug">${escape_html(w.message)}</p></div>`);
       }
-      $$renderer2.push(`<!--]--></div>`);
+      $$renderer2.push(`<!--]--></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1331,7 +1294,7 @@ function GuidanceCard($$renderer, $$props) {
     let { crumbGoal } = $$props;
     const info = derived$1(() => t().guidance[crumbGoal]);
     const translatedGoal = derived$1(() => t().crumbGoalNames[crumbGoal]);
-    $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-5"><h2 class="text-base font-semibold text-stone-700 uppercase tracking-wide mb-3">${escape_html(t().readingYourCrumb)}</h2> <div class="text-sm text-stone-700 space-y-2"><p><span class="font-semibold text-amber-700">${escape_html(t().target(translatedGoal()))}</span> ${escape_html(info().description)}</p> <p><span class="font-semibold text-blue-700">${escape_html(t().underFermented)}</span> ${escape_html(info().underFermented)}</p> <p><span class="font-semibold text-red-700">${escape_html(t().overFermented)}</span> ${escape_html(info().overFermented)}</p></div> <div class="mt-4 pt-4 border-t border-stone-100 text-xs text-stone-500 space-y-1"><p><strong>${escape_html(t().floatTest)}</strong> ${escape_html(t().floatTestDesc)}</p> <p><strong>${escape_html(t().pokeTest)}</strong> ${escape_html(t().pokeTestDesc)}</p> <p><strong>${escape_html(t().jiggleTest)}</strong> ${escape_html(t().jiggleTestDesc)}</p></div></div>`);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-3">${escape_html(t().readingYourCrumb)}</h2> <div class="text-sm text-base-content space-y-2"><p><span class="font-semibold text-secondary">${escape_html(t().target(translatedGoal()))}</span> ${escape_html(info().description)}</p> <p><span class="font-semibold text-warning">${escape_html(t().underFermented)}</span> ${escape_html(info().underFermented)}</p> <p><span class="font-semibold text-error">${escape_html(t().overFermented)}</span> ${escape_html(info().overFermented)}</p></div> <div class="mt-4 pt-4 border-t border-base-200 text-xs text-base-content/70 space-y-1"><p><strong>${escape_html(t().floatTest)}</strong> ${escape_html(t().floatTestDesc)}</p> <p><strong>${escape_html(t().pokeTest)}</strong> ${escape_html(t().pokeTestDesc)}</p> <p><strong>${escape_html(t().jiggleTest)}</strong> ${escape_html(t().jiggleTestDesc)}</p></div></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
@@ -1342,13 +1305,13 @@ function AssumptionsDrawer($$renderer, $$props) {
     let { assumptions } = $$props;
     if (store_get($$store_subs ??= {}, "$assumptionsOpen", assumptionsOpen)) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<button type="button" class="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" aria-label="Close assumptions drawer"></button> <div class="fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-white shadow-xl ring-1 ring-stone-200" role="dialog" aria-modal="true"${attr("aria-label", t().calculationAssumptions)}><div class="sticky top-0 flex items-center justify-between px-5 py-4 bg-white border-b border-stone-100"><h2 class="text-base font-semibold text-stone-800">${escape_html(t().calculationAssumptions)}</h2> <button type="button" class="text-stone-400 hover:text-stone-700 transition-colors p-1 rounded-lg hover:bg-stone-100" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <div class="px-5 py-4"><p class="text-sm text-stone-500 mb-4">${escape_html(t().assumptionsDesc)}</p> <dl class="space-y-2"><!--[-->`);
+      $$renderer2.push(`<button type="button" class="fixed inset-0 z-40 bg-neutral/40 backdrop-blur-sm" aria-label="Close assumptions drawer"></button> <div class="fixed bottom-0 left-0 right-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-base-100 shadow-xl ring-1 ring-base-300/80" role="dialog" aria-modal="true"${attr("aria-label", t().calculationAssumptions)}><div class="sticky top-0 flex items-center justify-between px-5 py-4 bg-base-100/95 backdrop-blur border-b border-base-200"><h2 class="text-base font-semibold text-base-content">${escape_html(t().calculationAssumptions)}</h2> <button type="button" class="btn btn-ghost btn-sm btn-circle" aria-label="Close"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button></div> <div class="px-5 py-4"><p class="text-sm text-base-content/70 mb-4">${escape_html(t().assumptionsDesc)}</p> <dl class="space-y-2"><!--[-->`);
       const each_array = ensure_array_like(Object.entries(assumptions));
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let [key, value] = each_array[$$index];
-        $$renderer2.push(`<div class="flex justify-between items-center py-2 border-b border-stone-50"><dt class="text-sm text-stone-600">${escape_html(key)}</dt> <dd class="text-sm font-semibold text-stone-800 tabular-nums">${escape_html(value)}</dd></div>`);
+        $$renderer2.push(`<div class="flex justify-between items-center py-2 border-b border-base-200"><dt class="text-sm text-base-content/70">${escape_html(key)}</dt> <dd class="text-sm font-semibold text-base-content tabular-nums">${escape_html(value)}</dd></div>`);
       }
-      $$renderer2.push(`<!--]--></dl></div> <div class="px-5 pb-6"><button type="button" class="w-full py-3 rounded-xl bg-stone-100 text-stone-700 text-sm font-semibold hover:bg-stone-200 transition-colors">${escape_html(t().done)}</button></div></div>`);
+      $$renderer2.push(`<!--]--></dl></div> <div class="px-5 pb-6"><button type="button" class="btn btn-primary w-full">${escape_html(t().done)}</button></div></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1360,27 +1323,14 @@ function _page($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
-    let copied = false;
     const totalFlour = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG);
+    let darkMode = false;
     head("1uha8ag", $$renderer2, ($$renderer3) => {
       $$renderer3.title(($$renderer4) => {
         $$renderer4.push(`<title>DoughCulator</title>`);
       });
     });
-    $$renderer2.push(`<div class="min-h-screen bg-stone-50"><header class="bg-white border-b border-stone-100 sticky top-0 z-30"><div class="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between"><div class="flex items-center gap-3"><span class="text-2xl" aria-hidden="true">🍞</span> <div><h1 class="text-base font-bold text-stone-800 leading-tight">DoughCulator</h1> <p class="text-xs text-stone-400 leading-tight">${escape_html(t().appSubtitle)}</p></div></div> <div class="flex items-center gap-2"><div class="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-stone-200 text-stone-600" aria-label="Select language"><button type="button"${attr_class("hover:text-amber-500 transition-colors", void 0, {
-      "text-amber-600": store_get($$store_subs ??= {}, "$lang", lang) === "en"
-    })}>EN</button> <span class="text-stone-300">/</span> <button type="button"${attr_class("hover:text-amber-500 transition-colors", void 0, {
-      "text-amber-600": store_get($$store_subs ??= {}, "$lang", lang) === "es"
-    })}>ES</button> <span class="text-stone-300">/</span> <button type="button"${attr_class("hover:text-amber-500 transition-colors", void 0, {
-      "text-amber-600": store_get($$store_subs ??= {}, "$lang", lang) === "sv"
-    })}>SV</button></div> <button type="button" class="text-xs px-3 py-1.5 rounded-full border border-stone-200 text-stone-600 hover:bg-stone-50 transition-colors font-medium">${escape_html(t().assumptions)}</button> <button type="button"${attr("disabled", totalFlour() <= 0, true)}${attr_class("text-xs px-3 py-1.5 rounded-full font-semibold transition-all", void 0, {
-      "bg-emerald-500": copied,
-      "bg-amber-500": totalFlour() > 0,
-      "text-white": totalFlour() > 0,
-      "bg-stone-200": totalFlour() <= 0,
-      "text-stone-400": totalFlour() <= 0,
-      "cursor-not-allowed": totalFlour() <= 0
-    })}>${escape_html(t().copyRecipe)}</button></div></div></header> <main class="max-w-2xl mx-auto px-4 py-6 space-y-4">`);
+    $$renderer2.push(`<div class="min-h-screen bg-gradient-to-b from-base-200 via-base-200 to-base-300/40"><header class="bg-neutral/95 text-neutral-content border-b border-primary/25 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-neutral/90 sticky top-0 z-30"><div class="max-w-2xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-y-3"><div class="flex items-center gap-3 min-w-0"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-xl text-primary ring-1 ring-primary/35" aria-hidden="true">🍞</span> <div><h1 class="text-base font-bold text-neutral-content leading-tight">DoughCulator</h1> <p class="text-xs text-neutral-content/70 leading-tight">${escape_html(t().appSubtitle)}</p></div></div> <div class="flex items-center flex-wrap justify-end gap-2"><label class="swap swap-rotate inline-grid h-9 w-9 place-items-center rounded-full border border-transparent bg-transparent text-neutral-content/75 transition-colors duration-200 hover:border-neutral-content/35 hover:bg-neutral-content/10 hover:text-neutral-content focus-within:border-primary/45 focus-within:ring-2 focus-within:ring-primary/55 focus-within:ring-offset-2 focus-within:ring-offset-neutral/95" aria-label="Toggle dark mode"><input type="checkbox"${attr("checked", darkMode, true)} class="sr-only appearance-none"/> <svg class="swap-on h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"></path></svg> <svg class="swap-off h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"></path></svg></label> <div class="join border border-neutral-content/25 rounded-full bg-neutral-content/5 p-0.5" aria-label="Select language"><button type="button"${attr_class(`btn btn-xs join-item rounded-l-full border-0 ${stringify(store_get($$store_subs ??= {}, "$lang", lang) === "en" ? "btn-primary" : "btn-ghost text-neutral-content/70 hover:text-neutral-content hover:bg-neutral-content/10")}`)}>EN</button> <button type="button"${attr_class(`btn btn-xs join-item border-0 ${stringify(store_get($$store_subs ??= {}, "$lang", lang) === "es" ? "btn-primary" : "btn-ghost text-neutral-content/70 hover:text-neutral-content hover:bg-neutral-content/10")}`)}>ES</button> <button type="button"${attr_class(`btn btn-xs join-item rounded-r-full border-0 ${stringify(store_get($$store_subs ??= {}, "$lang", lang) === "sv" ? "btn-primary" : "btn-ghost text-neutral-content/70 hover:text-neutral-content hover:bg-neutral-content/10")}`)}>SV</button></div> <button type="button" class="btn btn-outline btn-sm rounded-full border-neutral-content/25 text-neutral-content/80 hover:border-neutral-content/40 hover:bg-neutral-content/10 hover:text-neutral-content">${escape_html(t().assumptions)}</button> <button type="button"${attr("disabled", totalFlour() <= 0, true)}${attr_class(`btn btn-sm rounded-full shadow-sm ${stringify(totalFlour() > 0 ? "btn-primary" : "btn-disabled")}`)}>${escape_html(t().copyRecipe)}</button></div></div></header> <main class="max-w-2xl mx-auto px-4 py-6 space-y-4">`);
     InputSection($$renderer2);
     $$renderer2.push(`<!----> `);
     if (totalFlour() > 0) {
@@ -1411,9 +1361,9 @@ function _page($$renderer, $$props) {
       $$renderer2.push(`<!---->`);
     } else {
       $$renderer2.push("<!--[-1-->");
-      $$renderer2.push(`<div class="rounded-2xl bg-white shadow-sm ring-1 ring-stone-200 p-10 text-center"><div class="text-4xl mb-3" aria-hidden="true">⚖️</div> <p class="text-stone-600 font-medium">${escape_html(t().emptyStateTitle)}</p> <p class="text-stone-400 text-sm mt-1">${escape_html(t().emptyStateSubtitle)}</p></div>`);
+      $$renderer2.push(`<div class="card bg-base-100/95 shadow-sm ring-1 ring-base-300/70"><div class="card-body items-center text-center"><div class="text-4xl mb-3" aria-hidden="true">⚖️</div> <p class="text-base-content/70 font-medium">${escape_html(t().emptyStateTitle)}</p> <p class="text-base-content/50 text-sm mt-1">${escape_html(t().emptyStateSubtitle)}</p></div></div>`);
     }
-    $$renderer2.push(`<!--]--></main> <footer class="max-w-2xl mx-auto px-4 py-8 text-center text-xs text-stone-400"><p>${escape_html(t().footerLine1)}</p> <p class="mt-1">${escape_html(t().footerLine2)}</p></footer></div> `);
+    $$renderer2.push(`<!--]--></main> <footer class="max-w-2xl mx-auto px-4 py-8 text-center text-xs text-base-content/60"><p>${escape_html(t().footerLine1)}</p> <p class="mt-1">${escape_html(t().footerLine2)}</p></footer></div> `);
     AssumptionsDrawer($$renderer2, {
       assumptions: store_get($$store_subs ??= {}, "$result", result).assumptions
     });

@@ -1,2 +1,68 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
+@plugin "daisyui" {
+  themes: bumblebee --default, dark;
+}
+
+@layer base {
+  [data-theme='bumblebee'] {
+    color-scheme: light;
+    --color-base-100: oklch(98.5% 0.01 85);
+    --color-base-200: oklch(95.5% 0.02 85);
+    --color-base-300: oklch(91% 0.03 82);
+    --color-base-content: oklch(30% 0.04 55);
+    --color-primary: oklch(74% 0.16 82);
+    --color-primary-content: oklch(26% 0.04 56);
+    --color-secondary: oklch(52% 0.11 46);
+    --color-secondary-content: oklch(96% 0.01 85);
+    --color-accent: oklch(63% 0.11 156);
+    --color-accent-content: oklch(18% 0.03 156);
+    --color-neutral: oklch(34% 0.03 56);
+    --color-neutral-content: oklch(95% 0.01 85);
+    --color-info: oklch(63% 0.13 235);
+    --color-info-content: oklch(21% 0.05 235);
+    --color-success: oklch(64% 0.14 154);
+    --color-success-content: oklch(20% 0.04 154);
+    --color-warning: oklch(80% 0.15 83);
+    --color-warning-content: oklch(30% 0.05 70);
+    --color-error: oklch(62% 0.2 27);
+    --color-error-content: oklch(98% 0 0);
+  }
+
+  [data-theme='dark'] {
+    color-scheme: dark;
+    --color-base-100: oklch(25% 0.02 53);
+    --color-base-200: oklch(22% 0.02 53);
+    --color-base-300: oklch(18% 0.02 53);
+    --color-base-content: oklch(89% 0.01 85);
+    --color-primary: oklch(76% 0.14 82);
+    --color-primary-content: oklch(22% 0.04 56);
+    --color-secondary: oklch(72% 0.1 46);
+    --color-secondary-content: oklch(18% 0.03 46);
+    --color-accent: oklch(74% 0.1 156);
+    --color-accent-content: oklch(16% 0.03 156);
+    --color-neutral: oklch(33% 0.02 53);
+    --color-neutral-content: oklch(91% 0.01 85);
+    --color-info: oklch(72% 0.14 235);
+    --color-info-content: oklch(17% 0.04 235);
+    --color-success: oklch(74% 0.14 154);
+    --color-success-content: oklch(16% 0.03 154);
+    --color-warning: oklch(82% 0.15 83);
+    --color-warning-content: oklch(24% 0.04 75);
+    --color-error: oklch(72% 0.21 27);
+    --color-error-content: oklch(20% 0.05 27);
+  }
+
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+    min-height: 100%;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 12% -10%, color-mix(in oklab, var(--color-primary) 16%, transparent) 0%, transparent 40%),
+      radial-gradient(circle at 88% -12%, color-mix(in oklab, var(--color-secondary) 12%, transparent) 0%, transparent 42%);
+  }
+}

@@ -98,6 +98,18 @@ function clamp(min: number, max: number, val: number): number {
 	return Math.max(min, Math.min(max, val));
 }
 
+export function recommendAutolyseMins(ambientTempC: number, doughTempC: number | null): number {
+	const effectiveTempC =
+		doughTempC !== null ? (ambientTempC + doughTempC) / 2 : ambientTempC;
+
+	if (effectiveTempC >= 29) return 20;
+	if (effectiveTempC >= 27) return 25;
+	if (effectiveTempC >= 24) return 30;
+	if (effectiveTempC >= 21) return 35;
+	if (effectiveTempC >= 18) return 40;
+	return 45;
+}
+
 // ============================================================
 // Formula Calculation
 // ============================================================
