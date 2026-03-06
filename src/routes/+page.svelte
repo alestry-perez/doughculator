@@ -307,6 +307,21 @@
 	<footer class="max-w-2xl mx-auto px-4 py-8 text-center text-xs text-base-content/60">
 		<p>{t.footerLine1}</p>
 		<p class="mt-1">{t.footerLine2}</p>
+		<div class="mt-6 flex justify-center">
+			<script
+				type="text/javascript"
+				src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
+				data-name="bmc-button"
+				data-slug="alestryperez"
+				data-color="#FFDD00"
+				data-emoji=""
+				data-font="Cookie"
+				data-text="Buy me a coffee"
+				data-outline-color="#000000"
+				data-font-color="#000000"
+				data-coffee-color="#ffffff"
+			></script>
+		</div>
 	</footer>
 
 	{#if installHelpOpen}
