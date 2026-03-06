@@ -72,7 +72,7 @@
 <div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70">
 	<div class="card-body p-5">
 		<h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-1">{t.schedule}</h2>
-		<p class="text-xs italic text-base-content/60 mb-3">press to complete</p>
+		<p class="text-xs italic text-base-content/60 mb-3">Press to mark completed step</p>
 
 		<ol class="relative space-y-0">
 			{#each stepsWithTimes as { step, clockTime, endClockTime }, i}

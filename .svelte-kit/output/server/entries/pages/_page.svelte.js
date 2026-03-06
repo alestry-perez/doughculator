@@ -1242,7 +1242,7 @@ function ScheduleCard($$renderer, $$props) {
       }
       return "";
     }
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-base-content/60 mb-3">press to complete</p> <ol class="relative space-y-0"><!--[-->`);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-base-content/60 mb-3">Press to mark completed step</p> <ol class="relative space-y-0"><!--[-->`);
     const each_array = ensure_array_like(stepsWithTimes());
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let { step, clockTime, endClockTime } = each_array[i];
