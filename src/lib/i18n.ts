@@ -353,6 +353,15 @@ const en = {
 	// TimingCard
 	timing: 'Timing',
 	bulkFermentation: 'Bulk Fermentation',
+	timingBarsModalTitle: 'Timing Bar Guide',
+	timingBarsModalIntro:
+		'These bars show a fermentation window, not one exact minute. Read them left to right: the darker inner bar marks the earliest likely ready point, and the lighter bar behind it shows the later end of the recommended range.',
+	timingBarsBulkTitle: 'Bulk Fermentation',
+	timingBarsBulkBody:
+		'When the darker bar ends, start checking the dough for rise, bubbles, and jiggle. If it still needs time, let it continue toward the end of the lighter bar.',
+	timingBarsColdTitle: 'Cold Retard',
+	timingBarsColdBody:
+		'For cold retard, the darker fill marks the earliest bake-ready point after chilling. The lighter full bar shows the longer holding window in the fridge before the dough risks going too far.',
 	fastest: 'Fastest',
 	slowest: 'Slowest',
 	foldSchedule: (count: number, interval: number) =>
@@ -540,6 +549,15 @@ const es: Translations = {
 	// TimingCard
 	timing: 'Tiempos',
 	bulkFermentation: 'Fermentación en Masa',
+	timingBarsModalTitle: 'Guía de Barras de Tiempo',
+	timingBarsModalIntro:
+		'Estas barras muestran una ventana de fermentación, no un minuto exacto. Léelas de izquierda a derecha: la barra interior más oscura marca el primer punto probable de estar lista, y la barra más clara detrás muestra el final más tardío del rango recomendado.',
+	timingBarsBulkTitle: 'Fermentación en Masa',
+	timingBarsBulkBody:
+		'Cuando termina la barra más oscura, empieza a revisar volumen, burbujas y temblor de la masa. Si aún necesita tiempo, déjala seguir hasta el final de la barra más clara.',
+	timingBarsColdTitle: 'Fermentación en Frío',
+	timingBarsColdBody:
+		'En frío, el relleno más oscuro marca el punto más temprano para hornear tras el reposo en nevera. La barra clara completa muestra la ventana más larga de permanencia en frío antes de que la masa corra riesgo de pasarse.',
 	fastest: 'Más rápido',
 	slowest: 'Más lento',
 	foldSchedule: (count: number, interval: number) =>
@@ -726,6 +744,15 @@ const sv: Translations = {
 	// TimingCard
 	timing: 'Timing',
 	bulkFermentation: 'Bulkjäsning',
+	timingBarsModalTitle: 'Guide till Tidsstaplar',
+	timingBarsModalIntro:
+		'Dessa staplar visar ett jästidsfönster, inte en exakt minut. Läs dem från vänster till höger: den mörkare inre stapeln markerar den tidigaste sannolika tidpunkten då degen är klar, och den ljusare stapeln bakom visar den senare delen av det rekommenderade intervallet.',
+	timingBarsBulkTitle: 'Bulkjäsning',
+	timingBarsBulkBody:
+		'När den mörkare stapeln tar slut bör du börja kontrollera degens höjd, bubblor och gung. Om den behöver mer tid kan du låta den fortsätta mot slutet av den ljusare stapeln.',
+	timingBarsColdTitle: 'Kall Jäsning',
+	timingBarsColdBody:
+		'För kall jäsning markerar den mörkare fyllningen den tidigaste punkten då degen brukar vara redo att bakas efter kylning. Den ljusare hela stapeln visar det längre förvaringsfönstret i kylen innan degen riskerar att gå för långt.',
 	fastest: 'Snabbast',
 	slowest: 'Långsammast',
 	foldSchedule: (count: number, interval: number) =>

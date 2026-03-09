@@ -6,6 +6,8 @@
 
 	const t = $derived(translations[$lang]);
 
+	let timingBarsModalOpen = $state(false);
+
 	let { timing, formula, proofMethod }: {
 		timing: TimingResult;
 		formula: FormulaResult;
@@ -45,7 +47,19 @@
 
 <div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70">
 	<div class="card-body gap-5 p-5">
-		<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.timing}</h2>
+		<div class="flex items-center gap-1.5">
+			<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.timing}</h2>
+			<button
+				type="button"
+				onclick={() => (timingBarsModalOpen = true)}
+				class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+				aria-label="Learn how to read timing bars"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+					<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+				</svg>
+			</button>
+		</div>
 
 		<!-- Badges -->
 		<div class="flex flex-wrap gap-2">
@@ -118,6 +132,68 @@
 		</div>
 	</div>
 </div>
+
+{#if timingBarsModalOpen}
+	<div class="modal modal-open">
+		<button
+			type="button"
+			class="modal-backdrop"
+			onclick={() => (timingBarsModalOpen = false)}
+			aria-label="Close timing bar info modal"
+		></button>
+
+		<div
+			class="modal-box w-full max-w-md p-0 overflow-hidden"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="timing-bars-modal-title"
+		>
+			<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+				<h2 id="timing-bars-modal-title" class="text-base font-semibold text-base-content">
+					{t.timingBarsModalTitle}
+				</h2>
+				<button
+					type="button"
+					onclick={() => (timingBarsModalOpen = false)}
+					class="btn btn-ghost btn-sm btn-circle"
+					aria-label="Close"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="px-5 py-4 space-y-4">
+				<p class="text-sm text-base-content/70 leading-relaxed">{t.timingBarsModalIntro}</p>
+
+				<div>
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">
+						{t.timingBarsBulkTitle}
+					</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.timingBarsBulkBody}</p>
+				</div>
+
+				<div class="border-t border-base-200 pt-4">
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">
+						{t.timingBarsColdTitle}
+					</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.timingBarsColdBody}</p>
+				</div>
+			</div>
+
+			<div class="px-5 pb-5">
+				<button
+					type="button"
+					onclick={() => (timingBarsModalOpen = false)}
+					class="btn btn-primary w-full"
+				>
+					{t.done}
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	// No extra styles needed
