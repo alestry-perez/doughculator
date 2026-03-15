@@ -56,15 +56,36 @@ Production output is written to `build/`.
 ## Feature Summary
 
 - Formula engine (hydration, inoculation, salt, starter accounting)
+- Per-flour absorption + fermentation coefficients (6 flour types)
 - Timing engine (bulk, room proof, cold retard, folds)
 - Auto-generated schedule in `relative` or `clock` mode
-- Warnings + assumptions drawer
+- Warnings + assumptions drawer (includes blend absorption and ferment multiplier)
 - Localized UI (`en`, `es`, `sv`)
 - Local persistence for user inputs
 
 ## Calculation Model (Current)
 
-### 1) Hydration
+### 1) Per-Flour Properties
+
+Each flour type has a named absorption coefficient and fermentation multiplier:
+
+| Flour | Absorption Coeff | Ferment Mult |
+| --- | --- | --- |
+| Bread Flour | 1.00 | 1.00 |
+| All-Purpose | 0.97 | 1.00 |
+| Whole Wheat | 1.12 | 0.95 |
+| Rye | 1.20 | 0.72 |
+| Spelt | 0.95 | 0.82 |
+| Einkorn | 1.12 | 0.90 |
+
+Both values are computed as weighted averages across the active flour blend:
+
+```txt
+blendAbsorption  = Σ (pct / blendSum) * absorptionCoeff
+blendFermentMult = Σ (pct / blendSum) * fermentMult
+```
+
+### 2) Hydration
 
 Base hydration by crumb goal:
 
@@ -74,12 +95,14 @@ Base hydration by crumb goal:
 | Balanced | 73% |
 | Open | 82% |
 
-Whole wheat hydration adjustment:
+Blend-absorption hydration adjustment (replaces old WW heuristic):
 
 ```txt
-wwHydrationAdjust = clamp(0, 5, wwRatio * 100 * 0.12)
+wwHydrationAdjust = (blendAbsorption - 1.0) * 100
 finalHydrationPct = baseHydrationPct + wwHydrationAdjust
 ```
+
+Example: a 100% Rye blend adds +20%; a 100% Spelt blend subtracts −5%.
 
 Hydration band:
 
