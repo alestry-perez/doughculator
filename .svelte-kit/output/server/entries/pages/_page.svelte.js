@@ -1,4 +1,4 @@
-import { e as escape_html, a6 as attr_class, a7 as clsx, a8 as store_get, a9 as attr, aa as ensure_array_like, ab as stringify, ac as unsubscribe_stores, a5 as derived$1, h as head } from "../../chunks/index2.js";
+import { e as escape_html, a6 as attr_class, a7 as clsx, a8 as store_get, a9 as attr, aa as ensure_array_like, ab as stringify, ac as attr_style, ad as unsubscribe_stores, a5 as derived$1, h as head } from "../../chunks/index2.js";
 import { d as derived, w as writable } from "../../chunks/index.js";
 const scheduleStrings = {
   en: {
@@ -90,7 +90,8 @@ const warningStrings = {
     warnHydrationTemp: "High hydration + warm temp — runaway fermentation risk. Aim for cooler environment (~22–23°C).",
     infoHighHydration: "High hydration dough — requires strong bench technique. Wet hands, gentle folds.",
     infoWWAutolyse: "High whole wheat % — consider shorter autolyse (20–25 min) or bassinage technique to improve handling.",
-    warnOpenCrumb: "Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs."
+    warnOpenCrumb: "Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs.",
+    ryeHighWarning: "High rye (>30%) — fermentation may be faster than predicted. Watch your dough closely."
   },
   es: {
     dangerLow: "Temperatura peligrosamente baja — fermentación casi inactiva. Considera un lugar más cálido.",
@@ -101,7 +102,8 @@ const warningStrings = {
     warnHydrationTemp: "Hidratación alta + temperatura cálida — riesgo de fermentación desbocada. Busca un ambiente más fresco (~22–23°C).",
     infoHighHydration: "Masa de alta hidratación — requiere buena técnica de mesa. Manos húmedas y pliegues suaves.",
     infoWWAutolyse: "Alto % de integral — considera una autólisis más corta (20–25 min) o técnica de bassinage para mejorar el manejo.",
-    warnOpenCrumb: "La miga abierta requiere un control ambiental más riguroso. Vigila la masa de cerca para detectar señales correctas de fermentación."
+    warnOpenCrumb: "La miga abierta requiere un control ambiental más riguroso. Vigila la masa de cerca para detectar señales correctas de fermentación.",
+    ryeHighWarning: "Centeno alto (>30%) — la fermentación puede ser más rápida de lo previsto. Vigila tu masa de cerca."
   },
   sv: {
     dangerLow: "Degens temperatur farligt låg — jäsningen nästan inaktiv. Överväg en varmare plats.",
@@ -112,7 +114,8 @@ const warningStrings = {
     warnHydrationTemp: "Hög hydratation + varm temperatur — risk för skenande jäsning. Sikta på svalare miljö (~22–23°C).",
     infoHighHydration: "Hög hydratation — kräver bra bänkteknik. Blöta händer, varsamma vikningar.",
     infoWWAutolyse: "Hög andel fullkorn — överväg kortare autolys (20–25 min) eller bassinage-teknik för bättre hantering.",
-    warnOpenCrumb: "Öppen smulstruktur kräver noggrannare miljökontroll. Övervaka degen noga för rätt jästecken."
+    warnOpenCrumb: "Öppen smulstruktur kräver noggrannare miljökontroll. Övervaka degen noga för rätt jästecken.",
+    ryeHighWarning: "Hög rågandel (>30%) — jäsningen kan gå snabbare än beräknat. Övervaka degen noga."
   }
 };
 const assumptionStrings = {
@@ -122,7 +125,9 @@ const assumptionStrings = {
     starterHydration: "Starter hydration",
     inoculation: "Inoculation",
     baseHydration: "Base hydration",
-    wwHydrationAdjust: "WW hydration adjust",
+    wwHydrationAdjust: "Blend hydration adjust",
+    blendAbsorption: "Blend absorption",
+    blendFermentMult: "Ferment multiplier",
     finalHydration: "Final hydration",
     autolyse: "Autolyse",
     off: "Off",
@@ -138,7 +143,9 @@ const assumptionStrings = {
     starterHydration: "Hidratación del iniciador",
     inoculation: "Inoculación",
     baseHydration: "Hidratación base",
-    wwHydrationAdjust: "Ajuste hidratación integral",
+    wwHydrationAdjust: "Ajuste hidratación mezcla",
+    blendAbsorption: "Absorción de la mezcla",
+    blendFermentMult: "Multiplicador de fermentación",
     finalHydration: "Hidratación final",
     autolyse: "Autólisis",
     off: "Apagada",
@@ -154,7 +161,9 @@ const assumptionStrings = {
     starterHydration: "Surdeghydratation",
     inoculation: "Inokulering",
     baseHydration: "Bashydratation",
-    wwHydrationAdjust: "Fullkornsjustering hydratation",
+    wwHydrationAdjust: "Blandningsjustering hydratation",
+    blendAbsorption: "Blandningsabsorption",
+    blendFermentMult: "Jäsningsmultiplikator",
     finalHydration: "Sluthydratation",
     autolyse: "Autolys",
     off: "Av",
@@ -196,6 +205,17 @@ const en = {
   // InputSection
   parameters: "Parameters",
   totalFlour: "Total Flour (g)",
+  flourSelection: "Flour Selection",
+  flourTypes: {
+    BreadFlour: "Bread Flour",
+    AllPurpose: "All-Purpose",
+    WholeWheat: "Whole Wheat",
+    Rye: "Rye",
+    Spelt: "Spelt",
+    Einkorn: "Einkorn"
+  },
+  blendTotal: "Total",
+  blendNormalize: "Normalize to 100%",
   flourBlend: "Flour Blend",
   white: "White",
   wholeWheat: "Whole Wheat",
@@ -374,6 +394,17 @@ const es = {
   // InputSection
   parameters: "Parámetros",
   totalFlour: "Harina Total (g)",
+  flourSelection: "Selección de Harina",
+  flourTypes: {
+    BreadFlour: "Harina de Fuerza",
+    AllPurpose: "Harina Todo Uso",
+    WholeWheat: "Harina Integral",
+    Rye: "Centeno",
+    Spelt: "Espelta",
+    Einkorn: "Einkorn"
+  },
+  blendTotal: "Total",
+  blendNormalize: "Normalizar al 100%",
   flourBlend: "Mezcla de Harina",
   white: "Blanca",
   wholeWheat: "Integral",
@@ -556,6 +587,17 @@ const sv = {
   // InputSection
   parameters: "Parametrar",
   totalFlour: "Totalt Mjöl (g)",
+  flourSelection: "Mjölval",
+  flourTypes: {
+    BreadFlour: "Vetemjöl Special",
+    AllPurpose: "Vetemjöl",
+    WholeWheat: "Fullkornsvetemjöl",
+    Rye: "Råg",
+    Spelt: "Dinkel",
+    Einkorn: "Einkorn"
+  },
+  blendTotal: "Totalt",
+  blendNormalize: "Normalisera till 100%",
   flourBlend: "Mjölblandning",
   white: "Vitt",
   wholeWheat: "Fullkorn",
@@ -704,13 +746,23 @@ const sv = {
   }
 };
 const translations = { en, es, sv };
+const WHOLE_GRAIN_FLOURS = ["WholeWheat", "Rye", "Spelt", "Einkorn"];
+const ALL_FLOUR_TYPES = ["BreadFlour", "AllPurpose", "WholeWheat", "Rye", "Spelt", "Einkorn"];
+const FLOUR_PROPERTIES = {
+  BreadFlour: { absorptionCoeff: 1, fermentMult: 1 },
+  AllPurpose: { absorptionCoeff: 0.97, fermentMult: 1 },
+  WholeWheat: { absorptionCoeff: 1.12, fermentMult: 0.95 },
+  Rye: { absorptionCoeff: 1.2, fermentMult: 0.72 },
+  Spelt: { absorptionCoeff: 0.95, fermentMult: 0.82 },
+  Einkorn: { absorptionCoeff: 1.12, fermentMult: 0.9 }
+};
 function clamp(min, max, val) {
   return Math.max(min, Math.min(max, val));
 }
 function calcFormula(inputs2) {
   const {
     totalFlourInputG,
-    whitePct,
+    flourBlend,
     crumbGoal,
     ambientTempC,
     doughTempC,
@@ -720,16 +772,29 @@ function calcFormula(inputs2) {
     starterHydrationPct
   } = inputs2;
   const totalFlourG = totalFlourInputG;
-  const whiteFlouG = Math.round(totalFlourG * (whitePct / 100));
-  const wwFlourG = totalFlourG - whiteFlouG;
-  const wwRatio = totalFlourG > 0 ? wwFlourG / totalFlourG : 0;
+  const totalBlendPct = flourBlend.reduce((s, e) => s + e.pct, 0);
+  const normFactor = totalBlendPct > 0 ? 100 / totalBlendPct : 1;
+  const wwPctNorm = flourBlend.filter((e) => WHOLE_GRAIN_FLOURS.includes(e.type)).reduce((s, e) => s + e.pct * normFactor, 0);
+  const wwRatio = totalFlourG > 0 ? wwPctNorm / 100 : 0;
+  const wwFlourG = Math.round(totalFlourG * wwRatio);
+  const whiteFlouG = totalFlourG - wwFlourG;
+  const blendSum = flourBlend.reduce((s, e) => s + e.pct, 0);
+  const norm = blendSum > 0 ? blendSum : 1;
+  const blendAbsorption = flourBlend.reduce(
+    (s, e) => s + e.pct / norm * FLOUR_PROPERTIES[e.type].absorptionCoeff,
+    0
+  );
+  const blendFermentMult = flourBlend.reduce(
+    (s, e) => s + e.pct / norm * FLOUR_PROPERTIES[e.type].fermentMult,
+    0
+  );
   const baseHydrationMap = {
     Tight: 65,
     Balanced: 73,
     Open: 82
   };
   const baseHydrationPct = baseHydrationMap[crumbGoal];
-  const wwHydrationAdjust = clamp(0, 5, wwRatio * 100 * 0.12);
+  const wwHydrationAdjust = (blendAbsorption - 1) * 100;
   const finalHydrationPct = baseHydrationPct + wwHydrationAdjust;
   let hydrationBand;
   if (finalHydrationPct < 70) {
@@ -830,6 +895,8 @@ function calcFormula(inputs2) {
     wwRatio,
     baseHydrationPct,
     wwHydrationAdjust,
+    blendAbsorption,
+    blendFermentMult,
     finalHydrationPct,
     hydrationBand,
     totalWaterG,
@@ -851,7 +918,7 @@ function calcFormula(inputs2) {
   };
 }
 function calcTiming(formula) {
-  const { effectiveTempC, hydrationBand, inoculationPct, wwRatio } = formula;
+  const { effectiveTempC, hydrationBand, inoculationPct, blendFermentMult } = formula;
   let bulkBaseMin;
   let bulkBaseMax;
   if (effectiveTempC < 21) {
@@ -867,9 +934,8 @@ function calcTiming(formula) {
   }
   const hydrationMult = hydrationBand === "Low" ? 1.15 : hydrationBand === "High" ? 0.85 : 1;
   const inocScale = Math.pow(20 / inoculationPct, 0.35);
-  const wwMult = wwRatio >= 0.3 ? 0.95 : 1;
-  const bulkMin = bulkBaseMin * hydrationMult * inocScale * wwMult;
-  const bulkMax = bulkBaseMax * hydrationMult * inocScale * wwMult;
+  const bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult;
+  const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult;
   const proofBaseMin = 1.5;
   const proofBaseMax = 3;
   let proofTempMult;
@@ -1015,6 +1081,10 @@ function calcWarnings(inputs2, formula, lang2) {
   if (crumbGoal === "Open") {
     warnings.push({ level: "warn", message: w.warnOpenCrumb });
   }
+  const ryeEntry = inputs2.flourBlend.find((e) => e.type === "Rye");
+  if (ryeEntry && ryeEntry.pct > 30) {
+    warnings.push({ level: "warn", message: w.ryeHighWarning });
+  }
   return warnings;
 }
 function calcAssumptions(inputs2, formula, lang2) {
@@ -1030,19 +1100,24 @@ function calcAssumptions(inputs2, formula, lang2) {
     inoculationPct,
     baseHydrationPct,
     wwHydrationAdjust,
+    blendAbsorption,
+    blendFermentMult,
     finalHydrationPct,
     autoSaltPct,
     effectiveSaltPct,
     effectiveStarterHydrationPct
   } = formula;
   const a = assumptionStrings[lang2];
+  const hydrationAdjustSign = wwHydrationAdjust >= 0 ? "+" : "";
   return {
     [a.ambientTemp]: `${effectiveTempC.toFixed(1)}°C`,
     [a.salt]: saltAutoCalc ? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2)) : a.saltManual(saltPct),
     [a.starterHydration]: starterHydrationAutoCalc ? a.starterHydrationAuto(effectiveStarterHydrationPct) : a.starterHydrationManual(effectiveStarterHydrationPct),
     [a.inoculation]: `${inoculationPct.toFixed(1)}%`,
     [a.baseHydration]: `${baseHydrationPct}%`,
-    [a.wwHydrationAdjust]: `+${wwHydrationAdjust.toFixed(1)}%`,
+    [a.blendAbsorption]: blendAbsorption.toFixed(3),
+    [a.blendFermentMult]: blendFermentMult.toFixed(3),
+    [a.wwHydrationAdjust]: `${hydrationAdjustSign}${wwHydrationAdjust.toFixed(1)}%`,
     [a.finalHydration]: `${finalHydrationPct.toFixed(1)}%`,
     [a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off
   };
@@ -1075,8 +1150,10 @@ function addMinsToTime(startTime, mins) {
 }
 const DEFAULT_INPUTS = {
   totalFlourInputG: 500,
-  whitePct: 80,
-  // → 400g white, 100g WW
+  flourBlend: [
+    { type: "BreadFlour", pct: 80 },
+    { type: "WholeWheat", pct: 20 }
+  ],
   crumbGoal: "Balanced",
   ambientTempC: 24,
   doughTempC: null,
@@ -1133,9 +1210,19 @@ function InputSection($$renderer, $$props) {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
     const crumbGoals = ["Tight", "Balanced", "Open"];
-    let whiteFlourGrams = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * (store_get($$store_subs ??= {}, "$inputs", inputs).whitePct / 100)));
-    let wwFlourGrams = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG - whiteFlourGrams());
-    let wwPct = derived$1(() => 100 - store_get($$store_subs ??= {}, "$inputs", inputs).whitePct);
+    let blendTotal = derived$1(() => store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.reduce((s, e) => s + e.pct, 0));
+    let blendValid = derived$1(() => Math.round(blendTotal()) === 100);
+    function isFlourSelected(type) {
+      return store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.some((e) => e.type === type);
+    }
+    const flourColors = {
+      BreadFlour: "#F59E0B",
+      AllPurpose: "#60A5FA",
+      WholeWheat: "#92400E",
+      Rye: "#059669",
+      Spelt: "#7C3AED",
+      Einkorn: "#F43F5E"
+    };
     let autoSaltPct = derived$1(() => store_get($$store_subs ??= {}, "$result", result).formula.autoSaltPct);
     let autoSaltG = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$result", result).formula.saltG));
     let ambientDisplay = derived$1(() => {
@@ -1159,22 +1246,60 @@ function InputSection($$renderer, $$props) {
     const autolyseMaxMins = 60;
     const autolyseProgressMax = autolyseMaxMins - autolyseMinMins;
     const autolyseProgressValue = derived$1(() => Math.max(0, Math.min(autolyseProgressMax, store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins - autolyseMinMins)));
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="btn btn-ghost btn-sm rounded-full border border-base-300 bg-base-100" aria-label="Toggle temperature unit"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <div class="px-5 pb-5 space-y-5"><div class="form-control"><label for="total-flour" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().totalFlour)}</span></label> <input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="input input-bordered w-full" placeholder="500"/></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().flourBlend)}</span> <span class="text-xs font-semibold text-base-content/70">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)}% ${escape_html(t().white)} / ${escape_html(wwPct())}% ${escape_html(t().wholeWheat)}</span></div> <input type="range" min="0" max="100" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).whitePct)} class="range range-secondary range-sm w-full"/> <div class="flex justify-between text-xs text-base-content/50 mt-1.5"><span class="tabular-nums">${escape_html(t().white)}: ${escape_html(whiteFlourGrams())}g</span> <span class="tabular-nums">${escape_html(t().wholeWheat)}: ${escape_html(wwFlourGrams())}g</span></div></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().crumbGoal)}</p> <div class="grid grid-cols-3 gap-2"><!--[-->`);
-    const each_array = ensure_array_like(crumbGoals);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().parameters)}</h2> <button type="button" class="btn btn-ghost btn-sm rounded-full border border-base-300 bg-base-100" aria-label="Toggle temperature unit"><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <div class="px-5 pb-5 space-y-5"><div class="form-control"><label for="total-flour" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().totalFlour)}</span></label> <input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="input input-bordered w-full" placeholder="500"/></div> <div><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().flourSelection)}</span> <div class="grid grid-cols-3 gap-2 mt-2"><!--[-->`);
+    const each_array = ensure_array_like(ALL_FLOUR_TYPES);
     for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-      let goal = each_array[$$index];
+      let flourType = each_array[$$index];
+      $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2 px-1 text-xs ${stringify(isFlourSelected(flourType) ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(t().flourTypes[flourType])}</button>`);
+    }
+    $$renderer2.push(`<!--]--></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="mt-3 space-y-2"><!--[-->`);
+      const each_array_1 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let entry = each_array_1[$$index_1];
+        $$renderer2.push(`<div class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-full flex-shrink-0"${attr_style(`background-color: ${stringify(flourColors[entry.type])}`)}></span> <span class="text-xs text-base-content/70 flex-1 min-w-0 truncate">${escape_html(t().flourTypes[entry.type])}</span> <div class="flex items-center gap-2 flex-1"><input type="range" min="0" max="100" step="1"${attr("value", entry.pct)} class="range range-sm range-secondary flex-1"/> <input type="number" min="0" max="100" step="1"${attr("value", Math.round(entry.pct))} class="input input-xs w-14 text-right tabular-nums"/> <span class="text-xs text-base-content/70">%</span></div></div>`);
+      }
+      $$renderer2.push(`<!--]--></div> <div class="flex items-center justify-between mt-2"><span class="text-xs text-base-content/50">${escape_html(t().blendTotal)}: <span${attr_class(`font-semibold tabular-nums ${stringify(blendValid() ? "text-success" : "text-error")}`)}>${escape_html(Math.round(blendTotal()))}%</span></span> `);
+      if (!blendValid()) {
+        $$renderer2.push("<!--[0-->");
+        $$renderer2.push(`<button type="button" class="btn btn-xs btn-ghost text-secondary border border-secondary/30">${escape_html(t().blendNormalize)}</button>`);
+      } else {
+        $$renderer2.push("<!--[-1-->");
+      }
+      $$renderer2.push(`<!--]--></div> <div class="flex rounded-full overflow-hidden h-2 mt-2 gap-px"><!--[-->`);
+      const each_array_2 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
+      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+        let entry = each_array_2[$$index_2];
+        $$renderer2.push(`<div class="h-full"${attr_style(`width: ${stringify(Math.max(0, entry.pct))}%; background-color: ${stringify(flourColors[entry.type])}`)}${attr("title", `${stringify(t().flourTypes[entry.type])}: ${stringify(entry.pct)}%`)}></div>`);
+      }
+      $$renderer2.push(`<!--]--></div> <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5"><!--[-->`);
+      const each_array_3 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
+      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+        let entry = each_array_3[$$index_3];
+        $$renderer2.push(`<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums"><span class="inline-block w-2 h-2 rounded-full flex-shrink-0"${attr_style(`background-color: ${stringify(flourColors[entry.type])}`)}></span> ${escape_html(t().flourTypes[entry.type])}: ${escape_html(Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * entry.pct / 100))}g</span>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().crumbGoal)}</p> <div class="grid grid-cols-3 gap-2"><!--[-->`);
+    const each_array_4 = ensure_array_like(crumbGoals);
+    for (let $$index_4 = 0, $$length = each_array_4.length; $$index_4 < $$length; $$index_4++) {
+      let goal = each_array_4[$$index_4];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 flex-col h-auto py-3 px-2 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal === goal ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}><span class="text-sm font-bold">${escape_html(t().crumbGoalNames[goal])}</span></button>`);
     }
     $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(t().crumbDescriptions[store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal])}</p></div> <div><div class="flex items-center gap-1.5 mb-2"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fermentationPhilosophyLabel)}</p> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0" aria-label="Learn about fermentation philosophy options"><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="grid grid-cols-2 gap-2"><!--[-->`);
-    const each_array_1 = ensure_array_like(["Predictability", "FlavorDevelopment"]);
-    for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-      let philosophy = each_array_1[$$index_1];
+    const each_array_5 = ensure_array_like(["Predictability", "FlavorDevelopment"]);
+    for (let $$index_5 = 0, $$length = each_array_5.length; $$index_5 < $$length; $$index_5++) {
+      let philosophy = each_array_5[$$index_5];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(philosophy === "Predictability" ? t().philosophyPredictability : t().philosophyFlavorDev)}</button>`);
     }
     $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().proofMethod)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
-    const each_array_2 = ensure_array_like(["Room", "ColdRetard"]);
-    for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
-      let method = each_array_2[$$index_2];
+    const each_array_6 = ensure_array_like(["Room", "ColdRetard"]);
+    for (let $$index_6 = 0, $$length = each_array_6.length; $$index_6 < $$length; $$index_6++) {
+      let method = each_array_6[$$index_6];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === method ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(method === "Room" ? t().roomTemp : t().coldRetard)}</button>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);
@@ -1185,9 +1310,9 @@ function InputSection($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().scheduleMode)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
-    const each_array_3 = ensure_array_like(["relative", "clock"]);
-    for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
-      let mode = each_array_3[$$index_3];
+    const each_array_7 = ensure_array_like(["relative", "clock"]);
+    for (let $$index_7 = 0, $$length = each_array_7.length; $$index_7 < $$length; $$index_7++) {
+      let mode = each_array_7[$$index_7];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === mode ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(mode === "relative" ? t().relative : t().clock)}</button>`);
     }
     $$renderer2.push(`<!--]--></div></div> `);

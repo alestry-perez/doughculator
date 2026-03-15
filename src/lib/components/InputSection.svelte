@@ -1,6 +1,6 @@
 <script lang="ts">
-	import type { Inputs, CrumbGoal, FermentationPhilosophy } from '$lib/calculator';
-	import { cToF, fToC, recommendAutolyseMins } from '$lib/calculator';
+	import type { Inputs, CrumbGoal, FermentationPhilosophy, FlourType, FlourBlendEntry } from '$lib/calculator';
+	import { cToF, fToC, recommendAutolyseMins, WHOLE_GRAIN_FLOURS, ALL_FLOUR_TYPES } from '$lib/calculator';
 	import { inputs, result, lang } from '$lib/store';
 	import { translations } from '$lib/i18n';
 
@@ -11,10 +11,113 @@
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
 
-	// Derived flour gram display
-	let whiteFlourGrams = $derived(Math.round($inputs.totalFlourInputG * ($inputs.whitePct / 100)));
-	let wwFlourGrams = $derived($inputs.totalFlourInputG - whiteFlourGrams);
-	let wwPct = $derived(100 - $inputs.whitePct);
+	// Flour blend helpers
+	let blendTotal = $derived($inputs.flourBlend.reduce((s, e) => s + e.pct, 0));
+	let blendValid = $derived(Math.round(blendTotal) === 100);
+
+	function isFlourSelected(type: FlourType): boolean {
+		return $inputs.flourBlend.some(e => e.type === type);
+	}
+
+	function toggleFlour(type: FlourType) {
+		inputs.update(prev => {
+			const existing = prev.flourBlend.find(e => e.type === type);
+			if (existing) {
+				// Can't remove the last flour
+				if (prev.flourBlend.length <= 1) return prev;
+				const remaining = prev.flourBlend.filter(e => e.type !== type);
+				const totalOther = remaining.reduce((s, e) => s + e.pct, 0);
+				let redistributed: FlourBlendEntry[];
+				if (totalOther > 0) {
+					const scale = 100 / totalOther;
+					redistributed = remaining.map(e => ({ ...e, pct: Math.round(e.pct * scale) }));
+				} else {
+					const each = Math.floor(100 / remaining.length);
+					redistributed = remaining.map((e, i) => ({
+						...e,
+						pct: i === 0 ? each + (100 - each * remaining.length) : each
+					}));
+				}
+				// Fix rounding drift
+				const sum = redistributed.reduce((s, e) => s + e.pct, 0);
+				if (sum !== 100 && redistributed.length > 0) {
+					redistributed[0] = { ...redistributed[0], pct: redistributed[0].pct + (100 - sum) };
+				}
+				return { ...prev, flourBlend: redistributed };
+			} else {
+				// Add: give new flour an equal share, scale others down
+				const newCount = prev.flourBlend.length + 1;
+				const newPct = Math.round(100 / newCount);
+				const scale = (100 - newPct) / 100;
+				const updated: FlourBlendEntry[] = prev.flourBlend.map(e => ({ ...e, pct: Math.round(e.pct * scale) }));
+				updated.push({ type, pct: newPct });
+				const sum = updated.reduce((s, e) => s + e.pct, 0);
+				if (sum !== 100 && updated.length > 0) {
+					updated[0] = { ...updated[0], pct: updated[0].pct + (100 - sum) };
+				}
+				return { ...prev, flourBlend: updated };
+			}
+		});
+	}
+
+	function updateFlourPct(type: FlourType, raw: string) {
+		const val = Math.max(0, Math.min(100, parseFloat(raw) || 0));
+		inputs.update(prev => {
+			const others = prev.flourBlend.filter(e => e.type !== type);
+			const otherTotal = others.reduce((s, e) => s + e.pct, 0);
+			const remaining = 100 - val;
+			let updated: typeof prev.flourBlend;
+			if (others.length === 0) {
+				updated = prev.flourBlend.map(e => ({ ...e, pct: 100 }));
+			} else if (otherTotal === 0) {
+				const share = Math.floor(remaining / others.length);
+				const leftover = remaining - share * others.length;
+				updated = prev.flourBlend.map((e, i) => {
+					if (e.type === type) return { ...e, pct: val };
+					const idx = others.indexOf(e);
+					return { ...e, pct: share + (idx === 0 ? leftover : 0) };
+				});
+			} else {
+				const scale = remaining / otherTotal;
+				const scaled = others.map(e => ({ ...e, pct: e.pct * scale }));
+				const floored = scaled.map(e => ({ ...e, pct: Math.floor(e.pct) }));
+				const flooredSum = floored.reduce((s, e) => s + e.pct, 0);
+				let leftover = remaining - flooredSum;
+				// Distribute rounding remainder to flours with largest fractional parts
+				const fracs = scaled.map((e, i) => ({ i, frac: e.pct - Math.floor(e.pct) }))
+					.sort((a, b) => b.frac - a.frac);
+				for (let j = 0; j < leftover; j++) floored[fracs[j].i].pct += 1;
+				const otherMap = new Map(floored.map(e => [e.type, e.pct]));
+				updated = prev.flourBlend.map(e =>
+					e.type === type ? { ...e, pct: val } : { ...e, pct: otherMap.get(e.type) ?? e.pct }
+				);
+			}
+			return { ...prev, flourBlend: updated };
+		});
+	}
+
+	function normalizeBlend() {
+		inputs.update(prev => {
+			const total = prev.flourBlend.reduce((s, e) => s + e.pct, 0);
+			if (total === 0 || total === 100) return prev;
+			const scale = 100 / total;
+			const normalized = prev.flourBlend.map(e => ({ ...e, pct: Math.round(e.pct * scale) }));
+			const sum = normalized.reduce((s, e) => s + e.pct, 0);
+			if (sum !== 100 && normalized.length > 0) {
+				normalized[0] = { ...normalized[0], pct: normalized[0].pct + (100 - sum) };
+			}
+			return { ...prev, flourBlend: normalized };
+		});
+	}
+
+	const flourColors: Record<string, string> = {
+		BreadFlour: '#F59E0B',
+		AllPurpose: '#60A5FA',
+		WholeWheat: '#92400E',
+		Rye: '#059669',
+		Spelt: '#7C3AED',
+		Einkorn: '#F43F5E'
+	};
 
 	// Auto salt display
 	let autoSaltPct = $derived($result.formula.autoSaltPct);
@@ -64,11 +167,6 @@
 	function onTotalFlourInput(e: Event) {
 		const val = Math.max(0, parseFloat((e.target as HTMLInputElement).value) || 0);
 		updateField('totalFlourInputG', val);
-	}
-
-	function onWhitePctInput(e: Event) {
-		const val = clampPct(parseFloat((e.target as HTMLInputElement).value) || 0);
-		updateField('whitePct', val);
 	}
 
 	function onAmbientInput(e: Event) {
@@ -162,27 +260,94 @@
 			/>
 		</div>
 
-		<!-- White flour % slider -->
+		<!-- Flour Selection -->
 		<div>
-			<div class="flex items-center justify-between mb-1.5">
-				<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.flourBlend}</span>
-				<span class="text-xs font-semibold text-base-content/70">
-					{$inputs.whitePct}% {t.white} / {wwPct}% {t.wholeWheat}
-				</span>
+			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.flourSelection}</span>
+
+			<!-- Flour type toggle grid -->
+			<div class="grid grid-cols-3 gap-2 mt-2">
+				{#each ALL_FLOUR_TYPES as flourType}
+					<button
+						type="button"
+						onclick={() => toggleFlour(flourType)}
+						class="btn btn-sm rounded-xl border-2 h-auto py-2 px-1 text-xs
+							{isFlourSelected(flourType)
+								? 'btn-secondary border-secondary text-secondary-content'
+								: 'btn-ghost border-base-300'}"
+					>
+						{t.flourTypes[flourType]}
+					</button>
+				{/each}
 			</div>
-			<input
-				type="range"
-				min="0"
-				max="100"
-				step="5"
-				value={$inputs.whitePct}
-				oninput={onWhitePctInput}
-				class="range range-secondary range-sm w-full"
-			/>
-			<div class="flex justify-between text-xs text-base-content/50 mt-1.5">
-				<span class="tabular-nums">{t.white}: {whiteFlourGrams}g</span>
-				<span class="tabular-nums">{t.wholeWheat}: {wwFlourGrams}g</span>
-			</div>
+
+			<!-- Selected flour percentage inputs -->
+			{#if $inputs.flourBlend.length > 0}
+				<div class="mt-3 space-y-2">
+					{#each $inputs.flourBlend as entry (entry.type)}
+						<div class="flex items-center gap-2">
+							<span
+								class="inline-block w-3 h-3 rounded-full flex-shrink-0"
+								style="background-color: {flourColors[entry.type]}"
+							></span>
+							<span class="text-xs text-base-content/70 flex-1 min-w-0 truncate">{t.flourTypes[entry.type]}</span>
+							<div class="flex items-center gap-2 flex-1">
+								<input
+									type="range"
+									min="0"
+									max="100"
+									step="1"
+									value={entry.pct}
+									oninput={(e) => updateFlourPct(entry.type, (e.target as HTMLInputElement).value)}
+									class="range range-sm range-secondary flex-1"
+								/>
+								<input
+									type="number"
+									min="0"
+									max="100"
+									step="1"
+									value={Math.round(entry.pct)}
+									onchange={(e) => updateFlourPct(entry.type, (e.target as HTMLInputElement).value)}
+									class="input input-xs w-14 text-right tabular-nums"
+								/>
+								<span class="text-xs text-base-content/70">%</span>
+							</div>
+						</div>
+					{/each}
+				</div>
+
+				<!-- Blend total indicator -->
+				<div class="flex items-center justify-between mt-2">
+					<span class="text-xs text-base-content/50">{t.blendTotal}: <span class="font-semibold tabular-nums {blendValid ? 'text-success' : 'text-error'}">{Math.round(blendTotal)}%</span></span>
+					{#if !blendValid}
+						<button
+							type="button"
+							onclick={normalizeBlend}
+							class="btn btn-xs btn-ghost text-secondary border border-secondary/30"
+						>
+							{t.blendNormalize}
+						</button>
+					{/if}
+				</div>
+
+				<!-- Visual blend bar -->
+				<div class="flex rounded-full overflow-hidden h-2 mt-2 gap-px">
+					{#each $inputs.flourBlend as entry (entry.type)}
+						<div
+							class="h-full"
+							style="width: {Math.max(0, entry.pct)}%; background-color: {flourColors[entry.type]}"
+							title="{t.flourTypes[entry.type]}: {entry.pct}%"
+						></div>
+					{/each}
+				</div>
+				<div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
+					{#each $inputs.flourBlend as entry (entry.type)}
+						<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums">
+							<span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {flourColors[entry.type]}"></span>
+							{t.flourTypes[entry.type]}: {Math.round($inputs.totalFlourInputG * entry.pct / 100)}g
+						</span>
+					{/each}
+				</div>
+			{/if}
 		</div>
 
 		<!-- Crumb goal -->

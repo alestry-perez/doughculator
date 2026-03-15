@@ -6,6 +6,10 @@ The app is static-build friendly and tuned for practical home baking inputs: flo
 
 ## What Changed Recently
 
+- **Per-flour science** — `FLOUR_PROPERTIES` table added with individual absorption coefficients and fermentation multipliers for all 6 flour types. Hydration and bulk timing now use weighted blend averages instead of a simple whole-grain heuristic.
+- **Rye warning** — a `warn`-level notice fires when Rye exceeds 30% of the blend.
+- **Flour Selection UI** — 6 flour type toggle buttons; each row has a range slider + numeric input side by side; dragging or typing both trigger real-time redistribution to 100%.
+- **Color-coded blend bar** — each flour type has a unique color (Amber / Blue / Brown / Green / Purple / Rose) applied consistently across the blend bar, slider dots, and gram breakdown labels.
 - Added artisan-bakery warm light/dark styling on top of daisyUI (`bumblebee` + `dark`) with a cleaner header toggle.
 - `Autolyse` is now `Off/Auto` and **temperature-driven** when enabled.
 - Autolyse duration is display-only (progress bar), not manually draggable.

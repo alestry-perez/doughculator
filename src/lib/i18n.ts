@@ -136,7 +136,9 @@ export const warningStrings = {
 		infoWWAutolyse:
 			'High whole wheat % — consider shorter autolyse (20–25 min) or bassinage technique to improve handling.',
 		warnOpenCrumb:
-			'Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs.'
+			'Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs.',
+		ryeHighWarning:
+			'High rye (>30%) — fermentation may be faster than predicted. Watch your dough closely.'
 	},
 	es: {
 		dangerLow:
@@ -155,7 +157,9 @@ export const warningStrings = {
 		infoWWAutolyse:
 			'Alto % de integral — considera una autólisis más corta (20–25 min) o técnica de bassinage para mejorar el manejo.',
 		warnOpenCrumb:
-			'La miga abierta requiere un control ambiental más riguroso. Vigila la masa de cerca para detectar señales correctas de fermentación.'
+			'La miga abierta requiere un control ambiental más riguroso. Vigila la masa de cerca para detectar señales correctas de fermentación.',
+		ryeHighWarning:
+			'Centeno alto (>30%) — la fermentación puede ser más rápida de lo previsto. Vigila tu masa de cerca.'
 	},
 	sv: {
 		dangerLow:
@@ -174,7 +178,9 @@ export const warningStrings = {
 		infoWWAutolyse:
 			'Hög andel fullkorn — överväg kortare autolys (20–25 min) eller bassinage-teknik för bättre hantering.',
 		warnOpenCrumb:
-			'Öppen smulstruktur kräver noggrannare miljökontroll. Övervaka degen noga för rätt jästecken.'
+			'Öppen smulstruktur kräver noggrannare miljökontroll. Övervaka degen noga för rätt jästecken.',
+		ryeHighWarning:
+			'Hög rågandel (>30%) — jäsningen kan gå snabbare än beräknat. Övervaka degen noga.'
 	}
 };
 
@@ -185,7 +191,9 @@ export const assumptionStrings = {
 		starterHydration: 'Starter hydration',
 		inoculation: 'Inoculation',
 		baseHydration: 'Base hydration',
-		wwHydrationAdjust: 'WW hydration adjust',
+		wwHydrationAdjust: 'Blend hydration adjust',
+		blendAbsorption: 'Blend absorption',
+		blendFermentMult: 'Ferment multiplier',
 		finalHydration: 'Final hydration',
 		autolyse: 'Autolyse',
 		off: 'Off',
@@ -202,7 +210,9 @@ export const assumptionStrings = {
 		starterHydration: 'Hidratación del iniciador',
 		inoculation: 'Inoculación',
 		baseHydration: 'Hidratación base',
-		wwHydrationAdjust: 'Ajuste hidratación integral',
+		wwHydrationAdjust: 'Ajuste hidratación mezcla',
+		blendAbsorption: 'Absorción de la mezcla',
+		blendFermentMult: 'Multiplicador de fermentación',
 		finalHydration: 'Hidratación final',
 		autolyse: 'Autólisis',
 		off: 'Apagada',
@@ -219,7 +229,9 @@ export const assumptionStrings = {
 		starterHydration: 'Surdeghydratation',
 		inoculation: 'Inokulering',
 		baseHydration: 'Bashydratation',
-		wwHydrationAdjust: 'Fullkornsjustering hydratation',
+		wwHydrationAdjust: 'Blandningsjustering hydratation',
+		blendAbsorption: 'Blandningsabsorption',
+		blendFermentMult: 'Jäsningsmultiplikator',
 		finalHydration: 'Sluthydratation',
 		autolyse: 'Autolys',
 		off: 'Av',
@@ -268,6 +280,17 @@ const en = {
 	// InputSection
 	parameters: 'Parameters',
 	totalFlour: 'Total Flour (g)',
+	flourSelection: 'Flour Selection',
+	flourTypes: {
+		BreadFlour: 'Bread Flour',
+		AllPurpose: 'All-Purpose',
+		WholeWheat: 'Whole Wheat',
+		Rye: 'Rye',
+		Spelt: 'Spelt',
+		Einkorn: 'Einkorn'
+	} as Record<string, string>,
+	blendTotal: 'Total',
+	blendNormalize: 'Normalize to 100%',
 	flourBlend: 'Flour Blend',
 	white: 'White',
 	wholeWheat: 'Whole Wheat',
@@ -460,6 +483,17 @@ const es: Translations = {
 	// InputSection
 	parameters: 'Parámetros',
 	totalFlour: 'Harina Total (g)',
+	flourSelection: 'Selección de Harina',
+	flourTypes: {
+		BreadFlour: 'Harina de Fuerza',
+		AllPurpose: 'Harina Todo Uso',
+		WholeWheat: 'Harina Integral',
+		Rye: 'Centeno',
+		Spelt: 'Espelta',
+		Einkorn: 'Einkorn'
+	} as Record<string, string>,
+	blendTotal: 'Total',
+	blendNormalize: 'Normalizar al 100%',
 	flourBlend: 'Mezcla de Harina',
 	white: 'Blanca',
 	wholeWheat: 'Integral',
@@ -659,6 +693,17 @@ const sv: Translations = {
 	// InputSection
 	parameters: 'Parametrar',
 	totalFlour: 'Totalt Mjöl (g)',
+	flourSelection: 'Mjölval',
+	flourTypes: {
+		BreadFlour: 'Vetemjöl Special',
+		AllPurpose: 'Vetemjöl',
+		WholeWheat: 'Fullkornsvetemjöl',
+		Rye: 'Råg',
+		Spelt: 'Dinkel',
+		Einkorn: 'Einkorn'
+	} as Record<string, string>,
+	blendTotal: 'Totalt',
+	blendNormalize: 'Normalisera till 100%',
 	flourBlend: 'Mjölblandning',
 	white: 'Vitt',
 	wholeWheat: 'Fullkorn',

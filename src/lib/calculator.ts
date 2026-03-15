@@ -10,9 +10,28 @@ export type TempBand = 'Freezing' | 'Cold' | 'Standard' | 'Warm' | 'Hot';
 export type ProofMethod = 'Room' | 'ColdRetard';
 export type FermentationPhilosophy = 'Predictability' | 'FlavorDevelopment';
 
+export type FlourType = 'BreadFlour' | 'AllPurpose' | 'WholeWheat' | 'Rye' | 'Spelt' | 'Einkorn';
+
+export interface FlourBlendEntry {
+	type: FlourType;
+	pct: number; // percentage of total flour, entries should sum to 100
+}
+
+export const WHOLE_GRAIN_FLOURS: FlourType[] = ['WholeWheat', 'Rye', 'Spelt', 'Einkorn'];
+export const ALL_FLOUR_TYPES: FlourType[] = ['BreadFlour', 'AllPurpose', 'WholeWheat', 'Rye', 'Spelt', 'Einkorn'];
+
+const FLOUR_PROPERTIES: Record<FlourType, { absorptionCoeff: number; fermentMult: number }> = {
+	BreadFlour:  { absorptionCoeff: 1.00, fermentMult: 1.00 },
+	AllPurpose:  { absorptionCoeff: 0.97, fermentMult: 1.00 },
+	WholeWheat:  { absorptionCoeff: 1.12, fermentMult: 0.95 },
+	Rye:         { absorptionCoeff: 1.20, fermentMult: 0.72 },
+	Spelt:       { absorptionCoeff: 0.95, fermentMult: 0.82 },
+	Einkorn:     { absorptionCoeff: 1.12, fermentMult: 0.90 },
+};
+
 export interface Inputs {
 	totalFlourInputG: number;    // total flour grams (primary input)
-	whitePct: number;            // white flour %, 0–100 (WW% = 100 - whitePct)
+	flourBlend: FlourBlendEntry[]; // custom flour mix, percentages should sum to 100
 	crumbGoal: CrumbGoal;
 	// Advanced
 	ambientTempC: number;        // default 24
@@ -38,6 +57,8 @@ export interface FormulaResult {
 	wwRatio: number;
 	baseHydrationPct: number;
 	wwHydrationAdjust: number;
+	blendAbsorption: number;
+	blendFermentMult: number;
 	finalHydrationPct: number;
 	hydrationBand: HydrationBand;
 	totalWaterG: number;
@@ -119,7 +140,7 @@ export function recommendAutolyseMins(ambientTempC: number, doughTempC: number |
 function calcFormula(inputs: Inputs): FormulaResult {
 	const {
 		totalFlourInputG,
-		whitePct,
+		flourBlend,
 		crumbGoal,
 		ambientTempC,
 		doughTempC,
@@ -130,9 +151,26 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	} = inputs;
 
 	const totalFlourG = totalFlourInputG;
-	const whiteFlouG = Math.round(totalFlourG * (whitePct / 100));
-	const wwFlourG = totalFlourG - whiteFlouG;
-	const wwRatio = totalFlourG > 0 ? wwFlourG / totalFlourG : 0;
+
+	// Normalize blend in case percentages don't sum to exactly 100
+	const totalBlendPct = flourBlend.reduce((s, e) => s + e.pct, 0);
+	const normFactor = totalBlendPct > 0 ? 100 / totalBlendPct : 1;
+	const wwPctNorm = flourBlend
+		.filter(e => WHOLE_GRAIN_FLOURS.includes(e.type))
+		.reduce((s, e) => s + e.pct * normFactor, 0);
+	const wwRatio = totalFlourG > 0 ? wwPctNorm / 100 : 0;
+	const wwFlourG = Math.round(totalFlourG * wwRatio);
+	const whiteFlouG = totalFlourG - wwFlourG;
+
+	// Per-flour blend coefficients (weighted average)
+	const blendSum = flourBlend.reduce((s, e) => s + e.pct, 0);
+	const norm = blendSum > 0 ? blendSum : 1;
+	const blendAbsorption = flourBlend.reduce(
+		(s, e) => s + (e.pct / norm) * FLOUR_PROPERTIES[e.type].absorptionCoeff, 0
+	);
+	const blendFermentMult = flourBlend.reduce(
+		(s, e) => s + (e.pct / norm) * FLOUR_PROPERTIES[e.type].fermentMult, 0
+	);
 
 	// Base hydration by crumb goal
 	const baseHydrationMap: Record<CrumbGoal, number> = {
@@ -142,8 +180,8 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	};
 	const baseHydrationPct = baseHydrationMap[crumbGoal];
 
-	// WW adjustment
-	const wwHydrationAdjust = clamp(0, 5, wwRatio * 100 * 0.12);
+	// Blend-absorption-based hydration adjustment
+	const wwHydrationAdjust = (blendAbsorption - 1.0) * 100;
 	const finalHydrationPct = baseHydrationPct + wwHydrationAdjust;
 
 	// Hydration band
@@ -279,6 +317,8 @@ function calcFormula(inputs: Inputs): FormulaResult {
 		wwRatio,
 		baseHydrationPct,
 		wwHydrationAdjust,
+		blendAbsorption,
+		blendFermentMult,
 		finalHydrationPct,
 		hydrationBand,
 		totalWaterG,
@@ -305,7 +345,7 @@ function calcFormula(inputs: Inputs): FormulaResult {
 // ============================================================
 
 function calcTiming(formula: FormulaResult): TimingResult {
-	const { effectiveTempC, hydrationBand, inoculationPct, wwRatio } = formula;
+	const { effectiveTempC, hydrationBand, inoculationPct, blendFermentMult } = formula;
 
 	// Baseline bulk range (hours) by effective temp
 	let bulkBaseMin: number;
@@ -329,11 +369,8 @@ function calcTiming(formula: FormulaResult): TimingResult {
 	// Inoculation scaling
 	const inocScale = Math.pow(20 / inoculationPct, 0.35);
 
-	// WW multiplier
-	const wwMult = wwRatio >= 0.3 ? 0.95 : 1.0;
-
-	const bulkMin = bulkBaseMin * hydrationMult * inocScale * wwMult;
-	const bulkMax = bulkBaseMax * hydrationMult * inocScale * wwMult;
+	const bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult;
+	const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult;
 
 	// Room proof baseline at 24–26°C: [1.5, 3] hours, apply same multipliers
 	const proofBaseMin = 1.5;
@@ -532,6 +569,11 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 		warnings.push({ level: 'warn', message: w.warnOpenCrumb });
 	}
 
+	const ryeEntry = inputs.flourBlend.find(e => e.type === 'Rye');
+	if (ryeEntry && ryeEntry.pct > 30) {
+		warnings.push({ level: 'warn', message: w.ryeHighWarning });
+	}
+
 	return warnings;
 }
 
@@ -552,6 +594,8 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 		inoculationPct,
 		baseHydrationPct,
 		wwHydrationAdjust,
+		blendAbsorption,
+		blendFermentMult,
 		finalHydrationPct,
 		autoSaltPct,
 		effectiveSaltPct,
@@ -559,6 +603,7 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 	} = formula;
 	const a = assumptionStrings[lang];
 
+	const hydrationAdjustSign = wwHydrationAdjust >= 0 ? '+' : '';
 	return {
 		[a.ambientTemp]: `${effectiveTempC.toFixed(1)}°C`,
 		[a.salt]: saltAutoCalc
@@ -569,7 +614,9 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 			: a.starterHydrationManual(effectiveStarterHydrationPct),
 		[a.inoculation]: `${inoculationPct.toFixed(1)}%`,
 		[a.baseHydration]: `${baseHydrationPct}%`,
-		[a.wwHydrationAdjust]: `+${wwHydrationAdjust.toFixed(1)}%`,
+		[a.blendAbsorption]: blendAbsorption.toFixed(3),
+		[a.blendFermentMult]: blendFermentMult.toFixed(3),
+		[a.wwHydrationAdjust]: `${hydrationAdjustSign}${wwHydrationAdjust.toFixed(1)}%`,
 		[a.finalHydration]: `${finalHydrationPct.toFixed(1)}%`,
 		[a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off
 	};
@@ -628,7 +675,10 @@ export function addMinsToTime(startTime: string, mins: number): string {
 
 export const DEFAULT_INPUTS: Inputs = {
 	totalFlourInputG: 500,
-	whitePct: 80,               // → 400g white, 100g WW
+	flourBlend: [
+		{ type: 'BreadFlour' as FlourType, pct: 80 },
+		{ type: 'WholeWheat' as FlourType, pct: 20 }
+	],
 	crumbGoal: 'Balanced',
 	ambientTempC: 24,
 	doughTempC: null,
