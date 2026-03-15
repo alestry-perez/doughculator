@@ -110,7 +110,7 @@ Hydration band:
 - `Medium`: `70% - 75%`
 - `High`: `> 75%`
 
-### 2) Effective Temperature
+### 3) Effective Temperature
 
 ```txt
 effectiveTempC = (ambientTempC + doughTempC) / 2   // if dough temp provided
@@ -127,7 +127,7 @@ Temperature bands:
 | Warm | `24C - <27C` |
 | Hot | `>= 27C` |
 
-### 3) Inoculation (Starter %)
+### 4) Inoculation (Starter %)
 
 The app supports two fermentation philosophies.
 
@@ -162,7 +162,7 @@ Clamps:
 - Predictability: `clamp(10, 26, inoculationPct)`
 - Flavor Development: `clamp(5, 12.5, inoculationPct)`
 
-### 4) Salt and Starter Hydration Controls
+### 5) Salt and Starter Hydration Controls
 
 Salt:
 
@@ -177,7 +177,7 @@ Starter hydration:
 - Manual override available when toggle is enabled
 - Effective starter hydration is clamped to `50-200%`
 
-### 5) Starter Accounting
+### 6) Starter Accounting
 
 Starter is included in formula totals, not added on top.
 
@@ -190,7 +190,7 @@ mixFlourG = totalFlourG - starterFlourG
 mixWaterG = totalWaterG - starterWaterG
 ```
 
-### 6) Timing Model
+### 7) Timing Model
 
 Bulk baseline (hours):
 
@@ -205,15 +205,17 @@ Bulk baseline (hours):
 Multipliers:
 
 ```txt
-hydrationMult = Low:1.15, Medium:1.0, High:0.85
-inocScale = (20 / inoculationPct) ^ 0.35
-wwMult = wwRatio >= 0.30 ? 0.95 : 1.0
+hydrationMult    = Low:1.15, Medium:1.0, High:0.85
+inocScale        = (20 / inoculationPct) ^ 0.35
+blendFermentMult = weighted average of per-flour fermentMult (see §1)
 ```
 
 ```txt
-bulkMin = bulkBaseMin * hydrationMult * inocScale * wwMult
-bulkMax = bulkBaseMax * hydrationMult * inocScale * wwMult
+bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult
+bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult
 ```
+
+Note: `blendFermentMult` replaces the old binary `wwMult` (0.95 when ≥30% whole grain). Rye-heavy blends now produce meaningfully shorter bulk times reflecting Rye's fast enzymatic activity.
 
 Room proof baseline is `[1.5h, 3h]` (24-26C reference), then scaled by temperature + hydration + inoculation multipliers.
 
@@ -226,7 +228,7 @@ foldCount = min(4, floor(bulkMin * 60 / 30))
 foldIntervalMins = 30
 ```
 
-### 7) Autolyse (Off/Auto)
+### 8) Autolyse (Off/Auto)
 
 When `Autolyse` is toggled to `Auto`, minutes are derived from effective temperature.
 
@@ -241,7 +243,22 @@ When `Autolyse` is toggled to `Auto`, minutes are derived from effective tempera
 
 In UI, this is shown as a non-editable progress bar.
 
-### 8) Schedule Order
+### 9) Warnings
+
+| Warning | Condition | Level |
+| --- | --- | --- |
+| Temp too low | `effectiveTempC < 18` | danger |
+| Temp too high | `effectiveTempC >= 30` | danger |
+| Warm temp | `27 ≤ temp < 30` | warn |
+| Sweet spot | `24 ≤ temp < 27` | info |
+| Slow zone | `20 ≤ temp < 24` | info |
+| High hydration + warm | `hydration=High AND temp > 26` | warn |
+| High hydration | `hydration=High` | info |
+| WW autolyse length | `wwRatio > 0.3 AND autolyse > 30min` | info |
+| Open crumb | `crumbGoal='Open'` | warn |
+| **High rye** | **`Rye > 30%`** | **warn** |
+
+### 10) Schedule Order
 
 1. Autolyse (if enabled)
 2. Add starter + salt
