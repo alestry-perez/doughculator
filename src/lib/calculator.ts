@@ -98,6 +98,7 @@ export interface ScheduleStep {
 	rangeMinMins?: number;
 	rangeMaxMins?: number;
 	notes?: string;
+	isSubStep?: boolean;
 }
 
 export interface WarningMessage {
@@ -448,12 +449,13 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		notes: s.bulkNote
 	});
 
-	// 4. Stretch & fold sets
+	// 4. Stretch & fold sets (sub-steps of bulk fermentation)
 	for (let i = 1; i <= foldCount; i++) {
 		steps.push({
 			label: s.stretchFold(i),
 			durationMins: 5,
-			notes: s.stretchFoldNote(i, i * foldIntervalMins)
+			notes: s.stretchFoldNote(i, i * foldIntervalMins),
+			isSubStep: true
 		});
 	}
 

@@ -41,20 +41,26 @@
 		step: ScheduleStep;
 		clockTime: string | null;
 		endClockTime: string | null;
+		topLevelIndex: number; // index among top-level steps only
 	}
 
 	const stepsWithTimes = $derived.by(() => {
+		let topLevelCounter = 0;
 		if (scheduleMode !== 'clock' || !startTime) {
-			return steps.map((s) => ({ step: s, clockTime: null, endClockTime: null } as StepDisplay));
+			return steps.map((s) => {
+				const topLevelIndex = s.isSubStep ? -1 : topLevelCounter++;
+				return { step: s, clockTime: null, endClockTime: null, topLevelIndex } as StepDisplay;
+			});
 		}
 
 		let cumulativeMins = 0;
 		return steps.map((s) => {
+			const topLevelIndex = s.isSubStep ? -1 : topLevelCounter++;
 			const clockTime = addMinsToTime(startTime, cumulativeMins);
 			const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
 			cumulativeMins += durMins;
 			const endClockTime = addMinsToTime(startTime, cumulativeMins);
-			return { step: s, clockTime, endClockTime } as StepDisplay;
+			return { step: s, clockTime, endClockTime, topLevelIndex } as StepDisplay;
 		});
 	});
 
@@ -75,56 +81,105 @@
 		<p class="text-xs italic text-base-content/60 mb-3">Press to mark completed step</p>
 
 		<ol class="relative space-y-0">
-			{#each stepsWithTimes as { step, clockTime, endClockTime }, i}
-				<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-				<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
-				<li
-					class="flex gap-4 pb-5 relative group cursor-pointer select-none"
-					onclick={() => toggleStep(i)}
-					onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleStep(i); } }}
-					role="checkbox"
-					aria-checked={completedSteps.has(i)}
-					tabindex="0"
-				>
-					<!-- Timeline line -->
-					{#if i < stepsWithTimes.length - 1}
-						<div class="absolute left-4 top-8 bottom-0 w-px bg-secondary/20"></div>
-					{/if}
+			{#each stepsWithTimes as { step, clockTime, endClockTime, topLevelIndex }, i}
+				{#if step.isSubStep}
+					<!-- Sub-step: stretch & fold nested under Bulk Fermentation -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+					<li
+						class="flex gap-3 pb-3 relative group cursor-pointer select-none pl-11"
+						onclick={() => toggleStep(i)}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleStep(i); } }}
+						role="checkbox"
+						aria-checked={completedSteps.has(i)}
+						tabindex="0"
+					>
+						<!-- Vertical connector line continuing from parent -->
+						<div class="absolute left-4 top-0 bottom-0 w-px bg-secondary/20"></div>
 
-					<!-- Step number bubble / checkmark -->
-					<div class="shrink-0 w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center z-10 transition-colors
-						{completedSteps.has(i)
-							? 'bg-success/15 text-success'
-							: 'bg-secondary/15 text-secondary group-hover:bg-secondary/25'}">
-						{#if completedSteps.has(i)}
-							&#10003;
-						{:else}
-							{i + 1}
-						{/if}
-					</div>
-
-					<div class="flex-1 min-w-0 transition-opacity {completedSteps.has(i) ? 'opacity-50' : ''}">
-						<div class="flex items-start justify-between gap-2">
-							<span class="text-sm font-semibold leading-tight transition-colors
-								{completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-base-content'}">
-								{step.label}
-							</span>
-							<div class="shrink-0 text-right">
-								{#if scheduleMode === 'clock' && clockTime}
-									<div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{clockTime}</div>
-									{#if endClockTime && endClockTime !== clockTime}
-										<div class="text-xs text-base-content/50 tabular-nums {completedSteps.has(i) ? 'line-through' : ''}">→ {endClockTime}</div>
-									{/if}
-								{:else}
-									<div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{durationLabel(step)}</div>
+						<!-- Sub-step marker: small diamond -->
+						<div class="shrink-0 w-5 h-5 rounded-sm rotate-45 text-[9px] font-bold flex items-center justify-center z-10 transition-colors mt-0.5
+							{completedSteps.has(i)
+								? 'bg-success/15 text-success'
+								: 'bg-secondary/10 text-secondary/70 group-hover:bg-secondary/20'}">
+							<span class="-rotate-45">
+								{#if completedSteps.has(i)}
+									&#10003;
 								{/if}
-							</div>
+							</span>
 						</div>
-						{#if step.notes}
-							<p class="text-xs mt-1 leading-snug {completedSteps.has(i) ? 'text-base-content/30 line-through' : 'text-base-content/70'}">{step.notes}</p>
+
+						<div class="flex-1 min-w-0 transition-opacity {completedSteps.has(i) ? 'opacity-50' : ''}">
+							<div class="flex items-start justify-between gap-2">
+								<span class="text-xs font-medium leading-tight transition-colors
+									{completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-base-content/80'}">
+									{step.label}
+								</span>
+								<div class="shrink-0 text-right">
+									{#if scheduleMode === 'clock' && clockTime}
+										<div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{clockTime}</div>
+									{:else}
+										<div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{durationLabel(step)}</div>
+									{/if}
+								</div>
+							</div>
+							{#if step.notes}
+								<p class="text-[11px] mt-0.5 leading-snug {completedSteps.has(i) ? 'text-base-content/25 line-through' : 'text-base-content/55'}">{step.notes}</p>
+							{/if}
+						</div>
+					</li>
+				{:else}
+					<!-- Top-level step -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+					<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
+					<li
+						class="flex gap-4 pb-5 relative group cursor-pointer select-none"
+						onclick={() => toggleStep(i)}
+						onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleStep(i); } }}
+						role="checkbox"
+						aria-checked={completedSteps.has(i)}
+						tabindex="0"
+					>
+						<!-- Timeline line -->
+						{#if i < stepsWithTimes.length - 1}
+							<div class="absolute left-4 top-8 bottom-0 w-px bg-secondary/20"></div>
 						{/if}
-					</div>
-				</li>
+
+						<!-- Step number bubble / checkmark -->
+						<div class="shrink-0 w-8 h-8 rounded-full font-bold text-xs flex items-center justify-center z-10 transition-colors
+							{completedSteps.has(i)
+								? 'bg-success/15 text-success'
+								: 'bg-secondary/15 text-secondary group-hover:bg-secondary/25'}">
+							{#if completedSteps.has(i)}
+								&#10003;
+							{:else}
+								{topLevelIndex + 1}
+							{/if}
+						</div>
+
+						<div class="flex-1 min-w-0 transition-opacity {completedSteps.has(i) ? 'opacity-50' : ''}">
+							<div class="flex items-start justify-between gap-2">
+								<span class="text-sm font-semibold leading-tight transition-colors
+									{completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-base-content'}">
+									{step.label}
+								</span>
+								<div class="shrink-0 text-right">
+									{#if scheduleMode === 'clock' && clockTime}
+										<div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{clockTime}</div>
+										{#if endClockTime && endClockTime !== clockTime}
+											<div class="text-xs text-base-content/50 tabular-nums {completedSteps.has(i) ? 'line-through' : ''}">→ {endClockTime}</div>
+										{/if}
+									{:else}
+										<div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{durationLabel(step)}</div>
+									{/if}
+								</div>
+							</div>
+							{#if step.notes}
+								<p class="text-xs mt-1 leading-snug {completedSteps.has(i) ? 'text-base-content/30 line-through' : 'text-base-content/70'}">{step.notes}</p>
+							{/if}
+						</div>
+					</li>
+				{/if}
 			{/each}
 		</ol>
 	</div>
