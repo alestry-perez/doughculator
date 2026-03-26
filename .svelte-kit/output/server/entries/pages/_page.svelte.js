@@ -4,80 +4,68 @@ const scheduleStrings = {
   en: {
     autolyse: "Autolyse",
     autolyseNote: () => "Mix flour and most of water (hold back ~50g water, all salt, all starter). Cover and rest.",
-    addStarterSalt: "Add Starter + Salt",
-    addStarterNote: "Incorporate starter and salt, pinch and fold until fully integrated.",
-    bulkFermentation: "Bulk Fermentation",
-    bulkNote: "Ferment until dough has grown 50–75%, feels airy, passes float test. Adjust based on your environment.",
-    stretchFold: (n) => `Stretch & Fold ${n}`,
-    stretchFoldNote: (n, mins) => `Set of 4 coil folds (${mins} min into bulk). Dough should start to hold tension.`,
-    restBulk: "Rest (Remaining Bulk)",
-    restNote: "Cover and leave undisturbed. Watch for signs of fermentation (bubbles, jiggle, rise).",
-    preShape: "Pre-shape",
-    preShapeNote: "Gentle pre-shape, rest on counter uncovered.",
-    benchRest: "Bench Rest",
-    benchRestNote: "Allow gluten to relax before final shape.",
+    mix: "Mix",
+    mixNote: "Combine starter and water, stir until dissolved. Add flour to form a shaggy dough. Rest covered.",
+    stretchFold: "Stretch & Fold",
+    stretchFoldNote: (intervalMins) => `3 sets, ${intervalMins} min apart.`,
+    coilFolds: "Coil Folds",
+    coilFoldsNote: (intervalMins) => `2 sets, ${intervalMins} min apart.`,
+    bulkFermentation: "Bulk Ferment",
+    bulkNote: (minH, maxH) => `Ferment at room temp until puffy.`,
+    preShape: "Preshape",
+    preShapeNote: "Shape into a round ball. Rest covered.",
     finalShape: "Final Shape",
-    finalShapeNote: "Shape into batard or boule. Build surface tension. Place seam-side up in floured banneton.",
+    finalShapeNote: "Shape and place into a floured proofing basket.",
     roomProof: "Room Temperature Proof",
     roomProofNote: "Cover banneton. Dough should puff and pass the poke test (slow spring-back).",
-    coldRetard: "Cold Retard (Fridge)",
-    coldRetardNote: (temp) => `Place covered banneton in fridge at ${temp}°C. Can bake directly from cold.`,
-    preheatOven: "Preheat Oven + Dutch Oven",
-    preheatNote: "500°F / 260°C with Dutch oven inside. Oven must be fully saturated with heat.",
-    scoreBake: "Score + Bake",
-    scoreBakeNote: "Score dough quickly. Bake covered 20 min, then uncover and bake 25 min more until deep golden."
+    coldRetard: "Cold Proof",
+    coldRetardNote: "Refrigerate ~15 hours.",
+    bake: "Bake",
+    bakeNote: "Preheat oven + Dutch oven to 230°C (450°F). Score and bake."
   },
   es: {
     autolyse: "Autólisis",
     autolyseNote: () => "Mezcla la harina y la mayor parte del agua (reserva ~50g de agua, toda la sal e iniciador). Tapa y reposa.",
-    addStarterSalt: "Agregar Iniciador + Sal",
-    addStarterNote: "Incorpora el iniciador y la sal; pellizca y pliega hasta integrar completamente.",
+    mix: "Mezclar",
+    mixNote: "Combina iniciador y agua, mezcla hasta disolver. Agrega la harina para formar una masa irregular. Reposa tapado 45 min.",
+    stretchFold: "Estirado y Plegado",
+    stretchFoldNote: (intervalMins) => `3 series, ${intervalMins} min de descanso entre cada una.`,
+    coilFolds: "Pliegues en Espiral",
+    coilFoldsNote: (intervalMins) => `2 series, ${intervalMins} min de descanso entre cada una.`,
     bulkFermentation: "Fermentación en Masa",
-    bulkNote: "Fermenta hasta que la masa crezca un 50–75%, se sienta aireada y pase la prueba de flotación. Ajusta según tu ambiente.",
-    stretchFold: (n) => `Estirado y Plegado ${n}`,
-    stretchFoldNote: (n, mins) => `Serie de 4 pliegues en espiral (${mins} min desde el inicio). La masa debe comenzar a mantener tensión.`,
-    restBulk: "Reposo (Resto de Fermentación)",
-    restNote: "Tapa y deja reposar sin tocar. Observa señales de fermentación (burbujas, temblor, subida).",
+    bulkNote: (minH, maxH) => `Fermenta a temperatura ambiente ${minH}–${maxH}h hasta que esté esponjosa.`,
     preShape: "Pre-formado",
-    preShapeNote: "Pre-forma con cuidado y deja reposar en la mesa sin tapar.",
-    benchRest: "Reposo en Mesa",
-    benchRestNote: "Deja que el gluten se relaje antes del formado final.",
+    preShapeNote: "Forma una bola redonda. Reposa tapado.",
     finalShape: "Formado Final",
-    finalShapeNote: "Forma un batard o boule. Crea tensión superficial. Coloca con la costura hacia arriba en el banneton enharinado.",
+    finalShapeNote: "Forma y coloca en el banneton enharinado.",
     roomProof: "Fermentación a Temperatura Ambiente",
     roomProofNote: "Tapa el banneton. La masa debe hincharse y pasar la prueba del dedo (recuperación lenta).",
-    coldRetard: "Fermentación en Frío (Nevera)",
-    coldRetardNote: (temp) => `Coloca el banneton tapado en la nevera a ${temp}°C. Se puede hornear directamente desde el frío.`,
-    preheatOven: "Precalentar Horno + Olla",
-    preheatNote: "260°C / 500°F con la olla dentro. El horno debe estar completamente caliente.",
-    scoreBake: "Greñar + Hornear",
-    scoreBakeNote: "Greña rápidamente. Hornea tapado 20 min, luego destapa y hornea 25 min más hasta dorar bien."
+    coldRetard: "Fermentación en Frío",
+    coldRetardNote: "Refrigera ~15 horas.",
+    bake: "Hornear",
+    bakeNote: "Precalienta el horno + olla holandesa a 230°C (450°F). Greña y hornea."
   },
   sv: {
     autolyse: "Autolys",
     autolyseNote: () => "Blanda mjöl och det mesta av vattnet (håll tillbaka ~50g vatten, allt salt och all surdeg). Täck och vila.",
-    addStarterSalt: "Tillsätt Surdeg + Salt",
-    addStarterNote: "Blanda in surdegen och saltet, nyp och vik tills allt är helt integrerat.",
+    mix: "Blanda",
+    mixNote: "Kombinera surdeg och vatten, rör tills upplöst. Tillsätt mjöl och forma en grov deg. Vila täckt.",
+    stretchFold: "Sträck & Vik",
+    stretchFoldNote: (intervalMins) => `3 omgångar, ${intervalMins} min mellan varje.`,
+    coilFolds: "Spiralvikningar",
+    coilFoldsNote: (intervalMins) => `2 omgångar, ${intervalMins} min mellan varje.`,
     bulkFermentation: "Bulkjäsning",
-    bulkNote: "Jäs tills degen vuxit 50–75%, känns luftig och klarar flottestet. Justera efter din miljö.",
-    stretchFold: (n) => `Sträck & Vik ${n}`,
-    stretchFoldNote: (n, mins) => `4 vikningar (${mins} min in i bulkjäsningen). Degen ska börja hålla spänning.`,
-    restBulk: "Vila (Resterande Bulkjäsning)",
-    restNote: "Täck och låt stå ostörd. Titta efter jästecken (bubblor, rörelse, stigning).",
+    bulkNote: (minH, maxH) => `Jäs i rumstemperatur ${minH}–${maxH}h tills degen är luftig.`,
     preShape: "Förformning",
-    preShapeNote: "Försiktig förformning, vila på bänken utan täckning.",
-    benchRest: "Bänkvila",
-    benchRestNote: "Låt glutenet slappna av inför slutformningen.",
+    preShapeNote: "Forma till en rund boll. Vila täckt i 45 min.",
     finalShape: "Slutformning",
-    finalShapeNote: "Forma till batard eller boule. Bygg upp ytterspänning. Lägg med skarven uppåt i mjölat jäskorg.",
+    finalShapeNote: "Forma och lägg i mjölat jäskorg.",
     roomProof: "Jäsning i Rumstemperatur",
     roomProofNote: "Täck jäskorgen. Degen ska puffa upp och klara stickprovet (långsam återfjädring).",
-    coldRetard: "Kall Jäsning (Kylskåp)",
-    coldRetardNote: (temp) => `Ställ täckt jäskorg i kylskåp på ${temp}°C. Kan bakas direkt från kylskåpet.`,
-    preheatOven: "Förvärm Ugn + Gryta",
-    preheatNote: "260°C / 500°F med gjutjärnsgryta inuti. Ugnen måste vara ordentligt uppvärmd.",
-    scoreBake: "Snitta + Baka",
-    scoreBakeNote: "Snitta snabbt. Baka täckt i 20 min, ta sedan av locket och baka ytterligare 25 min tills djupt gyllenbrun."
+    coldRetard: "Kall Jäsning",
+    coldRetardNote: "Kyl i ~15 timmar.",
+    bake: "Baka",
+    bakeNote: "Förvärm ugn + gryta till 230°C (450°F). Snitta och baka."
   }
 };
 const warningStrings = {
@@ -247,17 +235,9 @@ const en = {
   autolyseModalTitle: "Autolyse Guide",
   autolyseModalIntro: "Autolyse is a short rest after mixing flour and water, before adding starter and salt. It improves hydration and starts gluten development with less mixing.",
   autolyseModalUseTitle: "When to use it",
-  autolyseModalUseItems: [
-    "High-hydration doughs where you want better extensibility and easier shaping.",
-    "Doughs with whole wheat or thirsty flours that benefit from fuller hydration.",
-    "When the dough feels tight during mixing and you want gentler gluten development."
-  ],
+  autolyseModalUseItems: ["High-hydration doughs where you want better extensibility and easier shaping.", "Doughs with whole wheat or thirsty flours that benefit from fuller hydration.", "When the dough feels tight during mixing and you want gentler gluten development."],
   autolyseModalAvoidTitle: "When to skip or shorten",
-  autolyseModalAvoidItems: [
-    "Very warm kitchen or dough conditions (around 29°C / 84°F and above); keep it short or leave it off.",
-    "If your dough already gets slack or sticky quickly; long autolyse can reduce strength.",
-    "When you need a fast mix-and-go workflow and prefer speed over marginal handling gains."
-  ],
+  autolyseModalAvoidItems: ["Very warm kitchen or dough conditions (around 29°C / 84°F and above); keep it short or leave it off.", "If your dough already gets slack or sticky quickly; long autolyse can reduce strength.", "When you need a fast mix-and-go workflow and prefer speed over marginal handling gains."],
   fermentationPhilosophyLabel: "Fermentation Philosophy",
   philosophyPredictability: "Predictability",
   philosophyFlavorDev: "Flavor Development",
@@ -440,17 +420,9 @@ const es = {
   autolyseModalTitle: "Guía de Autólisis",
   autolyseModalIntro: "La autólisis es un reposo corto tras mezclar harina y agua, antes de añadir iniciador y sal. Mejora la hidratación y comienza el desarrollo de gluten con menos amasado.",
   autolyseModalUseTitle: "Cuándo usarla",
-  autolyseModalUseItems: [
-    "Masas de alta hidratación cuando buscas más extensibilidad y formado más fácil.",
-    "Masas con harina integral o harinas muy absorbentes que se benefician de una hidratación completa.",
-    "Cuando la masa se siente tensa al mezclar y quieres desarrollar gluten de forma más suave."
-  ],
+  autolyseModalUseItems: ["Masas de alta hidratación cuando buscas más extensibilidad y formado más fácil.", "Masas con harina integral o harinas muy absorbentes que se benefician de una hidratación completa.", "Cuando la masa se siente tensa al mezclar y quieres desarrollar gluten de forma más suave."],
   autolyseModalAvoidTitle: "Cuándo evitarla o acortarla",
-  autolyseModalAvoidItems: [
-    "Cocina o masa muy cálida (aprox. 29°C / 84°F o más); acórtala o déjala apagada.",
-    "Si la masa ya se vuelve floja o pegajosa con rapidez; una autólisis larga puede debilitar estructura.",
-    "Cuando necesitas un flujo rápido de mezclar y seguir, y priorizas velocidad."
-  ],
+  autolyseModalAvoidItems: ["Cocina o masa muy cálida (aprox. 29°C / 84°F o más); acórtala o déjala apagada.", "Si la masa ya se vuelve floja o pegajosa con rapidez; una autólisis larga puede debilitar estructura.", "Cuando necesitas un flujo rápido de mezclar y seguir, y priorizas velocidad."],
   fermentationPhilosophyLabel: "Filosofía de Fermentación",
   philosophyPredictability: "Consistencia",
   philosophyFlavorDev: "Sabor",
@@ -629,17 +601,9 @@ const sv = {
   autolyseModalTitle: "Autolysguide",
   autolyseModalIntro: "Autolys är en kort vila efter att mjöl och vatten blandats, innan surdeg och salt tillsätts. Den förbättrar hydreringen och startar glutenutvecklingen med mindre bearbetning.",
   autolyseModalUseTitle: "När du bör använda den",
-  autolyseModalUseItems: [
-    "Degar med hög hydrering där du vill ha bättre tänjbarhet och enklare formning.",
-    "Degar med fullkorn eller törstiga mjölsorter som mår bra av mer fullständig hydrering.",
-    "När degen känns stram tidigt i blandningen och du vill ha skonsammare glutenutveckling."
-  ],
+  autolyseModalUseItems: ["Degar med hög hydrering där du vill ha bättre tänjbarhet och enklare formning.", "Degar med fullkorn eller törstiga mjölsorter som mår bra av mer fullständig hydrering.", "När degen känns stram tidigt i blandningen och du vill ha skonsammare glutenutveckling."],
   autolyseModalAvoidTitle: "När du bör hoppa över eller korta ner",
-  autolyseModalAvoidItems: [
-    "Mycket varm köks- eller degtemperatur (runt 29°C / 84°F eller högre); håll den kort eller stäng av.",
-    "Om degen redan blir slapp eller kladdig snabbt; lång autolys kan minska styrkan.",
-    "När du behöver ett snabbt arbetsflöde och prioriterar tempo över små hanteringsvinster."
-  ],
+  autolyseModalAvoidItems: ["Mycket varm köks- eller degtemperatur (runt 29°C / 84°F eller högre); håll den kort eller stäng av.", "Om degen redan blir slapp eller kladdig snabbt; lång autolys kan minska styrkan.", "När du behöver ett snabbt arbetsflöde och prioriterar tempo över små hanteringsvinster."],
   fermentationPhilosophyLabel: "Jäsningsfilosofi",
   philosophyPredictability: "Förutsägbarhet",
   philosophyFlavorDev: "Smakutveckling",
@@ -955,7 +919,12 @@ function calcTiming(formula) {
   const coldRetardMin = 8;
   const coldRetardMax = 16;
   const foldCount = Math.min(4, Math.floor(bulkMin * 60 / 30));
-  const foldIntervalMins = 30;
+  let foldIntervalMins;
+  if (effectiveTempC >= 29) foldIntervalMins = 20;
+  else if (effectiveTempC >= 27) foldIntervalMins = 22;
+  else if (effectiveTempC >= 24) foldIntervalMins = 25;
+  else if (effectiveTempC >= 21) foldIntervalMins = 30;
+  else foldIntervalMins = 35;
   return {
     bulkMin,
     bulkMax,
@@ -969,9 +938,11 @@ function calcTiming(formula) {
 }
 function calcSchedule(inputs2, formula, timing, lang2) {
   const { autolyseOn, autolyseMins, proofMethod } = inputs2;
-  const { bulkMin, bulkMax, proofMin, proofMax, coldRetardMin, coldRetardMax, foldCount, foldIntervalMins } = timing;
+  const { proofMin, proofMax, coldRetardMin, coldRetardMax, foldIntervalMins, bulkMin, bulkMax } = timing;
   const s = scheduleStrings[lang2];
   const steps = [];
+  const bulkMinH = Math.round(bulkMin * 10) / 10;
+  const bulkMaxH = Math.round(bulkMax * 10) / 10;
   if (autolyseOn) {
     steps.push({
       label: s.autolyse,
@@ -980,41 +951,33 @@ function calcSchedule(inputs2, formula, timing, lang2) {
     });
   }
   steps.push({
-    label: s.addStarterSalt,
-    durationMins: 5,
-    notes: s.addStarterNote
+    label: s.mix,
+    durationMins: 45,
+    notes: s.mixNote
+  });
+  steps.push({
+    label: s.stretchFold,
+    durationMins: 3 * foldIntervalMins,
+    notes: s.stretchFoldNote(foldIntervalMins),
+    setCount: 3
+  });
+  steps.push({
+    label: s.coilFolds,
+    durationMins: 2 * foldIntervalMins,
+    notes: s.coilFoldsNote(foldIntervalMins),
+    setCount: 2
   });
   steps.push({
     label: s.bulkFermentation,
     durationMins: null,
     rangeMinMins: Math.round(bulkMin * 60),
     rangeMaxMins: Math.round(bulkMax * 60),
-    notes: s.bulkNote
-  });
-  for (let i = 1; i <= foldCount; i++) {
-    steps.push({
-      label: s.stretchFold(i),
-      durationMins: 5,
-      notes: s.stretchFoldNote(i, i * foldIntervalMins),
-      isSubStep: true
-    });
-  }
-  const foldEndMins = foldCount * foldIntervalMins;
-  const remainingBulkMin = Math.max(0, Math.round(bulkMin * 60) - foldEndMins - 5);
-  steps.push({
-    label: s.restBulk,
-    durationMins: remainingBulkMin > 0 ? remainingBulkMin : null,
-    notes: s.restNote
+    notes: s.bulkNote(bulkMinH, bulkMaxH)
   });
   steps.push({
     label: s.preShape,
-    durationMins: 5,
+    durationMins: 45,
     notes: s.preShapeNote
-  });
-  steps.push({
-    label: s.benchRest,
-    durationMins: 30,
-    notes: s.benchRestNote
   });
   steps.push({
     label: s.finalShape,
@@ -1035,18 +998,13 @@ function calcSchedule(inputs2, formula, timing, lang2) {
       durationMins: null,
       rangeMinMins: coldRetardMin * 60,
       rangeMaxMins: coldRetardMax * 60,
-      notes: s.coldRetardNote(inputs2.fridgeTempC)
+      notes: s.coldRetardNote
     });
   }
   steps.push({
-    label: s.preheatOven,
+    label: s.bake,
     durationMins: 45,
-    notes: s.preheatNote
-  });
-  steps.push({
-    label: s.scoreBake,
-    durationMins: 45,
-    notes: s.scoreBakeNote
+    notes: s.bakeNote
   });
   return steps;
 }
@@ -1438,6 +1396,10 @@ function ScheduleCard($$renderer, $$props) {
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
     let { steps, scheduleMode, startTime } = $$props;
     let completedSteps = /* @__PURE__ */ new Set();
+    let completedSets = /* @__PURE__ */ new Map();
+    function isSetDone(stepIndex, setIndex) {
+      return completedSets.get(stepIndex)?.has(setIndex) ?? false;
+    }
     const stepsWithTimes = derived$1(() => {
       let topLevelCounter = 0;
       if (scheduleMode !== "clock" || !startTime) {
@@ -1465,20 +1427,20 @@ function ScheduleCard($$renderer, $$props) {
       }
       return "";
     }
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-1">${escape_html(t().schedule)}</h2> <p class="text-xs italic text-base-content/60 mb-3">Press to mark completed step</p> <ol class="relative space-y-0"><!--[-->`);
+    $$renderer2.push(`<div class="shadow-sm card bg-base-100 ring-1 ring-base-300/70"><div class="p-5 card-body"><h2 class="mb-1 text-base font-semibold tracking-wide uppercase text-base-content">${escape_html(t().schedule)}</h2> <p class="mb-3 text-xs italic text-base-content/60">Press to mark completed step</p> <ol class="relative space-y-0"><!--[-->`);
     const each_array = ensure_array_like(stepsWithTimes());
     for (let i = 0, $$length = each_array.length; i < $$length; i++) {
       let { step, clockTime, endClockTime, topLevelIndex } = each_array[i];
       if (step.isSubStep) {
         $$renderer2.push("<!--[0-->");
-        $$renderer2.push(`<li class="flex gap-3 pb-3 relative group cursor-pointer select-none pl-11" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0"><div class="absolute left-4 top-0 bottom-0 w-px bg-secondary/20"></div> <div${attr_class(`shrink-0 w-5 h-5 rounded-sm rotate-45 text-[9px] font-bold flex items-center justify-center z-10 transition-colors mt-0.5 ${stringify(completedSteps.has(i) ? "bg-success/15 text-success" : "bg-secondary/10 text-secondary/70 group-hover:bg-secondary/20")}`)}><span class="-rotate-45">`);
+        $$renderer2.push(`<li class="relative flex gap-3 pb-3 cursor-pointer select-none group pl-11" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0"><div class="absolute top-0 bottom-0 w-px left-4 bg-secondary/20"></div> <div${attr_class(`shrink-0 w-5 h-5 rounded-sm rotate-45 text-[9px] font-bold flex items-center justify-center z-10 transition-colors mt-0.5 ${stringify(completedSteps.has(i) ? "bg-success/15 text-success" : "bg-secondary/10 text-secondary/70 group-hover:bg-secondary/20")}`)}><span class="-rotate-45">`);
         if (completedSteps.has(i)) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`✓`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
-        $$renderer2.push(`<!--]--></span></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-xs font-medium leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/80")}`)}>${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
+        $$renderer2.push(`<!--]--></span></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-xs font-medium leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/80")}`)}>${escape_html(step.label)}</span> <div class="text-right shrink-0">`);
         if (scheduleMode === "clock" && clockTime) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(clockTime)}</div>`);
@@ -1496,10 +1458,10 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push(`<!--]--></div></li>`);
       } else {
         $$renderer2.push("<!--[-1-->");
-        $$renderer2.push(`<li class="flex gap-4 pb-5 relative group cursor-pointer select-none" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0">`);
+        $$renderer2.push(`<li class="relative flex gap-4 pb-5 cursor-pointer select-none group" role="checkbox"${attr("aria-checked", completedSteps.has(i))} tabindex="0">`);
         if (i < stepsWithTimes().length - 1) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="absolute left-4 top-8 bottom-0 w-px bg-secondary/20"></div>`);
+          $$renderer2.push(`<div class="absolute bottom-0 w-px left-4 top-8 bg-secondary/20"></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -1511,7 +1473,7 @@ function ScheduleCard($$renderer, $$props) {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`${escape_html(topLevelIndex + 1)}`);
         }
-        $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-base-content")}`)}>${escape_html(step.label)}</span> <div class="shrink-0 text-right">`);
+        $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-base-content")}`)}>${escape_html(step.label)}</span> <div class="text-right shrink-0">`);
         if (scheduleMode === "clock" && clockTime) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-secondary")}`)}>${escape_html(clockTime)}</div> `);
@@ -1530,6 +1492,26 @@ function ScheduleCard($$renderer, $$props) {
         if (step.notes) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<p${attr_class(`text-xs mt-1 leading-snug ${stringify(completedSteps.has(i) ? "text-base-content/30 line-through" : "text-base-content/70")}`)}>${escape_html(step.notes)}</p>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> `);
+        if (step.setCount && !completedSteps.has(i)) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex flex-wrap gap-2 mt-2"><!--[-->`);
+          const each_array_1 = ensure_array_like(Array.from({ length: step.setCount }, (_, si) => si));
+          for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
+            let si = each_array_1[$$index];
+            $$renderer2.push(`<button${attr_class(`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium border transition-colors ${stringify(isSetDone(i, si) ? "bg-success/15 border-success/30 text-success" : "bg-base-200 border-base-300 text-base-content/60 hover:bg-base-300")}`)}><span${attr_class(`w-3.5 h-3.5 rounded-sm border flex items-center justify-center text-[9px] ${stringify(isSetDone(i, si) ? "bg-success/20 border-success/40 text-success" : "border-base-content/30")}`)}>`);
+            if (isSetDone(i, si)) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`✓`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+            }
+            $$renderer2.push(`<!--]--></span> Set ${escape_html(si + 1)}</button>`);
+          }
+          $$renderer2.push(`<!--]--></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }

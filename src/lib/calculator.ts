@@ -99,6 +99,7 @@ export interface ScheduleStep {
 	rangeMaxMins?: number;
 	notes?: string;
 	isSubStep?: boolean;
+	setCount?: number; // number of checkable sets within this step (e.g. 3 S&F, 2 coil folds)
 }
 
 export interface WarningMessage {
@@ -400,7 +401,14 @@ function calcTiming(formula: FormulaResult): TimingResult {
 
 	// Folds during bulk
 	const foldCount = Math.min(4, Math.floor((bulkMin * 60) / 30));
-	const foldIntervalMins = 30;
+
+	// Fold interval scales with temp: warmer = shorter intervals
+	let foldIntervalMins: number;
+	if (effectiveTempC >= 29) foldIntervalMins = 20;
+	else if (effectiveTempC >= 27) foldIntervalMins = 22;
+	else if (effectiveTempC >= 24) foldIntervalMins = 25;
+	else if (effectiveTempC >= 21) foldIntervalMins = 30;
+	else foldIntervalMins = 35;
 
 	return {
 		bulkMin,
@@ -420,9 +428,13 @@ function calcTiming(formula: FormulaResult): TimingResult {
 
 function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResult, lang: Lang): ScheduleStep[] {
 	const { autolyseOn, autolyseMins, proofMethod } = inputs;
-	const { bulkMin, bulkMax, proofMin, proofMax, coldRetardMin, coldRetardMax, foldCount, foldIntervalMins } = timing;
+	const { proofMin, proofMax, coldRetardMin, coldRetardMax, foldIntervalMins, bulkMin, bulkMax } = timing;
 	const s = scheduleStrings[lang];
 	const steps: ScheduleStep[] = [];
+
+	// Round bulk hours to one decimal for display
+	const bulkMinH = Math.round(bulkMin * 10) / 10;
+	const bulkMaxH = Math.round(bulkMax * 10) / 10;
 
 	// 1. Autolyse (if on)
 	if (autolyseOn) {
@@ -433,63 +445,53 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		});
 	}
 
-	// 2. Add starter + salt
+	// 2. Mix
 	steps.push({
-		label: s.addStarterSalt,
-		durationMins: 5,
-		notes: s.addStarterNote
+		label: s.mix,
+		durationMins: 45,
+		notes: s.mixNote
 	});
 
-	// 3. Bulk fermentation start
+	// 3. Stretch & Fold
+	steps.push({
+		label: s.stretchFold,
+		durationMins: 3 * foldIntervalMins,
+		notes: s.stretchFoldNote(foldIntervalMins),
+		setCount: 3
+	});
+
+	// 4. Coil Folds
+	steps.push({
+		label: s.coilFolds,
+		durationMins: 2 * foldIntervalMins,
+		notes: s.coilFoldsNote(foldIntervalMins),
+		setCount: 2
+	});
+
+	// 5. Bulk Ferment
 	steps.push({
 		label: s.bulkFermentation,
 		durationMins: null,
 		rangeMinMins: Math.round(bulkMin * 60),
 		rangeMaxMins: Math.round(bulkMax * 60),
-		notes: s.bulkNote
+		notes: s.bulkNote(bulkMinH, bulkMaxH)
 	});
 
-	// 4. Stretch & fold sets (sub-steps of bulk fermentation)
-	for (let i = 1; i <= foldCount; i++) {
-		steps.push({
-			label: s.stretchFold(i),
-			durationMins: 5,
-			notes: s.stretchFoldNote(i, i * foldIntervalMins),
-			isSubStep: true
-		});
-	}
-
-	// 5. Rest (remaining bulk)
-	const foldEndMins = foldCount * foldIntervalMins;
-	const remainingBulkMin = Math.max(0, Math.round(bulkMin * 60) - foldEndMins - 5);
-	steps.push({
-		label: s.restBulk,
-		durationMins: remainingBulkMin > 0 ? remainingBulkMin : null,
-		notes: s.restNote
-	});
-
-	// 6. Pre-shape
+	// 6. Preshape
 	steps.push({
 		label: s.preShape,
-		durationMins: 5,
+		durationMins: 45,
 		notes: s.preShapeNote
 	});
 
-	// 7. Bench rest
-	steps.push({
-		label: s.benchRest,
-		durationMins: 30,
-		notes: s.benchRestNote
-	});
-
-	// 8. Final shape
+	// 7. Final Shape
 	steps.push({
 		label: s.finalShape,
 		durationMins: 10,
 		notes: s.finalShapeNote
 	});
 
-	// 9. Proof
+	// 8. Proof
 	if (proofMethod === 'Room') {
 		steps.push({
 			label: s.roomProof,
@@ -504,22 +506,15 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 			durationMins: null,
 			rangeMinMins: coldRetardMin * 60,
 			rangeMaxMins: coldRetardMax * 60,
-			notes: s.coldRetardNote(inputs.fridgeTempC)
+			notes: s.coldRetardNote
 		});
 	}
 
-	// 10. Preheat oven
+	// 9. Bake
 	steps.push({
-		label: s.preheatOven,
+		label: s.bake,
 		durationMins: 45,
-		notes: s.preheatNote
-	});
-
-	// 11. Score + Bake
-	steps.push({
-		label: s.scoreBake,
-		durationMins: 45,
-		notes: s.scoreBakeNote
+		notes: s.bakeNote
 	});
 
 	return steps;
