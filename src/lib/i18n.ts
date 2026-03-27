@@ -5,6 +5,14 @@
 export type Lang = 'en' | 'es' | 'sv';
 
 // ------------------------------------
+// Imported from calculator.ts
+// ------------------------------------
+import {
+  COLD_RETARD_MIN_H,
+  COLD_RETARD_MAX_H,
+} from './calculator';
+
+// ------------------------------------
 // Calculator-level string tables
 // (used by calculator.ts)
 // ------------------------------------
@@ -14,11 +22,11 @@ export const scheduleStrings = {
     autolyse: 'Autolyse',
     autolyseNote: () => 'Mix flour and most of water (hold back ~50g water, all salt, all starter). Cover and rest.',
     mix: 'Mix',
-    mixNote: 'Combine starter and water, stir until dissolved. Add flour to form a shaggy dough. Rest covered.',
+    mixNote: 'Combine starter and water, stir until dissolved. Add flour to form a shaggy dough. Rest covered. After autolyse: now add held-back starter and remaining water.',
     stretchFold: 'Stretch & Fold',
-    stretchFoldNote: (intervalMins: number) => `3 sets, ${intervalMins} min apart.`,
+    stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} sets, ${intervalMins} min apart.`,
     coilFolds: 'Coil Folds',
-    coilFoldsNote: (intervalMins: number) => `2 sets, ${intervalMins} min apart.`,
+    coilFoldsNote: (intervalMins: number, sets?: number) => `${sets ?? 2} sets, ${intervalMins} min apart.`,
     bulkFermentation: 'Bulk Ferment',
     bulkNote: (minH: number, maxH: number) => `Ferment at room temp until puffy.`,
     preShape: 'Preshape',
@@ -28,7 +36,7 @@ export const scheduleStrings = {
     roomProof: 'Room Temperature Proof',
     roomProofNote: 'Cover banneton. Dough should puff and pass the poke test (slow spring-back).',
     coldRetard: 'Cold Proof',
-    coldRetardNote: 'Refrigerate ~15 hours.',
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigerate ${min}–${max} hours.`,
     bake: 'Bake',
     bakeNote: 'Preheat oven + Dutch oven to 230°C (450°F). Score and bake.',
   },
@@ -36,11 +44,11 @@ export const scheduleStrings = {
     autolyse: 'Autólisis',
     autolyseNote: () => 'Mezcla la harina y la mayor parte del agua (reserva ~50g de agua, toda la sal e iniciador). Tapa y reposa.',
     mix: 'Mezclar',
-    mixNote: 'Combina iniciador y agua, mezcla hasta disolver. Agrega la harina para formar una masa irregular. Reposa tapado 45 min.',
+    mixNote: 'Combina iniciador y agua, mezcla hasta disolver. Agrega la harina para formar una masa irregular. Reposa tapado. Después de la autólisis: ahora añade el iniciador reservado y el agua restante.',
     stretchFold: 'Estirado y Plegado',
-    stretchFoldNote: (intervalMins: number) => `3 series, ${intervalMins} min de descanso entre cada una.`,
+    stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} series, ${intervalMins} min de descanso entre cada una.`,
     coilFolds: 'Pliegues en Espiral',
-    coilFoldsNote: (intervalMins: number) => `2 series, ${intervalMins} min de descanso entre cada una.`,
+    coilFoldsNote: (intervalMins: number, sets?: number) => `${sets ?? 2} series, ${intervalMins} min de descanso entre cada una.`,
     bulkFermentation: 'Fermentación en Masa',
     bulkNote: (minH: number, maxH: number) => `Fermenta a temperatura ambiente hasta que esté esponjosa.`,
     preShape: 'Pre-formado',
@@ -50,7 +58,7 @@ export const scheduleStrings = {
     roomProof: 'Fermentación a Temperatura Ambiente',
     roomProofNote: 'Tapa el banneton. La masa debe hincharse y pasar la prueba del dedo (recuperación lenta).',
     coldRetard: 'Fermentación en Frío',
-    coldRetardNote: 'Refrigera ~15 horas.',
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigera ${min}–${max} horas.`,
     bake: 'Hornear',
     bakeNote: 'Precalienta el horno + olla holandesa a 230°C (450°F). Greña y hornea.',
   },
@@ -58,11 +66,11 @@ export const scheduleStrings = {
     autolyse: 'Autolys',
     autolyseNote: () => 'Blanda mjöl och det mesta av vattnet (håll tillbaka ~50g vatten, allt salt och all surdeg). Täck och vila.',
     mix: 'Blanda',
-    mixNote: 'Kombinera surdeg och vatten, rör tills upplöst. Tillsätt mjöl och forma en grov deg. Vila täckt.',
+    mixNote: 'Kombinera surdeg och vatten, rör tills upplöst. Tillsätt mjöl och forma en grov deg. Vila täckt. Efter autolys: tillsätt nu den sparade surdegen och resterande vatten.',
     stretchFold: 'Sträck & Vik',
-    stretchFoldNote: (intervalMins: number) => `3 omgångar, ${intervalMins} min mellan varje.`,
+    stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} omgångar, ${intervalMins} min mellan varje.`,
     coilFolds: 'Spiralvikningar',
-    coilFoldsNote: (intervalMins: number) => `2 omgångar, ${intervalMins} min mellan varje.`,
+    coilFoldsNote: (intervalMins: number, sets?: number) => `${sets ?? 2} omgångar, ${intervalMins} min mellan varje.`,
     bulkFermentation: 'Bulkjäsning',
     bulkNote: (minH: number, maxH: number) => `Jäs i rumstemperatur tills degen är luftig.`,
     preShape: 'Förformning',
@@ -72,7 +80,7 @@ export const scheduleStrings = {
     roomProof: 'Jäsning i Rumstemperatur',
     roomProofNote: 'Täck jäskorgen. Degen ska puffa upp och klara stickprovet (långsam återfjädring).',
     coldRetard: 'Kall Jäsning',
-    coldRetardNote: 'Kyl i ~15 timmar.',
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Kyl i ${min}–${max} timmar.`,
     bake: 'Baka',
     bakeNote: 'Förvärm ugn + gryta till 230°C (450°F). Snitta och baka.',
   },
@@ -90,6 +98,10 @@ export const warningStrings = {
     infoWWAutolyse: 'High whole wheat % — consider shorter autolyse (20–25 min) or bassinage technique to improve handling.',
     warnOpenCrumb: 'Open crumb requires tighter environmental control. Monitor dough closely for proper fermentation signs.',
     ryeHighWarning: 'High rye (>30%) — fermentation may be faster than predicted. Watch your dough closely.',
+    dangerOpenCrumbRye: 'Open crumb + high rye (>60%) is physically unrealistic. Rye lacks the gluten structure needed for an open crumb. Choose a tighter crumb goal or reduce rye.',
+    warnStarterHydrationClamped: 'Starter hydration was outside the accepted range (50–200%) and has been clamped. Timing and hydration calculations used the clamped value.',
+    warnFridgeTempUnused: 'Your fridge temperature setting is not currently used in cold retard timing. Duration is estimated at 8–16 hours regardless of fridge temp.',
+    dangerSubZeroTemp: 'Temperature at or below 0°C — fermentation will be completely halted. Check your temperature inputs.',
   },
   es: {
     dangerLow: 'Temperatura peligrosamente baja — fermentación casi inactiva. Considera un lugar más cálido.',
@@ -102,6 +114,10 @@ export const warningStrings = {
     infoWWAutolyse: 'Alto % de integral — considera una autólisis más corta (20–25 min) o técnica de bassinage para mejorar el manejo.',
     warnOpenCrumb: 'La miga abierta requiere un control ambiental más riguroso. Vigila la masa de cerca para detectar señales correctas de fermentación.',
     ryeHighWarning: 'Centeno alto (>30%) — la fermentación puede ser más rápida de lo previsto. Vigila tu masa de cerca.',
+    dangerOpenCrumbRye: 'Miga abierta + centeno alto (>60%) no es realista. El centeno carece de la estructura de gluten necesaria para una miga abierta. Elige una meta de miga más cerrada o reduce el centeno.',
+    warnStarterHydrationClamped: 'La hidratación del iniciador estaba fuera del rango aceptado (50–200%) y ha sido ajustada. Los cálculos usaron el valor ajustado.',
+    warnFridgeTempUnused: 'Tu ajuste de temperatura de nevera no se usa actualmente en los tiempos de fermentación en frío. La duración se estima en 8–16 horas independientemente de la temperatura.',
+    dangerSubZeroTemp: 'Temperatura igual o inferior a 0°C — la fermentación estará completamente detenida. Revisa tus valores de temperatura.',
   },
   sv: {
     dangerLow: 'Degens temperatur farligt låg — jäsningen nästan inaktiv. Överväg en varmare plats.',
@@ -114,6 +130,10 @@ export const warningStrings = {
     infoWWAutolyse: 'Hög andel fullkorn — överväg kortare autolys (20–25 min) eller bassinage-teknik för bättre hantering.',
     warnOpenCrumb: 'Öppen smulstruktur kräver noggrannare miljökontroll. Övervaka degen noga för rätt jästecken.',
     ryeHighWarning: 'Hög rågandel (>30%) — jäsningen kan gå snabbare än beräknat. Övervaka degen noga.',
+    dangerOpenCrumbRye: 'Öppen smulstruktur + hög rågandel (>60%) är fysiskt orealistiskt. Råg saknar den glutenstruktur som krävs för öppen smula. Välj ett tätare mål eller minska rågen.',
+    warnStarterHydrationClamped: 'Surdeghydratation var utanför godkänt intervall (50–200%) och har justerats. Beräkningar använde det justerade värdet.',
+    warnFridgeTempUnused: 'Din kylskåpsinställning används inte i beräkning av kalljäsningstiden. Varaktigheten beräknas till 8–16 timmar oavsett kyltemperatur.',
+    dangerSubZeroTemp: 'Temperatur vid eller under 0°C — jäsningen är helt stillastående. Kontrollera dina temperaturinmatningar.',
   },
 };
 

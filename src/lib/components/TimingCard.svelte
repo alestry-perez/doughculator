@@ -130,6 +130,8 @@
 				{formatMins((timing.bulkMax + (proofMethod === 'Room' ? timing.proofMax : timing.coldRetardMax)) * 60 + 95)}
 			</span>
 		</div>
+
+		<p class="text-xs text-base-content/50 text-center">Timing estimates are accurate to ±30–60 min.</p>
 	</div>
 </div>
 

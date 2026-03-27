@@ -5,8 +5,8 @@
 import { type Lang, scheduleStrings, warningStrings, assumptionStrings } from './i18n';
 
 export type CrumbGoal = 'Tight' | 'Balanced' | 'Open';
-export type HydrationBand = 'Low' | 'Medium' | 'High';
-export type TempBand = 'Freezing' | 'Cold' | 'Standard' | 'Warm' | 'Hot';
+export type HydrationBand = 'Low' | 'Medium' | 'High' | 'VeryHigh';
+export type TempBand = 'VeryCold' | 'Cold' | 'Standard' | 'Warm' | 'Hot';
 export type ProofMethod = 'Room' | 'ColdRetard';
 export type FermentationPhilosophy = 'Predictability' | 'FlavorDevelopment';
 
@@ -20,13 +20,14 @@ export interface FlourBlendEntry {
 export const WHOLE_GRAIN_FLOURS: FlourType[] = ['WholeWheat', 'Rye', 'Spelt', 'Einkorn'];
 export const ALL_FLOUR_TYPES: FlourType[] = ['BreadFlour', 'AllPurpose', 'WholeWheat', 'Rye', 'Spelt', 'Einkorn'];
 
-const FLOUR_PROPERTIES: Record<FlourType, { absorptionCoeff: number; fermentMult: number }> = {
-	BreadFlour:  { absorptionCoeff: 1.00, fermentMult: 1.00 },
-	AllPurpose:  { absorptionCoeff: 0.97, fermentMult: 1.00 },
-	WholeWheat:  { absorptionCoeff: 1.12, fermentMult: 0.95 },
-	Rye:         { absorptionCoeff: 1.20, fermentMult: 0.72 },
-	Spelt:       { absorptionCoeff: 0.95, fermentMult: 0.82 },
-	Einkorn:     { absorptionCoeff: 1.12, fermentMult: 0.90 },
+// A6: Uncertainties per flour type — wider for less-predictable whole grains
+const FLOUR_PROPERTIES: Record<FlourType, { absorptionCoeff: RangedValue; fermentMult: RangedValue; proofFermentMult: RangedValue }> = {
+	BreadFlour:  { absorptionCoeff: ranged(1.00, 0.05), fermentMult: ranged(1.00, 0.05), proofFermentMult: ranged(1.00, 0.05) },
+	AllPurpose:  { absorptionCoeff: ranged(0.97, 0.05), fermentMult: ranged(1.00, 0.05), proofFermentMult: ranged(1.00, 0.05) },
+	WholeWheat:  { absorptionCoeff: ranged(1.12, 0.10), fermentMult: ranged(0.85, 0.10), proofFermentMult: ranged(0.88, 0.10) },
+	Rye:         { absorptionCoeff: ranged(1.20, 0.15), fermentMult: ranged(0.72, 0.15), proofFermentMult: ranged(0.55, 0.15) },
+	Spelt:       { absorptionCoeff: ranged(1.02, 0.15), fermentMult: ranged(0.82, 0.15), proofFermentMult: ranged(0.85, 0.15) },
+	Einkorn:     { absorptionCoeff: ranged(0.87, 0.20), fermentMult: ranged(0.90, 0.20), proofFermentMult: ranged(0.88, 0.20) },
 };
 
 export interface Inputs {
@@ -58,7 +59,10 @@ export interface FormulaResult {
 	baseHydrationPct: number;
 	wwHydrationAdjust: number;
 	blendAbsorption: number;
+	blendAbsorptionRange: RangedValue;
 	blendFermentMult: number;
+	blendFermentMultRange: RangedValue;
+	blendProofFermentMult: number;
 	finalHydrationPct: number;
 	hydrationBand: HydrationBand;
 	totalWaterG: number;
@@ -84,8 +88,11 @@ export interface FormulaResult {
 export interface TimingResult {
 	bulkMin: number;
 	bulkMax: number;
+	bulkMinRange: RangedValue;  // A6: coefficient-uncertainty bounds on bulkMin
+	bulkMaxRange: RangedValue;  // A6: coefficient-uncertainty bounds on bulkMax
 	proofMin: number;
 	proofMax: number;
+	proofMinRange: RangedValue;  // A6: coefficient-uncertainty bounds on proofMin
 	coldRetardMin: number;
 	coldRetardMax: number;
 	foldCount: number;
@@ -121,6 +128,21 @@ export interface CalcResult {
 
 function clamp(min: number, max: number, val: number): number {
 	return Math.max(min, Math.min(max, val));
+}
+
+// A6: Uncertainty/confidence range system
+export interface RangedValue {
+	value: number;
+	low: number;   // pessimistic bound (longer fermentation time)
+	high: number;  // optimistic bound (shorter fermentation time)
+}
+
+function ranged(value: number, pct = 0.12): RangedValue {
+	return {
+		value,
+		low: value * (1 + pct),   // higher coeff → slower → longer time
+		high: value * (1 - pct),   // lower coeff → faster → shorter time
+	};
 }
 
 export function recommendAutolyseMins(ambientTempC: number, doughTempC: number | null): number {
@@ -167,12 +189,45 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	// Per-flour blend coefficients (weighted average)
 	const blendSum = flourBlend.reduce((s, e) => s + e.pct, 0);
 	const norm = blendSum > 0 ? blendSum : 1;
-	const blendAbsorption = flourBlend.reduce(
-		(s, e) => s + (e.pct / norm) * FLOUR_PROPERTIES[e.type].absorptionCoeff, 0
+
+	// A6: compute center value and uncertainty bounds separately
+	const blendAbsorptionObj = flourBlend.reduce(
+		(acc, e) => {
+			const p = FLOUR_PROPERTIES[e.type].absorptionCoeff;
+			const w = e.pct / norm;
+			return {
+				value: acc.value + w * p.value,
+				low: acc.low + w * p.low,
+				high: acc.high + w * p.high,
+			};
+		},
+		{ value: 0, low: 0, high: 0 } as { value: number; low: number; high: number }
 	);
-	const blendFermentMult = flourBlend.reduce(
-		(s, e) => s + (e.pct / norm) * FLOUR_PROPERTIES[e.type].fermentMult, 0
+	const blendAbsorption = blendAbsorptionObj.value;
+	const blendAbsorptionRange: RangedValue = {
+		value: blendAbsorptionObj.value,
+		low: blendAbsorptionObj.low,
+		high: blendAbsorptionObj.high,
+	};
+
+	const blendFermentMultObj = flourBlend.reduce(
+		(acc, e) => {
+			const p = FLOUR_PROPERTIES[e.type].fermentMult;
+			const w = e.pct / norm;
+			return {
+				value: acc.value + w * p.value,
+				low: acc.low + w * p.low,
+				high: acc.high + w * p.high,
+			};
+		},
+		{ value: 0, low: 0, high: 0 } as { value: number; low: number; high: number }
 	);
+	const blendFermentMult = blendFermentMultObj.value;
+	const blendFermentMultRange: RangedValue = {
+		value: blendFermentMultObj.value,
+		low: blendFermentMultObj.low,
+		high: blendFermentMultObj.high,
+	};
 
 	// Base hydration by crumb goal
 	const baseHydrationMap: Record<CrumbGoal, number> = {
@@ -192,8 +247,10 @@ function calcFormula(inputs: Inputs): FormulaResult {
 		hydrationBand = 'Low';
 	} else if (finalHydrationPct <= 75) {
 		hydrationBand = 'Medium';
-	} else {
+	} else if (finalHydrationPct <= 83) {
 		hydrationBand = 'High';
+	} else {
+		hydrationBand = 'VeryHigh'; // >83% — extreme hydration, faster fermentation risk
 	}
 
 	// Effective temp
@@ -203,7 +260,7 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	// Temp band
 	let tempBand: TempBand;
 	if (effectiveTempC < 18) {
-		tempBand = 'Freezing';
+		tempBand = 'VeryCold'; // renamed from 'Freezing' — 18°C is cool, not freezing (0°C freezes water)
 	} else if (effectiveTempC < 21) {
 		tempBand = 'Cold';
 	} else if (effectiveTempC < 24) {
@@ -291,8 +348,8 @@ function calcFormula(inputs: Inputs): FormulaResult {
 
 	// Water and salt
 	const totalWaterG = (finalHydrationPct / 100) * totalFlourG;
-	// Auto salt: 1.9% for all-white → up to 2.2% at 100% WW (flavor balance)
-	const autoSaltPct = clamp(1.8, 2.2, 1.9 + wwRatio * 0.3);
+	// Auto salt: 1.9% for all-white → up to 2.2% at 100% WW (flavor balance). Lower bound is 1.9, not 1.8.
+	const autoSaltPct = clamp(1.9, 2.2, 1.9 + wwRatio * 0.3);
 	const effectiveSaltPct = saltAutoCalc ? autoSaltPct : saltPct;
 	const saltG = (effectiveSaltPct / 100) * totalFlourG;
 
@@ -312,6 +369,9 @@ function calcFormula(inputs: Inputs): FormulaResult {
 	const totalFormulaWaterG = totalWaterG;
 	const totalDoughWeightG = totalFlourG + totalWaterG + saltG;
 
+	// A3: proof-specific ferment multiplier — shaped dough proofs ~15% slower than open bulk mass
+	const blendProofFermentMult = blendFermentMult * PROOF_KINETICS_FACTOR;
+
 	return {
 		totalFlourG,
 		whiteFlouG,
@@ -320,7 +380,10 @@ function calcFormula(inputs: Inputs): FormulaResult {
 		baseHydrationPct,
 		wwHydrationAdjust,
 		blendAbsorption,
+		blendAbsorptionRange,
 		blendFermentMult,
+		blendFermentMultRange,
+		blendProofFermentMult,
 		finalHydrationPct,
 		hydrationBand,
 		totalWaterG,
@@ -346,8 +409,12 @@ function calcFormula(inputs: Inputs): FormulaResult {
 // Timing Calculation
 // ============================================================
 
-function calcTiming(formula: FormulaResult): TimingResult {
-	const { effectiveTempC, hydrationBand, inoculationPct, blendFermentMult } = formula;
+function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
+	const { effectiveTempC: rawEffectiveTempC, hydrationBand, inoculationPct, blendFermentMult, blendFermentMultRange } = formula;
+	const { fermentationPhilosophy, ambientTempC } = inputs;
+
+	// Use rawEffectiveTempC for initial bulk base selection; A4 correction applied after bulk minutes are known
+	let effectiveTempC = rawEffectiveTempC;
 
 	// Baseline bulk range (hours) by effective temp
 	let bulkBaseMin: number;
@@ -364,15 +431,30 @@ function calcTiming(formula: FormulaResult): TimingResult {
 		[bulkBaseMin, bulkBaseMax] = [2, 4];
 	}
 
-	// Hydration multiplier
+	// Hydration multiplier — VeryHigh (>83%) ferments noticeably faster than High band
 	const hydrationMult =
-		hydrationBand === 'Low' ? 1.15 : hydrationBand === 'High' ? 0.85 : 1.0;
+		hydrationBand === 'Low' ? 1.15
+		: hydrationBand === 'High' ? 0.85
+		: hydrationBand === 'VeryHigh' ? 0.75
+		: 1.0;
 
 	// Inoculation scaling
 	const inocScale = Math.pow(20 / inoculationPct, 0.35);
 
+	// A6: center estimate uses blendFermentMult scalar; bounds use .low/.high from blendFermentMultRange
 	const bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult;
 	const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult;
+	const bulkMinLow  = bulkBaseMin * hydrationMult * inocScale * blendFermentMultRange.low;   // pessimistic (longer)
+	const bulkMaxHigh = bulkBaseMax * hydrationMult * inocScale * blendFermentMultRange.high;  // optimistic (shorter)
+
+	// A4: Temperature cooling model for long bulk ferments.
+	// For bulk >3h, dough temperature gradually drifts toward ambient as heat dissipates.
+	// Each hour past the 3h mark, effective temp drops 0.3°C, clamped so it never goes below ambient.
+	const bulkMinMins = bulkMin * 60;
+	if (bulkMinMins > 180) {
+		const correctedTemp = effectiveTempC - (bulkMinMins / 60 - 3) * 0.3;
+		effectiveTempC = Math.max(ambientTempC, Math.min(effectiveTempC, correctedTemp));
+	}
 
 	// Room proof baseline at 24–26°C: [1.5, 3] hours, apply same multipliers
 	const proofBaseMin = 1.5;
@@ -392,15 +474,36 @@ function calcTiming(formula: FormulaResult): TimingResult {
 		proofTempMult = 0.6;
 	}
 
-	const proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale;
-	const proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale;
+	// C2: blendFermentMult applied to proof (was missing — whole-grain doughs proof faster too)
+	// A3: Multiply by PROOF_KINETICS_FACTOR — shaped dough has tighter gluten network → proofs ~15% slower
+	// A6: coefficient range bounds widen the proof window
+	let proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMult * PROOF_KINETICS_FACTOR;
+	let proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale * blendFermentMult * PROOF_KINETICS_FACTOR;
+	let proofMinLow  = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMultRange.low  * PROOF_KINETICS_FACTOR;
+	let proofMinHigh = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMultRange.high * PROOF_KINETICS_FACTOR;
 
-	// Cold retard: always [8, 16] hours
-	const coldRetardMin = 8;
-	const coldRetardMax = 16;
+	// A5: fermentationPhilosophy extends to proof and cold retard.
+	// FlavorDevelopment: longer proof (+20%) and longer cold retard (+25%) to develop organic acids.
+	// Predictability: no change — values are already calibrated for consistent results.
+	let coldRetardMin = COLD_RETARD_MIN_H;
+	let coldRetardMax = COLD_RETARD_MAX_H;
+	if (fermentationPhilosophy === 'FlavorDevelopment') {
+		proofMin *= 1.2;
+		proofMax *= 1.2;
+		proofMinLow *= 1.2;
+		proofMinHigh *= 1.2;
+		coldRetardMin *= 1.25;
+		coldRetardMax *= 1.25;
+	}
 
 	// Folds during bulk
 	const foldCount = Math.min(4, Math.floor((bulkMin * 60) / 30));
+
+	// A6: coefficient-uncertainty range for bulk and proof
+	const coeffRatio = blendFermentMultRange.low / blendFermentMult;  // >1 when there's uncertainty
+	const bulkMinRange: RangedValue = { value: bulkMin, low: bulkMinLow, high: bulkMin / coeffRatio };
+	const bulkMaxRange: RangedValue = { value: bulkMax, low: bulkMax * coeffRatio, high: bulkMaxHigh };
+	const proofMinRange: RangedValue = { value: proofMin, low: proofMinLow, high: proofMin / coeffRatio };
 
 	// Fold interval scales with temp: warmer = shorter intervals
 	let foldIntervalMins: number;
@@ -413,8 +516,11 @@ function calcTiming(formula: FormulaResult): TimingResult {
 	return {
 		bulkMin,
 		bulkMax,
+		bulkMinRange,
+		bulkMaxRange,
 		proofMin,
 		proofMax,
+		proofMinRange,
 		coldRetardMin,
 		coldRetardMax,
 		foldCount,
@@ -428,7 +534,7 @@ function calcTiming(formula: FormulaResult): TimingResult {
 
 function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResult, lang: Lang): ScheduleStep[] {
 	const { autolyseOn, autolyseMins, proofMethod } = inputs;
-	const { proofMin, proofMax, coldRetardMin, coldRetardMax, foldIntervalMins, bulkMin, bulkMax } = timing;
+	const { proofMin, proofMax, coldRetardMin, coldRetardMax, foldIntervalMins, bulkMin, bulkMax, foldCount } = timing;
 	const s = scheduleStrings[lang];
 	const steps: ScheduleStep[] = [];
 
@@ -436,37 +542,48 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	const bulkMinH = Math.round(bulkMin * 10) / 10;
 	const bulkMaxH = Math.round(bulkMax * 10) / 10;
 
+	// L3: use temperature-adjusted autolyse recommendation
+	const recommendedAutolyse = recommendAutolyseMins(inputs.ambientTempC, inputs.doughTempC);
+
 	// 1. Autolyse (if on)
 	if (autolyseOn) {
+		const scheduledAutolyse = recommendedAutolyse;
+		const userNote = autolyseMins !== recommendedAutolyse ? ` (your input: ${autolyseMins} min)` : '';
 		steps.push({
 			label: s.autolyse,
-			durationMins: autolyseMins,
-			notes: s.autolyseNote()
+			durationMins: scheduledAutolyse,
+			notes: s.autolyseNote() + userNote
 		});
 	}
 
 	// 2. Mix
 	steps.push({
 		label: s.mix,
-		durationMins: 45,
+		durationMins: MIX_DURATION_MINS,
 		notes: s.mixNote
 	});
+
+	// L2: distribute foldCount proportionally — S&F gets ~60%, coil gets remainder
+	const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
+	const cfSets = Math.max(0, foldCount - sfSets);
 
 	// 3. Stretch & Fold
 	steps.push({
 		label: s.stretchFold,
-		durationMins: 3 * foldIntervalMins,
-		notes: s.stretchFoldNote(foldIntervalMins),
-		setCount: 3
+		durationMins: sfSets * foldIntervalMins,
+		notes: s.stretchFoldNote(foldIntervalMins, sfSets),
+		setCount: sfSets
 	});
 
-	// 4. Coil Folds
-	steps.push({
-		label: s.coilFolds,
-		durationMins: 2 * foldIntervalMins,
-		notes: s.coilFoldsNote(foldIntervalMins),
-		setCount: 2
-	});
+	// 4. Coil Folds (skip if cfSets === 0, e.g. very short bulk)
+	if (cfSets > 0) {
+		steps.push({
+			label: s.coilFolds,
+			durationMins: cfSets * foldIntervalMins,
+			notes: s.coilFoldsNote(foldIntervalMins, cfSets),
+			setCount: cfSets
+		});
+	}
 
 	// 5. Bulk Ferment
 	steps.push({
@@ -480,14 +597,14 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	// 6. Preshape
 	steps.push({
 		label: s.preShape,
-		durationMins: 45,
+		durationMins: PRESHAPE_DURATION_MINS,
 		notes: s.preShapeNote
 	});
 
 	// 7. Final Shape
 	steps.push({
 		label: s.finalShape,
-		durationMins: 10,
+		durationMins: FINAL_SHAPE_DURATION_MINS,
 		notes: s.finalShapeNote
 	});
 
@@ -506,14 +623,14 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 			durationMins: null,
 			rangeMinMins: coldRetardMin * 60,
 			rangeMaxMins: coldRetardMax * 60,
-			notes: s.coldRetardNote
+			notes: s.coldRetardNote(coldRetardMin, coldRetardMax)
 		});
 	}
 
 	// 9. Bake
 	steps.push({
 		label: s.bake,
-		durationMins: 45,
+		durationMins: BAKE_DURATION_MINS,
 		notes: s.bakeNote
 	});
 
@@ -526,9 +643,15 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 
 function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): WarningMessage[] {
 	const warnings: WarningMessage[] = [];
-	const { effectiveTempC, hydrationBand, wwRatio } = formula;
-	const { autolyseOn, autolyseMins, crumbGoal } = inputs;
+	const { effectiveTempC, hydrationBand, wwRatio, effectiveStarterHydrationPct } = formula;
+	const { autolyseOn, autolyseMins, crumbGoal, starterHydrationAutoCalc, starterHydrationPct, proofMethod, fridgeTempC } = inputs;
 	const w = warningStrings[lang];
+
+	// L9: sub-zero temperature guard
+	const rawTemp = inputs.doughTempC !== null ? (inputs.ambientTempC + inputs.doughTempC) / 2 : inputs.ambientTempC;
+	if (rawTemp <= 0) {
+		warnings.push({ level: 'danger', message: w.dangerSubZeroTemp });
+	}
 
 	if (effectiveTempC < 18) {
 		warnings.push({ level: 'danger', message: w.dangerLow });
@@ -550,15 +673,17 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 		warnings.push({ level: 'info', message: w.infoSlow });
 	}
 
-	if (hydrationBand === 'High' && effectiveTempC > 26) {
+	if ((hydrationBand === 'High' || hydrationBand === 'VeryHigh') && effectiveTempC > 26) {
 		warnings.push({ level: 'warn', message: w.warnHydrationTemp });
 	}
 
-	if (hydrationBand === 'High') {
+	if (hydrationBand === 'High' || hydrationBand === 'VeryHigh') {
 		warnings.push({ level: 'info', message: w.infoHighHydration });
 	}
 
-	if (wwRatio > 0.3 && autolyseOn && autolyseMins > 30) {
+	// M6: only warn about WW autolyse when the user's value exceeds the temperature-appropriate recommendation
+	const recommendedAutolyse = recommendAutolyseMins(inputs.ambientTempC, inputs.doughTempC);
+	if (wwRatio > 0.3 && autolyseOn && autolyseMins > recommendedAutolyse) {
 		warnings.push({ level: 'info', message: w.infoWWAutolyse });
 	}
 
@@ -567,8 +692,28 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 	}
 
 	const ryeEntry = inputs.flourBlend.find(e => e.type === 'Rye');
-	if (ryeEntry && ryeEntry.pct > 30) {
+	const ryePct = ryeEntry ? ryeEntry.pct : 0;
+
+	// M2: compound guard — open crumb + high rye is physically impossible
+	if (crumbGoal === 'Open' && ryePct > 60) {
+		warnings.push({ level: 'danger', message: w.dangerOpenCrumbRye });
+	}
+
+	if (ryePct > 30) {
 		warnings.push({ level: 'warn', message: w.ryeHighWarning });
+	}
+
+	// M5: starter hydration was silently clamped
+	if (!starterHydrationAutoCalc) {
+		const clamped = Math.max(50, Math.min(200, starterHydrationPct));
+		if (clamped !== starterHydrationPct) {
+			warnings.push({ level: 'warn', message: w.warnStarterHydrationClamped });
+		}
+	}
+
+	// S3: fridge temp collected but not used in timing
+	if (proofMethod === 'ColdRetard' && fridgeTempC !== 4) {
+		warnings.push({ level: 'info', message: w.warnFridgeTempUnused });
 	}
 
 	return warnings;
@@ -580,6 +725,7 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 
 function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Record<string, string> {
 	const {
+		ambientTempC,
 		saltAutoCalc,
 		saltPct,
 		starterHydrationAutoCalc,
@@ -592,7 +738,9 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 		baseHydrationPct,
 		wwHydrationAdjust,
 		blendAbsorption,
+		blendAbsorptionRange,
 		blendFermentMult,
+		blendFermentMultRange,
 		finalHydrationPct,
 		autoSaltPct,
 		effectiveSaltPct,
@@ -601,8 +749,10 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 	const a = assumptionStrings[lang];
 
 	const hydrationAdjustSign = wwHydrationAdjust >= 0 ? '+' : '';
+	const timingConfidence = `${((blendFermentMultRange.low / blendFermentMult - 1) * 100).toFixed(0)}%`;
 	return {
-		[a.ambientTemp]: `${effectiveTempC.toFixed(1)}°C`,
+		[a.ambientTemp]: `${ambientTempC.toFixed(1)}°C`,
+		'Effective temp': `${effectiveTempC.toFixed(1)}°C`,
 		[a.salt]: saltAutoCalc
 			? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2))
 			: a.saltManual(saltPct),
@@ -611,11 +761,12 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 			: a.starterHydrationManual(effectiveStarterHydrationPct),
 		[a.inoculation]: `${inoculationPct.toFixed(1)}%`,
 		[a.baseHydration]: `${baseHydrationPct}%`,
-		[a.blendAbsorption]: blendAbsorption.toFixed(3),
-		[a.blendFermentMult]: blendFermentMult.toFixed(3),
+		[a.blendAbsorption]: `${blendAbsorption.toFixed(3)} (${blendAbsorptionRange.low.toFixed(3)}–${blendAbsorptionRange.high.toFixed(3)})`,
+		[a.blendFermentMult]: `${blendFermentMult.toFixed(3)} (${blendFermentMultRange.low.toFixed(3)}–${blendFermentMultRange.high.toFixed(3)})`,
 		[a.wwHydrationAdjust]: `${hydrationAdjustSign}${wwHydrationAdjust.toFixed(1)}%`,
 		[a.finalHydration]: `${finalHydrationPct.toFixed(1)}%`,
-		[a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off
+		[a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off,
+		'Timing confidence': `±${timingConfidence} from flour coefficient uncertainty`,
 	};
 }
 
@@ -625,7 +776,7 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 
 export function calculate(inputs: Inputs, lang: Lang = 'en'): CalcResult {
 	const formula = calcFormula(inputs);
-	const timing = calcTiming(formula);
+	const timing = calcTiming(formula, inputs);
 	const schedule = calcSchedule(inputs, formula, timing, lang);
 	const warnings = calcWarnings(inputs, formula, lang);
 	const assumptions = calcAssumptions(inputs, formula, lang);
@@ -669,6 +820,28 @@ export function addMinsToTime(startTime: string, mins: number): string {
 	const m = wrappedMins % 60;
 	return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
 }
+
+export const COLD_RETARD_MIN_H = 8;
+export const COLD_RETARD_MAX_H = 16;
+
+// A3: Shaped dough (final proof) has a tighter gluten network → CO2 escapes more slowly → proofs ~15% slower per unit of the same multiplier stack
+export const PROOF_KINETICS_FACTOR = 1.15;
+
+// A6: Per-flour-type coefficient uncertainty notes for UI display (does not affect calculations)
+export const COEFFICIENT_NOTES: Record<FlourType, string> = {
+	BreadFlour: 'Values vary by protein content (±5%)',
+	AllPurpose: 'Values vary by brand (±5%)',
+	WholeWheat: 'Values vary with bran content (±10%)',
+	Spelt: 'High variability by milling (±15%)',
+	Einkorn: 'High variability by variety (±20%)',
+	Rye: 'Values vary by extraction rate (±15%)',
+};
+export const BAKE_DURATION_MINS = 45;
+export const PRESHAPE_DURATION_MINS = 45;
+export const FINAL_SHAPE_DURATION_MINS = 10;
+export const MIX_DURATION_MINS = 45;
+export const STRETCH_FOLD_SET_COUNT = 3;
+export const COIL_FOLD_SET_COUNT = 2;
 
 export const DEFAULT_INPUTS: Inputs = {
 	totalFlourInputG: 500,

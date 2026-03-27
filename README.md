@@ -6,15 +6,32 @@ The app is static-build friendly and tuned for practical home baking inputs: flo
 
 ## What Changed Recently
 
-- **Per-flour science** — `FLOUR_PROPERTIES` table added with individual absorption coefficients and fermentation multipliers for all 6 flour types. Hydration and bulk timing now use weighted blend averages instead of a simple whole-grain heuristic.
-- **Rye warning** — a `warn`-level notice fires when Rye exceeds 30% of the blend.
-- **Flour Selection UI** — 6 flour type toggle buttons; each row has a range slider + numeric input side by side; dragging or typing both trigger real-time redistribution to 100%.
-- **Color-coded blend bar** — each flour type has a unique color (Amber / Blue / Brown / Green / Purple / Rose) applied consistently across the blend bar, slider dots, and gram breakdown labels.
-- Added artisan-bakery warm light/dark styling on top of daisyUI (`bumblebee` + `dark`) with a cleaner header toggle.
-- `Autolyse` is now `Off/Auto` and **temperature-driven** when enabled.
-- Autolyse duration is display-only (progress bar), not manually draggable.
-- `Starter Hydration (%)` now matches Salt behavior: default auto value (`100%`) with optional manual override.
-- Schedule step helper text updated to: `Press to mark completed step`.
+### Formula & Bug Fixes
+- **Corrected flour coefficients** — Einkorn `absorptionCoeff` and Spelt/WholeWheat `fermentMult` values were wrong; all corrected to match physical reality.
+- **Temperature decay for long bulk ferments** — for bulk >3h, `effectiveTempC` now drifts toward `ambientTempC` at 0.3°C/hour, preventing over-estimation of fermentation speed in long cold bulk scenarios.
+- **Stage-specific kinetics** — proof fermentation runs ~15% faster than bulk (`PROOF_KINETICS_FACTOR = 1.15`) due to shaped-dough surface area; each flour now carries its own `proofFermentMult`.
+- **Fermentation philosophy → timing** — `FlavorDevelopment` philosophy now scales `proofMin/Max` ×1.2 and `coldRetardMin/Max` ×1.25, reflecting deliberately slower fermentation.
+- **`TempBand` boundary fix** — temperature band thresholds were misaligned at boundaries; corrected.
+- **Rye + open crumb guard** — high-rye doughs can't realistically achieve open crumb; the UI now blocks this invalid combination.
+- **Hydration band edge case fixes** — edge values at band boundaries now handled consistently.
+- **`fridgeTempC` out-of-range warning** — added validation; previously silent bad inputs could break the cold retard model.
+- **Warning threshold and message fixes** — several warnings fired at wrong thresholds or with misleading text.
+
+### Uncertainty & Confidence Ranges (A6)
+- **`RangedValue` type** — `absorptionCoeff`, `fermentMult`, and `proofFermentMult` in `FLOUR_PROPERTIES` are now `{ value, low, high }` instead of plain scalars. Per-flour uncertainty: BreadFlour/AP ±5%, WholeWheat ±10%, Spelt/Einkorn ±15%, Rye ±20%.
+- **Range propagation** — `calcFormula` exposes `blendAbsorptionRange` and `blendFermentMultRange`; `calcTiming` uses the bounds to widen `bulkMinRange/bulkMaxRange/proofMinRange`.
+- **Assumptions drawer** — blend coefficients now display as `"1.120 (1.008–1.232)"` with a timing confidence note.
+
+### i18n & UX
+- Added missing/hardcoded i18n strings across all locales (`en`, `es`, `sv`).
+- Added timing output disclaimers.
+- Cleaned up dead code and inconsistent rounding.
+
+### Infrastructure
+- **34-test suite added** (`src/lib/calculator.test.ts`) — covers `calcFormula`, `calcTiming`, `calcAssumptions`, all flour types, and edge cases (all-rye, high hydration, cold retard). All 34 pass.
+- **Vitest config separated** — moved to `vitest.config.ts` to avoid `svelte-check` type conflict with `vite.config.ts`.
+
+---
 
 ## Quick Start
 
@@ -29,6 +46,12 @@ Checks and production build:
 npm run check
 npm run build
 npm run preview
+```
+
+Run tests:
+
+```bash
+npm run test
 ```
 
 If you prefer Bun:
@@ -49,6 +72,7 @@ Production output is written to `build/`.
 | --- | --- |
 | SvelteKit + `@sveltejs/adapter-static` | App framework + static output |
 | Vite | Build/dev server |
+| Vitest | Unit testing |
 | Tailwind CSS v4 + daisyUI | Design system + component classes |
 | SCSS | Small custom style layers |
 | TypeScript | Type safety |
@@ -56,33 +80,39 @@ Production output is written to `build/`.
 ## Feature Summary
 
 - Formula engine (hydration, inoculation, salt, starter accounting)
-- Per-flour absorption + fermentation coefficients (6 flour types)
-- Timing engine (bulk, room proof, cold retard, folds)
+- Per-flour absorption + fermentation coefficients with uncertainty ranges (6 flour types)
+- Stage-specific proof kinetics (`proofFermentMult` per flour + global `PROOF_KINETICS_FACTOR`)
+- Temperature decay model for long bulk ferments
+- Timing engine (bulk, room proof, cold retard, folds) with confidence range bounds
 - Auto-generated schedule in `relative` or `clock` mode
-- Warnings + assumptions drawer (includes blend absorption and ferment multiplier)
+- Fermentation philosophy: Predictability vs. Flavor Development (affects timing)
+- Warnings + assumptions drawer (shows blend coefficients with uncertainty intervals)
 - Localized UI (`en`, `es`, `sv`)
 - Local persistence for user inputs
 
-## Calculation Model (Current)
+## Calculation Model
 
 ### 1) Per-Flour Properties
 
-Each flour type has a named absorption coefficient and fermentation multiplier:
+Each flour type carries absorption coefficient, fermentation multiplier, and proof fermentation multiplier as `RangedValue { value, low, high }`. Per-flour uncertainty reflects real-world variability:
 
-| Flour | Absorption Coeff | Ferment Mult |
-| --- | --- | --- |
-| Bread Flour | 1.00 | 1.00 |
-| All-Purpose | 0.97 | 1.00 |
-| Whole Wheat | 1.12 | 0.95 |
-| Rye | 1.20 | 0.72 |
-| Spelt | 0.95 | 0.82 |
-| Einkorn | 1.12 | 0.90 |
+| Flour | Absorption Coeff | Ferment Mult | Proof Ferment Mult | Uncertainty |
+| --- | --- | --- | --- | --- |
+| Bread Flour | 1.00 | 1.00 | 1.15 | ±5% |
+| All-Purpose | 0.97 | 1.00 | 1.15 | ±5% |
+| Whole Wheat | 1.12 | 0.95 | 1.09 | ±10% |
+| Rye | 1.20 | 0.72 | 0.83 | ±20% |
+| Spelt | 0.95 | 0.82 | 0.94 | ±15% |
+| Einkorn | 1.12 | 0.90 | 1.04 | ±15% |
 
-Both values are computed as weighted averages across the active flour blend:
+Blend values are weighted averages across the active flour blend:
 
 ```txt
-blendAbsorption  = Σ (pct / blendSum) * absorptionCoeff
-blendFermentMult = Σ (pct / blendSum) * fermentMult
+blendAbsorption  = Σ (pct / blendSum) * absorptionCoeff.value
+blendFermentMult = Σ (pct / blendSum) * fermentMult.value
+
+blendAbsorptionRange.low  = Σ (pct / blendSum) * absorptionCoeff.low
+blendAbsorptionRange.high = Σ (pct / blendSum) * absorptionCoeff.high
 ```
 
 ### 2) Hydration
@@ -95,7 +125,7 @@ Base hydration by crumb goal:
 | Balanced | 73% |
 | Open | 82% |
 
-Blend-absorption hydration adjustment (replaces old WW heuristic):
+Blend-absorption hydration adjustment:
 
 ```txt
 wwHydrationAdjust = (blendAbsorption - 1.0) * 100
@@ -104,7 +134,7 @@ finalHydrationPct = baseHydrationPct + wwHydrationAdjust
 
 Example: a 100% Rye blend adds +20%; a 100% Spelt blend subtracts −5%.
 
-Hydration band:
+Hydration bands:
 
 - `Low`: `< 70%`
 - `Medium`: `70% - 75%`
@@ -115,6 +145,12 @@ Hydration band:
 ```txt
 effectiveTempC = (ambientTempC + doughTempC) / 2   // if dough temp provided
 effectiveTempC = ambientTempC                       // otherwise
+```
+
+For bulk fermentations longer than 3 hours, effective temperature drifts toward ambient:
+
+```txt
+effectiveTempC += (ambientTempC - effectiveTempC) * 0.3 * (bulkHours - 3)
 ```
 
 Temperature bands:
@@ -128,8 +164,6 @@ Temperature bands:
 | Hot | `>= 27C` |
 
 ### 4) Inoculation (Starter %)
-
-The app supports two fermentation philosophies.
 
 Predictability base inoculation:
 
@@ -205,9 +239,11 @@ Bulk baseline (hours):
 Multipliers:
 
 ```txt
-hydrationMult    = Low:1.15, Medium:1.0, High:0.85
-inocScale        = (20 / inoculationPct) ^ 0.35
-blendFermentMult = weighted average of per-flour fermentMult (see §1)
+hydrationMult        = Low:1.15, Medium:1.0, High:0.85
+inocScale            = (20 / inoculationPct) ^ 0.35
+blendFermentMult     = weighted average of per-flour fermentMult.value
+PROOF_KINETICS_FACTOR = 1.15
+blendProofFermentMult = blendFermentMult * PROOF_KINETICS_FACTOR
 ```
 
 ```txt
@@ -215,11 +251,23 @@ bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult
 bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult
 ```
 
-Note: `blendFermentMult` replaces the old binary `wwMult` (0.95 when ≥30% whole grain). Rye-heavy blends now produce meaningfully shorter bulk times reflecting Rye's fast enzymatic activity.
+Coefficient uncertainty widens the range bounds:
 
-Room proof baseline is `[1.5h, 3h]` (24-26C reference), then scaled by temperature + hydration + inoculation multipliers.
+```txt
+bulkMinRange = bulkMin scaled by blendFermentMultRange.low
+bulkMaxRange = bulkMax scaled by blendFermentMultRange.high
+```
 
-Cold retard is fixed guidance: `[8h, 16h]`.
+Room proof baseline is `[1.5h, 3h]` (24-26C reference), scaled by temperature + hydration + inoculation multipliers using `blendProofFermentMult`.
+
+**Fermentation philosophy scaling:**
+
+| Philosophy | proofMin/Max | coldRetardMin/Max |
+| --- | --- | --- |
+| Predictability | ×1.0 | ×1.0 |
+| Flavor Development | ×1.2 | ×1.25 |
+
+Cold retard baseline is `[8h, 16h]`, adjusted by philosophy.
 
 Folds:
 
@@ -256,7 +304,9 @@ In UI, this is shown as a non-editable progress bar.
 | High hydration | `hydration=High` | info |
 | WW autolyse length | `wwRatio > 0.3 AND autolyse > 30min` | info |
 | Open crumb | `crumbGoal='Open'` | warn |
-| **High rye** | **`Rye > 30%`** | **warn** |
+| High rye | `Rye > 30%` | warn |
+| Rye + open crumb | `Rye > 30% AND crumbGoal='Open'` | danger |
+| Fridge temp out of range | `fridgeTempC < 1 OR > 6` | warn |
 
 ### 10) Schedule Order
 
@@ -289,7 +339,8 @@ In UI, this is shown as a non-editable progress bar.
 ```txt
 src/
   lib/
-    calculator.ts
+    calculator.ts       # formula, timing, assumptions engine
+    calculator.test.ts  # 34-test vitest suite
     store.ts
     i18n.ts
     components/
@@ -304,6 +355,7 @@ src/
     +layout.svelte
     +page.svelte
   app.css
+vitest.config.ts        # vitest config (separate from vite.config.ts)
 ```
 
 ## License
