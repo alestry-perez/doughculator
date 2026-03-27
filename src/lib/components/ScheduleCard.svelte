@@ -222,19 +222,20 @@
                 <p class="text-xs mt-1 leading-snug {completedSteps.has(i) ? 'text-base-content/30 line-through' : 'text-base-content/70'}">{step.notes}</p>
               {/if}
               {#if step.setCount && !completedSteps.has(i)}
-                <div class="flex flex-wrap gap-2 mt-2">
+                <div class="flex flex-wrap items-center gap-2 mt-2">
                   {#each Array.from({length: step.setCount}, (_, si) => si) as si}
                     <button
-                      class="flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium border transition-colors {isSetDone(i, si) ? 'bg-success/15 border-success/30 text-success' : 'bg-base-200 border-base-300 text-base-content/60 hover:bg-base-300'}"
+                      class="w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-colors {isSetDone(i, si) ? 'bg-success/15 text-success' : 'bg-secondary/15 text-secondary hover:bg-secondary/25'}"
                       onclick={(e) => {
                         e.stopPropagation();
                         toggleSet(i, si);
                       }}
                     >
-                      <span class="w-3.5 h-3.5 rounded-sm border flex items-center justify-center text-[9px] {isSetDone(i, si) ? 'bg-success/20 border-success/40 text-success' : 'border-base-content/30'}">
-                        {#if isSetDone(i, si)}&#10003;{/if}
-                      </span>
-                      Set {si + 1}
+                      {#if isSetDone(i, si)}
+                        &#10003;
+                      {:else}
+                        {si + 1}
+                      {/if}
                     </button>
                   {/each}
                 </div>

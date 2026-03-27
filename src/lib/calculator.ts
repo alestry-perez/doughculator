@@ -565,7 +565,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 
 	// L2: distribute foldCount proportionally — S&F gets ~60%, coil gets remainder
 	const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
-	const cfSets = Math.max(0, foldCount - sfSets);
+	const cfSets = Math.max(0, foldCount - sfSets) + 1;
 
 	// 3. Stretch & Fold
 	steps.push({
@@ -627,11 +627,23 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		});
 	}
 
-	// 9. Bake
+	// 9. Bake — parent step (duration driven by sub-steps) + two phases
 	steps.push({
 		label: s.bake,
-		durationMins: BAKE_DURATION_MINS,
+		durationMins: null,
 		notes: s.bakeNote
+	});
+	steps.push({
+		label: s.bakeCovered,
+		durationMins: BAKE_COVERED_MINS,
+		notes: s.bakeCoveredNote,
+		isSubStep: true
+	});
+	steps.push({
+		label: s.bakeUncovered,
+		durationMins: BAKE_UNCOVERED_MINS,
+		notes: s.bakeUncoveredNote,
+		isSubStep: true
 	});
 
 	return steps;
@@ -836,7 +848,9 @@ export const COEFFICIENT_NOTES: Record<FlourType, string> = {
 	Einkorn: 'High variability by variety (±20%)',
 	Rye: 'Values vary by extraction rate (±15%)',
 };
-export const BAKE_DURATION_MINS = 45;
+export const BAKE_DURATION_MINS = 40;
+export const BAKE_COVERED_MINS = 20;
+export const BAKE_UNCOVERED_MINS = 20;
 export const PRESHAPE_DURATION_MINS = 45;
 export const FINAL_SHAPE_DURATION_MINS = 10;
 export const MIX_DURATION_MINS = 45;

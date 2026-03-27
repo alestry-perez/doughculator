@@ -38,7 +38,11 @@ export const scheduleStrings = {
     coldRetard: 'Cold Proof',
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigerate ${min}–${max} hours.`,
     bake: 'Bake',
-    bakeNote: 'Preheat oven + Dutch oven to 230°C (450°F). Score and bake.',
+    bakeNote: 'Preheat oven + Dutch oven to 230°C (450°F). Score and load.',
+    bakeCovered: 'Covered (lid on)',
+    bakeCoveredNote: 'Bake with lid on — steam builds crust structure.',
+    bakeUncovered: 'Uncovered (lid off)',
+    bakeUncoveredNote: 'Remove lid and bake until deep golden brown.',
   },
   es: {
     autolyse: 'Autólisis',
@@ -60,7 +64,11 @@ export const scheduleStrings = {
     coldRetard: 'Fermentación en Frío',
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigera ${min}–${max} horas.`,
     bake: 'Hornear',
-    bakeNote: 'Precalienta el horno + olla holandesa a 230°C (450°F). Greña y hornea.',
+    bakeNote: 'Precalienta el horno + olla holandesa a 230°C (450°F). Greña y carga.',
+    bakeCovered: 'Tapado (con tapa)',
+    bakeCoveredNote: 'Hornea con tapa — el vapor forma la estructura de la corteza.',
+    bakeUncovered: 'Destapado (sin tapa)',
+    bakeUncoveredNote: 'Retira la tapa y hornea hasta que esté dorado oscuro.',
   },
   sv: {
     autolyse: 'Autolys',
@@ -82,7 +90,11 @@ export const scheduleStrings = {
     coldRetard: 'Kall Jäsning',
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Kyl i ${min}–${max} timmar.`,
     bake: 'Baka',
-    bakeNote: 'Förvärm ugn + gryta till 230°C (450°F). Snitta och baka.',
+    bakeNote: 'Förvärm ugn + gryta till 230°C (450°F). Snitta och lägg in.',
+    bakeCovered: 'Med lock',
+    bakeCoveredNote: 'Baka med lock — ångan bygger skorpans struktur.',
+    bakeUncovered: 'Utan lock',
+    bakeUncoveredNote: 'Ta bort locket och baka tills djupt gyllenbrun.',
   },
 };
 
