@@ -1,0 +1,145 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775053601068,
+  "projectRoot": "/Users/alestry.perez/Desktop/projects/coding/doughculator",
+  "techStack": {
+    "languages": [
+      {
+        "name": "JavaScript/TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "package.json"
+        ]
+      },
+      {
+        "name": "TypeScript",
+        "version": null,
+        "confidence": "high",
+        "markers": [
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "frameworks": [
+      {
+        "name": "@sveltejs/kit",
+        "version": "2.50.2",
+        "category": "fullstack"
+      },
+      {
+        "name": "svelte",
+        "version": "5.51.0",
+        "category": "frontend"
+      },
+      {
+        "name": "vite",
+        "version": "7.3.1",
+        "category": "build"
+      },
+      {
+        "name": "vitest",
+        "version": "4.1.2",
+        "category": "testing"
+      }
+    ],
+    "packageManager": "npm",
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": "npm run build",
+    "testCommand": "npm test",
+    "lintCommand": null,
+    "devCommand": "npm run dev",
+    "scripts": {
+      "dev": "vite dev",
+      "build": "vite build",
+      "preview": "vite preview",
+      "prepare": "svelte-kit sync || echo ''",
+      "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+      "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+      "test": "vitest run"
+    }
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "src",
+      "static"
+    ],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "build": {
+      "path": "build",
+      "purpose": "Build output",
+      "fileCount": 6,
+      "lastAccessed": 1775053601059,
+      "keyFiles": [
+        "404.html",
+        "favicon.svg",
+        "icon-192.png",
+        "icon-512.png",
+        "manifest.webmanifest"
+      ]
+    },
+    "src": {
+      "path": "src",
+      "purpose": "Source code",
+      "fileCount": 4,
+      "lastAccessed": 1775053601059,
+      "keyFiles": [
+        "app.css",
+        "app.d.ts",
+        "app.html"
+      ]
+    },
+    "static": {
+      "path": "static",
+      "purpose": "Static files",
+      "fileCount": 5,
+      "lastAccessed": 1775053601061,
+      "keyFiles": [
+        "favicon.svg",
+        "icon-192.png",
+        "icon-512.png",
+        "manifest.webmanifest",
+        "robots.txt"
+      ]
+    },
+    "src/lib": {
+      "path": "src/lib",
+      "purpose": "Library code",
+      "fileCount": 6,
+      "lastAccessed": 1775053601062,
+      "keyFiles": [
+        "calculator.test.ts",
+        "calculator.ts",
+        "i18n.ts"
+      ]
+    },
+    "src/routes": {
+      "path": "src/routes",
+      "purpose": "Route handlers",
+      "fileCount": 2,
+      "lastAccessed": 1775053601062,
+      "keyFiles": [
+        "+layout.svelte",
+        "+page.svelte"
+      ]
+    }
+  },
+  "hotPaths": [],
+  "userDirectives": []
+}
