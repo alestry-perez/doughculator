@@ -112,7 +112,6 @@ declare module '$env/static/private' {
 	export const COLORTERM: string;
 	export const CONSOLE_NINJA_WELCOME_SHOWN: string;
 	export const NODE_ENV: string;
-	export const CONSOLE_NINJA_PREVIEW_ONLY_SHOWN: string;
 }
 
 /**
@@ -273,7 +272,6 @@ declare module '$env/dynamic/private' {
 		COLORTERM: string;
 		CONSOLE_NINJA_WELCOME_SHOWN: string;
 		NODE_ENV: string;
-		CONSOLE_NINJA_PREVIEW_ONLY_SHOWN: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;
 	}

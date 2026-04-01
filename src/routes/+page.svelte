@@ -42,7 +42,7 @@
 		return [
 			t.copyTitle,
 			t.copyDivider,
-			`${t.totalFlourRow}: ${Math.round(f.totalFlourG)}g (${t.white}: ${Math.round(f.whiteFlouG)}g, ${t.wholeWheat}: ${Math.round(f.wwFlourG)}g)`,
+			`${t.totalFlourRow}: ${Math.round(f.totalFlourG)}g (${$inputs.flourBlend.map(e => `${t.flourTypes[e.type] ?? e.type}: ${Math.round(f.totalFlourG * e.pct / 100)}g`).join(', ')})`,
 			`${t.water}: ${Math.round(f.totalWaterG)}g (${f.finalHydrationPct.toFixed(1)}%)`,
 			`${t.saltRow}: ${Math.round(f.saltG)}g`,
 			`${t.starter}: ${Math.round(f.starterTotalG)}g`,
@@ -273,7 +273,7 @@
 			<WarningsCard warnings={$result.warnings} />
 
 			<!-- Formula -->
-			<FormulaCard formula={$result.formula} />
+			<FormulaCard formula={$result.formula} flourBlend={$inputs.flourBlend} />
 
 			<!-- Timing -->
 			<TimingCard

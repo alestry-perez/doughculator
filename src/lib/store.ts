@@ -31,18 +31,30 @@ function persistInputs(inputs: Inputs) {
 	}
 }
 
+function normalizeInputs(inputs: Inputs): Inputs {
+	let { flourBlend, totalFlourInputG, ...rest } = inputs;
+	if (!flourBlend.length || flourBlend.every(f => f.pct <= 0)) {
+		flourBlend = [{ type: 'BreadFlour', pct: 100 }];
+	}
+	if (totalFlourInputG <= 0) {
+		totalFlourInputG = 100;
+	}
+	return { ...rest, flourBlend, totalFlourInputG };
+}
+
 function createInputsStore() {
-	const { subscribe, set, update } = writable<Inputs>(loadInputs());
+	const { subscribe, set, update } = writable<Inputs>(normalizeInputs(loadInputs()));
 
 	return {
 		subscribe,
 		set: (val: Inputs) => {
-			persistInputs(val);
-			set(val);
+			const normalized = normalizeInputs(val);
+			persistInputs(normalized);
+			set(normalized);
 		},
 		update: (fn: (val: Inputs) => Inputs) => {
 			update((current) => {
-				const next = fn(current);
+				const next = normalizeInputs(fn(current));
 				persistInputs(next);
 				return next;
 			});

@@ -1,16 +1,14 @@
 <script lang="ts">
-	import type { FormulaResult } from '$lib/calculator';
+	import type { FormulaResult, FlourBlendEntry } from '$lib/calculator';
 	import { lang } from '$lib/store';
 	import { translations } from '$lib/i18n';
 
 	const t = $derived(translations[$lang]);
 
-	let { formula }: {
+	let { formula, flourBlend }: {
 		formula: FormulaResult;
+		flourBlend: FlourBlendEntry[];
 	} = $props();
-
-	const whiteFlouG = $derived(formula.whiteFlouG);
-	const wwFlourG = $derived(formula.wwFlourG);
 
 	function pct(val: number, base: number): string {
 		if (base <= 0) return '—';
@@ -42,18 +40,13 @@
 				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalFlourG)}g</td>
 				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">100%</td>
 			</tr>
-			<tr class="bg-base-200/50">
-				<td class="px-5 py-2 text-base-content/70 text-xs pl-8">{t.whiteFlouRow}</td>
-				<td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">{round(whiteFlouG)}g</td>
-				<td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">{pct(whiteFlouG, formula.totalFlourG)}</td>
-			</tr>
-			{#if wwFlourG > 0}
+			{#each flourBlend as entry (entry.type)}
 				<tr class="bg-base-200/50">
-					<td class="px-5 py-2 text-base-content/70 text-xs pl-8">{t.wwFlourRow}</td>
-					<td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">{round(wwFlourG)}g</td>
-					<td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">{pct(wwFlourG, formula.totalFlourG)}</td>
+					<td class="px-5 py-2 text-base-content/70 text-xs pl-8">— {t.flourTypes[entry.type] ?? entry.type}</td>
+					<td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">{round(formula.totalFlourG * entry.pct / 100)}g</td>
+					<td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">{entry.pct}%</td>
 				</tr>
-			{/if}
+			{/each}
 			<tr>
 				<td class="px-5 py-2.5 text-base-content font-medium">{t.water}</td>
 				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalWaterG)}g</td>
@@ -67,7 +60,10 @@
 			<tr>
 				<td class="px-5 py-2.5 text-base-content font-medium">{t.starter}</td>
 				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.starterTotalG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">{pct(formula.starterFlourG, formula.totalFlourG)}</td>
+				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">
+					{pct(formula.starterFlourG, formula.totalFlourG)}
+					<span class="text-[10px] text-base-content/40 block leading-tight">{t.preFermentedFlour}</span>
+				</td>
 			</tr>
 		</tbody>
 		<tfoot>

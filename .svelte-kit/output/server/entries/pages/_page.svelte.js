@@ -21,7 +21,11 @@ const scheduleStrings = {
     coldRetard: "Cold Proof",
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigerate ${min}–${max} hours.`,
     bake: "Bake",
-    bakeNote: "Preheat oven + Dutch oven to 230°C (450°F). Score and bake."
+    bakeNote: "Preheat oven + Dutch oven to 230°C (450°F). Score and load.",
+    bakeCovered: "Covered (lid on)",
+    bakeCoveredNote: "Bake with lid on — steam builds crust structure.",
+    bakeUncovered: "Uncovered (lid off)",
+    bakeUncoveredNote: "Remove lid and bake until deep golden brown."
   },
   es: {
     autolyse: "Autólisis",
@@ -43,7 +47,11 @@ const scheduleStrings = {
     coldRetard: "Fermentación en Frío",
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigera ${min}–${max} horas.`,
     bake: "Hornear",
-    bakeNote: "Precalienta el horno + olla holandesa a 230°C (450°F). Greña y hornea."
+    bakeNote: "Precalienta el horno + olla holandesa a 230°C (450°F). Greña y carga.",
+    bakeCovered: "Tapado (con tapa)",
+    bakeCoveredNote: "Hornea con tapa — el vapor forma la estructura de la corteza.",
+    bakeUncovered: "Destapado (sin tapa)",
+    bakeUncoveredNote: "Retira la tapa y hornea hasta que esté dorado oscuro."
   },
   sv: {
     autolyse: "Autolys",
@@ -65,7 +73,11 @@ const scheduleStrings = {
     coldRetard: "Kall Jäsning",
     coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Kyl i ${min}–${max} timmar.`,
     bake: "Baka",
-    bakeNote: "Förvärm ugn + gryta till 230°C (450°F). Snitta och baka."
+    bakeNote: "Förvärm ugn + gryta till 230°C (450°F). Snitta och lägg in.",
+    bakeCovered: "Med lock",
+    bakeCoveredNote: "Baka med lock — ångan bygger skorpans struktur.",
+    bakeUncovered: "Utan lock",
+    bakeUncoveredNote: "Ta bort locket och baka tills djupt gyllenbrun."
   }
 };
 const warningStrings = {
@@ -82,8 +94,10 @@ const warningStrings = {
     ryeHighWarning: "High rye (>30%) — fermentation may be faster than predicted. Watch your dough closely.",
     dangerOpenCrumbRye: "Open crumb + high rye (>60%) is physically unrealistic. Rye lacks the gluten structure needed for an open crumb. Choose a tighter crumb goal or reduce rye.",
     warnStarterHydrationClamped: "Starter hydration was outside the accepted range (50–200%) and has been clamped. Timing and hydration calculations used the clamped value.",
-    warnFridgeTempUnused: "Your fridge temperature setting is not currently used in cold retard timing. Duration is estimated at 8–16 hours regardless of fridge temp.",
-    dangerSubZeroTemp: "Temperature at or below 0°C — fermentation will be completely halted. Check your temperature inputs."
+    warnFridgeTempUnused: "Your fridge temperature setting is not currently used in cold retard timing. Duration is estimated at 8–20 hours regardless of fridge temp.",
+    dangerSubZeroTemp: "Temperature at or below 0°C — fermentation will be completely halted. Check your temperature inputs.",
+    negativeWater: "Warning: Starter water exceeds total water needed. Reduce inoculation or increase hydration.",
+    minFlourAmount: "Minimum flour amount is 100g."
   },
   es: {
     dangerLow: "Temperatura peligrosamente baja — fermentación casi inactiva. Considera un lugar más cálido.",
@@ -98,8 +112,10 @@ const warningStrings = {
     ryeHighWarning: "Centeno alto (>30%) — la fermentación puede ser más rápida de lo previsto. Vigila tu masa de cerca.",
     dangerOpenCrumbRye: "Miga abierta + centeno alto (>60%) no es realista. El centeno carece de la estructura de gluten necesaria para una miga abierta. Elige una meta de miga más cerrada o reduce el centeno.",
     warnStarterHydrationClamped: "La hidratación del iniciador estaba fuera del rango aceptado (50–200%) y ha sido ajustada. Los cálculos usaron el valor ajustado.",
-    warnFridgeTempUnused: "Tu ajuste de temperatura de nevera no se usa actualmente en los tiempos de fermentación en frío. La duración se estima en 8–16 horas independientemente de la temperatura.",
-    dangerSubZeroTemp: "Temperatura igual o inferior a 0°C — la fermentación estará completamente detenida. Revisa tus valores de temperatura."
+    warnFridgeTempUnused: "Tu ajuste de temperatura de nevera no se usa actualmente en los tiempos de fermentación en frío. La duración se estima en 8–20 horas independientemente de la temperatura.",
+    dangerSubZeroTemp: "Temperatura igual o inferior a 0°C — la fermentación estará completamente detenida. Revisa tus valores de temperatura.",
+    negativeWater: "Advertencia: El agua del fermento excede el agua total necesaria. Reduzca la inoculación o aumente la hidratación.",
+    minFlourAmount: "La cantidad mínima de harina es 100g."
   },
   sv: {
     dangerLow: "Degens temperatur farligt låg — jäsningen nästan inaktiv. Överväg en varmare plats.",
@@ -114,8 +130,10 @@ const warningStrings = {
     ryeHighWarning: "Hög rågandel (>30%) — jäsningen kan gå snabbare än beräknat. Övervaka degen noga.",
     dangerOpenCrumbRye: "Öppen smulstruktur + hög rågandel (>60%) är fysiskt orealistiskt. Råg saknar den glutenstruktur som krävs för öppen smula. Välj ett tätare mål eller minska rågen.",
     warnStarterHydrationClamped: "Surdeghydratation var utanför godkänt intervall (50–200%) och har justerats. Beräkningar använde det justerade värdet.",
-    warnFridgeTempUnused: "Din kylskåpsinställning används inte i beräkning av kalljäsningstiden. Varaktigheten beräknas till 8–16 timmar oavsett kyltemperatur.",
-    dangerSubZeroTemp: "Temperatur vid eller under 0°C — jäsningen är helt stillastående. Kontrollera dina temperaturinmatningar."
+    warnFridgeTempUnused: "Din kylskåpsinställning används inte i beräkning av kalljäsningstiden. Varaktigheten beräknas till 8–20 timmar oavsett kyltemperatur.",
+    dangerSubZeroTemp: "Temperatur vid eller under 0°C — jäsningen är helt stillastående. Kontrollera dina temperaturinmatningar.",
+    negativeWater: "Varning: Starterns vatten överstiger det totala vattenbehovet. Minska inokulationen eller öka hydrationen.",
+    minFlourAmount: "Minsta mjölmängd är 100g."
   }
 };
 const assumptionStrings = {
@@ -332,7 +350,7 @@ const en = {
     }
   },
   floatTest: "Float test:",
-  floatTestDesc: "Drop a small piece of dough in water — if it floats, bulk is done.",
+  floatTestDesc: "The float test checks if your starter/levain is ready — a spoonful of ripe starter should float in water. This test is for starter readiness, not bulk dough.",
   pokeTest: "Poke test:",
   pokeTestDesc: "Poke proofed dough — slow, partial spring-back = ready to bake.",
   jiggleTest: "Jiggle test:",
@@ -353,7 +371,15 @@ const en = {
     Low: "Low",
     Medium: "Medium",
     High: "High"
-  }
+  },
+  scheduleComplete: "Press to mark completed step",
+  timingDisclaimer: "Timing estimates are approximate (±30-60 min). Observe your dough, not just the clock.",
+  flourBreadFlour: "Bread Flour",
+  flourAllPurpose: "All-Purpose",
+  flourWholeWheat: "Whole Wheat",
+  flourRye: "Rye",
+  flourSpelt: "Spelt",
+  flourEinkorn: "Einkorn"
 };
 const es = {
   // App / header
@@ -517,7 +543,7 @@ const es = {
     }
   },
   floatTest: "Prueba de flotación:",
-  floatTestDesc: "Suelta un trozo de masa en agua — si flota, la fermentación en masa terminó.",
+  floatTestDesc: "La prueba de flotación comprueba si tu masa madre está lista — una cucharada de masa madre madura debe flotar en agua. Esta prueba es para la madurez del fermento, no para la masa en bulk.",
   pokeTest: "Prueba del dedo:",
   pokeTestDesc: "Presiona la masa fermentada — si recupera lento y parcialmente, está lista para hornear.",
   jiggleTest: "Prueba del temblor:",
@@ -538,7 +564,15 @@ const es = {
     Low: "Baja",
     Medium: "Media",
     High: "Alta"
-  }
+  },
+  scheduleComplete: "Pulsa para marcar el paso como completado",
+  timingDisclaimer: "Los tiempos son aproximados (±30-60 min). Observe su masa, no solo el reloj.",
+  flourBreadFlour: "Harina de Fuerza",
+  flourAllPurpose: "Harina Normal",
+  flourWholeWheat: "Harina Integral",
+  flourRye: "Centeno",
+  flourSpelt: "Espelta",
+  flourEinkorn: "Escanda"
 };
 const sv = {
   // App / header
@@ -698,7 +732,7 @@ const sv = {
     }
   },
   floatTest: "Flottesttest:",
-  floatTestDesc: "Släpp en liten degbit i vatten — om den flyter är bulkjäsningen klar.",
+  floatTestDesc: "Flottesttestet kontrollerar om din surdeg är redo — en sked mogen surdeg ska flyta i vatten. Det här testet gäller surdegsmognad, inte bulkdegen.",
   pokeTest: "Stickprov:",
   pokeTestDesc: "Tryck på den jästa degen — långsam, delvis återfjädring = redo att baka.",
   jiggleTest: "Skakprov:",
@@ -719,7 +753,15 @@ const sv = {
     Low: "Låg",
     Medium: "Medium",
     High: "Hög"
-  }
+  },
+  scheduleComplete: "Tryck för att markera steget som klart",
+  timingDisclaimer: "Tidsuppskattningar är ungefärliga (±30-60 min). Observera din deg, inte bara klockan.",
+  flourBreadFlour: "Vetemjöl",
+  flourAllPurpose: "Vetmjöl",
+  flourWholeWheat: "Fullkornsmjöl",
+  flourRye: "Rågmjöl",
+  flourSpelt: "Dinkelmjöl",
+  flourEinkorn: "Enkornsmjöl"
 };
 const translations = { en, es, sv };
 const WHOLE_GRAIN_FLOURS = ["WholeWheat", "Rye", "Spelt", "Einkorn"];
@@ -728,9 +770,10 @@ const FLOUR_PROPERTIES = {
   BreadFlour: { absorptionCoeff: ranged(1, 0.05), fermentMult: ranged(1, 0.05), proofFermentMult: ranged(1, 0.05) },
   AllPurpose: { absorptionCoeff: ranged(0.97, 0.05), fermentMult: ranged(1, 0.05), proofFermentMult: ranged(1, 0.05) },
   WholeWheat: { absorptionCoeff: ranged(1.12, 0.1), fermentMult: ranged(0.85, 0.1), proofFermentMult: ranged(0.88, 0.1) },
-  Rye: { absorptionCoeff: ranged(1.2, 0.15), fermentMult: ranged(0.72, 0.15), proofFermentMult: ranged(0.55, 0.15) },
+  Rye: { absorptionCoeff: ranged(1.2, 0.15), fermentMult: ranged(0.72, 0.15), proofFermentMult: ranged(0.78, 0.2) },
+  // Rye proof is faster but not 45% faster; high-rye doughs have limited oven spring
   Spelt: { absorptionCoeff: ranged(1.02, 0.15), fermentMult: ranged(0.82, 0.15), proofFermentMult: ranged(0.85, 0.15) },
-  Einkorn: { absorptionCoeff: ranged(0.87, 0.2), fermentMult: ranged(0.9, 0.2), proofFermentMult: ranged(0.88, 0.2) }
+  Einkorn: { absorptionCoeff: ranged(1.02, 0.15), fermentMult: ranged(0.9, 0.2), proofFermentMult: ranged(0.88, 0.2) }
 };
 function clamp(min, max, val) {
   return Math.max(min, Math.min(max, val));
@@ -754,7 +797,7 @@ function recommendAutolyseMins(ambientTempC, doughTempC) {
   return 45;
 }
 function calcFormula(inputs2) {
-  const {
+  let {
     totalFlourInputG,
     flourBlend,
     crumbGoal,
@@ -765,13 +808,19 @@ function calcFormula(inputs2) {
     starterHydrationAutoCalc,
     starterHydrationPct
   } = inputs2;
+  if (!flourBlend.length || flourBlend.every((f) => f.pct <= 0)) {
+    flourBlend = [{ type: "BreadFlour", pct: 100 }];
+  }
+  if (totalFlourInputG <= 0) {
+    totalFlourInputG = 100;
+  }
   const totalFlourG = totalFlourInputG;
   const totalBlendPct = flourBlend.reduce((s, e) => s + e.pct, 0);
   const normFactor = totalBlendPct > 0 ? 100 / totalBlendPct : 1;
   const wwPctNorm = flourBlend.filter((e) => WHOLE_GRAIN_FLOURS.includes(e.type)).reduce((s, e) => s + e.pct * normFactor, 0);
   const wwRatio = totalFlourG > 0 ? wwPctNorm / 100 : 0;
   const wwFlourG = Math.round(totalFlourG * wwRatio);
-  const whiteFlouG = totalFlourG - wwFlourG;
+  const whiteFlourG = totalFlourG - wwFlourG;
   const blendSum = flourBlend.reduce((s, e) => s + e.pct, 0);
   const norm = blendSum > 0 ? blendSum : 1;
   const blendAbsorptionObj = flourBlend.reduce(
@@ -817,7 +866,7 @@ function calcFormula(inputs2) {
   };
   const baseHydrationPct = baseHydrationMap[crumbGoal];
   const wwHydrationAdjust = (blendAbsorption - 1) * 100;
-  const finalHydrationPct = baseHydrationPct + wwHydrationAdjust;
+  const finalHydrationPct = Math.min(baseHydrationPct + wwHydrationAdjust, 95);
   let hydrationBand;
   if (finalHydrationPct < 70) {
     hydrationBand = "Low";
@@ -861,10 +910,15 @@ function calcFormula(inputs2) {
     } else {
       inoculationPct -= 6;
     }
+    if (effectiveTempC < 21) {
+      inoculationPct += Math.min(3, (21 - effectiveTempC) * 0.5);
+    }
     if (hydrationBand === "Low") {
       inoculationPct += 2;
     } else if (hydrationBand === "High") {
       inoculationPct -= 2;
+    } else if (hydrationBand === "VeryHigh") {
+      inoculationPct -= 3;
     }
     if (wwRatio >= 0.3) {
       inoculationPct -= 1;
@@ -892,6 +946,8 @@ function calcFormula(inputs2) {
       inoculationPct += 2;
     } else if (hydrationBand === "High") {
       inoculationPct -= 2;
+    } else if (hydrationBand === "VeryHigh") {
+      inoculationPct -= 3;
     }
     if (wwRatio >= 0.3) {
       inoculationPct -= 1;
@@ -908,14 +964,16 @@ function calcFormula(inputs2) {
   const starterTotalG = starterFlourG * (1 + clampedStarterHydrationPct / 100);
   const starterWaterG = starterTotalG - starterFlourG;
   const mixFlourG = totalFlourG - starterFlourG;
-  const mixWaterG = totalWaterG - starterWaterG;
+  const mixWaterGRaw = totalWaterG - starterWaterG;
+  const mixWaterG = Math.max(0, mixWaterGRaw);
+  const negativeWater = mixWaterGRaw < 0;
   const totalFormulaFlourG = totalFlourG;
   const totalFormulaWaterG = totalWaterG;
   const totalDoughWeightG = totalFlourG + totalWaterG + saltG;
   const blendProofFermentMult = blendFermentMult * PROOF_KINETICS_FACTOR;
   return {
     totalFlourG,
-    whiteFlouG,
+    whiteFlourG,
     wwFlourG,
     wwRatio,
     baseHydrationPct,
@@ -941,14 +999,31 @@ function calcFormula(inputs2) {
     totalDoughWeightG,
     mixFlourG,
     mixWaterG,
+    negativeWater,
     effectiveTempC,
     tempBand
   };
 }
 function calcTiming(formula, inputs2) {
-  const { effectiveTempC: rawEffectiveTempC, hydrationBand, inoculationPct, blendFermentMult, blendFermentMultRange } = formula;
+  const { effectiveTempC: rawEffectiveTempC, hydrationBand, inoculationPct, blendFermentMult, blendFermentMultRange, blendProofFermentMult } = formula;
   const { fermentationPhilosophy, ambientTempC } = inputs2;
   let effectiveTempC = rawEffectiveTempC;
+  {
+    let prelimBulkBaseMin;
+    if (rawEffectiveTempC < 21) prelimBulkBaseMin = 8;
+    else if (rawEffectiveTempC < 24) prelimBulkBaseMin = 5;
+    else if (rawEffectiveTempC < 27) prelimBulkBaseMin = 3.5;
+    else if (rawEffectiveTempC < 29) prelimBulkBaseMin = 3;
+    else prelimBulkBaseMin = 2;
+    const hydrationMultPrelim = hydrationBand === "Low" ? 1.15 : hydrationBand === "High" ? 0.85 : hydrationBand === "VeryHigh" ? 0.75 : 1;
+    const inocScalePrelim = Math.pow(20 / inoculationPct, 0.35);
+    const prelimBulkMin = prelimBulkBaseMin * hydrationMultPrelim * inocScalePrelim * blendFermentMult;
+    const prelimBulkMinMins = prelimBulkMin * 60;
+    if (prelimBulkMinMins > 180) {
+      const correctedTemp = rawEffectiveTempC - (prelimBulkMinMins / 60 - 3) * 0.3;
+      effectiveTempC = Math.max(ambientTempC, Math.min(rawEffectiveTempC, correctedTemp));
+    }
+  }
   let bulkBaseMin;
   let bulkBaseMax;
   if (effectiveTempC < 21) {
@@ -968,11 +1043,6 @@ function calcTiming(formula, inputs2) {
   const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult;
   const bulkMinLow = bulkBaseMin * hydrationMult * inocScale * blendFermentMultRange.low;
   const bulkMaxHigh = bulkBaseMax * hydrationMult * inocScale * blendFermentMultRange.high;
-  const bulkMinMins = bulkMin * 60;
-  if (bulkMinMins > 180) {
-    const correctedTemp = effectiveTempC - (bulkMinMins / 60 - 3) * 0.3;
-    effectiveTempC = Math.max(ambientTempC, Math.min(effectiveTempC, correctedTemp));
-  }
   const proofBaseMin = 1.5;
   const proofBaseMax = 3;
   let proofTempMult;
@@ -987,30 +1057,34 @@ function calcTiming(formula, inputs2) {
   } else {
     proofTempMult = 0.6;
   }
-  let proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMult * PROOF_KINETICS_FACTOR;
-  let proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale * blendFermentMult * PROOF_KINETICS_FACTOR;
+  let proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMult;
+  let proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale * blendProofFermentMult;
   let proofMinLow = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMultRange.low * PROOF_KINETICS_FACTOR;
   proofBaseMin * proofTempMult * hydrationMult * inocScale * blendFermentMultRange.high * PROOF_KINETICS_FACTOR;
-  let coldRetardMin = COLD_RETARD_MIN_H;
-  let coldRetardMax = COLD_RETARD_MAX_H;
+  const baseRetardMin = COLD_RETARD_MIN_H;
+  const baseRetardMax = COLD_RETARD_MAX_H;
+  const { fridgeTempC } = inputs2;
+  const fridgeFactor = clamp(0.7, 1.5, 1 + (fridgeTempC - 4) * 0.08);
+  let coldRetardMin = Math.round(baseRetardMin * fridgeFactor);
+  let coldRetardMax = Math.round(baseRetardMax * fridgeFactor);
   if (fermentationPhilosophy === "FlavorDevelopment") {
     proofMin *= 1.2;
     proofMax *= 1.2;
     proofMinLow *= 1.2;
-    coldRetardMin *= 1.25;
-    coldRetardMax *= 1.25;
+    coldRetardMin = Math.round(coldRetardMin * 1.25);
+    coldRetardMax = Math.round(coldRetardMax * 1.25);
   }
-  const foldCount = Math.min(4, Math.floor(bulkMin * 60 / 30));
-  const coeffRatio = blendFermentMultRange.low / blendFermentMult;
-  const bulkMinRange = { value: bulkMin, low: bulkMinLow, high: bulkMin / coeffRatio };
-  const bulkMaxRange = { value: bulkMax, low: bulkMax * coeffRatio, high: bulkMaxHigh };
-  const proofMinRange = { value: proofMin, low: proofMinLow, high: proofMin / coeffRatio };
   let foldIntervalMins;
   if (effectiveTempC >= 29) foldIntervalMins = 20;
   else if (effectiveTempC >= 27) foldIntervalMins = 22;
   else if (effectiveTempC >= 24) foldIntervalMins = 25;
   else if (effectiveTempC >= 21) foldIntervalMins = 30;
   else foldIntervalMins = 35;
+  const foldCount = Math.min(4, Math.floor(bulkMin * 60 / foldIntervalMins));
+  const coeffRatio = blendFermentMultRange.low / blendFermentMult;
+  const bulkMinRange = { value: bulkMin, low: bulkMinLow, high: bulkMin / coeffRatio };
+  const bulkMaxRange = { value: bulkMax, low: bulkMax * coeffRatio, high: bulkMaxHigh };
+  const proofMinRange = { value: proofMin, low: proofMinLow, high: proofMin / coeffRatio };
   return {
     bulkMin,
     bulkMax,
@@ -1048,7 +1122,7 @@ function calcSchedule(inputs2, formula, timing, lang2) {
     notes: s.mixNote
   });
   const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
-  const cfSets = Math.max(0, foldCount - sfSets);
+  const cfSets = Math.max(0, foldCount - sfSets) + 1;
   steps.push({
     label: s.stretchFold,
     durationMins: sfSets * foldIntervalMins,
@@ -1099,16 +1173,34 @@ function calcSchedule(inputs2, formula, timing, lang2) {
   }
   steps.push({
     label: s.bake,
-    durationMins: BAKE_DURATION_MINS,
+    durationMins: null,
     notes: s.bakeNote
+  });
+  steps.push({
+    label: s.bakeCovered,
+    durationMins: BAKE_COVERED_MINS,
+    notes: s.bakeCoveredNote,
+    isSubStep: true
+  });
+  steps.push({
+    label: s.bakeUncovered,
+    durationMins: BAKE_UNCOVERED_MINS,
+    notes: s.bakeUncoveredNote,
+    isSubStep: true
   });
   return steps;
 }
 function calcWarnings(inputs2, formula, lang2) {
   const warnings = [];
-  const { effectiveTempC, hydrationBand, wwRatio, effectiveStarterHydrationPct } = formula;
+  const { effectiveTempC, hydrationBand, wwRatio, effectiveStarterHydrationPct, negativeWater } = formula;
   const { autolyseOn, autolyseMins, crumbGoal, starterHydrationAutoCalc, starterHydrationPct, proofMethod, fridgeTempC } = inputs2;
   const w = warningStrings[lang2];
+  if (inputs2.totalFlourInputG <= 0) {
+    warnings.push({ level: "warn", message: w.minFlourAmount ?? "Flour amount too low; defaulted to 100g." });
+  }
+  if (negativeWater) {
+    warnings.push({ level: "danger", message: w.negativeWater ?? "Starter hydration exceeds dough water; reduce inoculation or starter hydration." });
+  }
   const rawTemp = inputs2.doughTempC !== null ? (inputs2.ambientTempC + inputs2.doughTempC) / 2 : inputs2.ambientTempC;
   if (rawTemp <= 0) {
     warnings.push({ level: "danger", message: w.dangerSubZeroTemp });
@@ -1154,9 +1246,6 @@ function calcWarnings(inputs2, formula, lang2) {
     if (clamped !== starterHydrationPct) {
       warnings.push({ level: "warn", message: w.warnStarterHydrationClamped });
     }
-  }
-  if (proofMethod === "ColdRetard" && fridgeTempC !== 4) {
-    warnings.push({ level: "info", message: w.warnFridgeTempUnused });
   }
   return warnings;
 }
@@ -1220,6 +1309,7 @@ function formatMins(mins) {
   return `${h}h ${m}m`;
 }
 function addMinsToTime(startTime, mins) {
+  if (!/^\d{1,2}:\d{2}$/.test(startTime)) return startTime;
   const [hStr, mStr] = startTime.split(":");
   const totalMins = parseInt(hStr) * 60 + parseInt(mStr) + Math.round(mins);
   const wrappedMins = (totalMins % (24 * 60) + 24 * 60) % (24 * 60);
@@ -1230,7 +1320,8 @@ function addMinsToTime(startTime, mins) {
 const COLD_RETARD_MIN_H = 8;
 const COLD_RETARD_MAX_H = 16;
 const PROOF_KINETICS_FACTOR = 1.15;
-const BAKE_DURATION_MINS = 45;
+const BAKE_COVERED_MINS = 20;
+const BAKE_UNCOVERED_MINS = 20;
 const PRESHAPE_DURATION_MINS = 45;
 const FINAL_SHAPE_DURATION_MINS = 10;
 const MIX_DURATION_MINS = 45;
@@ -1453,9 +1544,7 @@ function FormulaCard($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
     const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
-    let { formula } = $$props;
-    const whiteFlouG = derived$1(() => formula.whiteFlouG);
-    const wwFlourG = derived$1(() => formula.wwFlourG);
+    let { formula, flourBlend } = $$props;
     function pct(val, base) {
       if (base <= 0) return "—";
       return `${(val / base * 100).toFixed(1)}%`;
@@ -1463,14 +1552,13 @@ function FormulaCard($$renderer, $$props) {
     function round(n) {
       return Math.round(n).toString();
     }
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><tr class="bg-base-200/50"><td class="px-5 py-2 text-base-content/70 text-xs pl-8">${escape_html(t().whiteFlouRow)}</td><td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(whiteFlouG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">${escape_html(pct(whiteFlouG(), formula.totalFlourG))}</td></tr>`);
-    if (wwFlourG() > 0) {
-      $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<tr class="bg-base-200/50"><td class="px-5 py-2 text-base-content/70 text-xs pl-8">${escape_html(t().wwFlourRow)}</td><td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(wwFlourG()))}g</td><td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">${escape_html(pct(wwFlourG(), formula.totalFlourG))}</td></tr>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><!--[-->`);
+    const each_array = ensure_array_like(flourBlend);
+    for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+      let entry = each_array[$$index];
+      $$renderer2.push(`<tr class="bg-base-200/50"><td class="px-5 py-2 text-base-content/70 text-xs pl-8">— ${escape_html(t().flourTypes[entry.type] ?? entry.type)}</td><td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(formula.totalFlourG * entry.pct / 100))}g</td><td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">${escape_html(entry.pct)}%</td></tr>`);
     }
-    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))}</td></tr></tbody><tfoot><tr class="border-t-2 border-secondary/30 bg-secondary/10"><td class="px-5 py-3 font-bold text-secondary">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-secondary">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-base-200 bg-base-200/60"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-base-200"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-base-content/50 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
+    $$renderer2.push(`<!--]--><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().water)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().saltRow)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.saltG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="px-5 py-2.5 text-base-content font-medium">${escape_html(t().starter)}</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))} <span class="text-[10px] text-base-content/40 block leading-tight">pre-fermented flour</span></td></tr></tbody><tfoot><tr class="border-t-2 border-secondary/30 bg-secondary/10"><td class="px-5 py-3 font-bold text-secondary">${escape_html(t().totalDough)}</td><td class="px-5 py-3 text-right tabular-nums font-bold text-secondary">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="px-5 py-3 text-right"></td></tr></tfoot></table> <div class="px-5 py-4 border-t border-base-200 bg-base-200/60"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().starterBreakdown)}</p> <div class="grid grid-cols-3 gap-3 text-sm"><div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterFlour)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.starterWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().starterWater)}</div></div> <div class="text-center"><div class="text-lg font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().totalStarter)}</div></div></div></div> <div class="px-5 py-4 border-t border-base-200"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3 text-sm"><div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixFlour)}</div></div> <div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center"><div class="text-lg font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/70 mt-0.5">${escape_html(t().mixWater)}</div></div></div> <p class="text-xs text-base-content/50 mt-2">${escape_html(t().starterNote)}</p></div></div>`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
@@ -1625,18 +1713,19 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push(`<!--]--> `);
         if (step.setCount && !completedSteps.has(i)) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div class="flex flex-wrap gap-2 mt-2"><!--[-->`);
+          $$renderer2.push(`<div class="flex flex-wrap items-center gap-2 mt-2"><!--[-->`);
           const each_array_1 = ensure_array_like(Array.from({ length: step.setCount }, (_, si) => si));
           for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
             let si = each_array_1[$$index];
-            $$renderer2.push(`<button${attr_class(`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium border transition-colors ${stringify(isSetDone(i, si) ? "bg-success/15 border-success/30 text-success" : "bg-base-200 border-base-300 text-base-content/60 hover:bg-base-300")}`)}><span${attr_class(`w-3.5 h-3.5 rounded-sm border flex items-center justify-center text-[9px] ${stringify(isSetDone(i, si) ? "bg-success/20 border-success/40 text-success" : "border-base-content/30")}`)}>`);
+            $$renderer2.push(`<button${attr_class(`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-colors ${stringify(isSetDone(i, si) ? "bg-success/15 text-success" : "bg-secondary/15 text-secondary hover:bg-secondary/25")}`)}>`);
             if (isSetDone(i, si)) {
               $$renderer2.push("<!--[0-->");
               $$renderer2.push(`✓`);
             } else {
               $$renderer2.push("<!--[-1-->");
+              $$renderer2.push(`${escape_html(si + 1)}`);
             }
-            $$renderer2.push(`<!--]--></span> Set ${escape_html(si + 1)}</button>`);
+            $$renderer2.push(`<!--]--></button>`);
           }
           $$renderer2.push(`<!--]--></div>`);
         } else {

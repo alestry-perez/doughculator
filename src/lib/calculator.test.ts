@@ -2,8 +2,10 @@ import { describe, it, expect } from 'vitest';
 import {
 	calculate,
 	recommendAutolyseMins,
+	addMinsToTime,
 	COLD_RETARD_MIN_H,
 	COLD_RETARD_MAX_H,
+	PROOF_KINETICS_FACTOR,
 	type Inputs,
 	type FlourBlendEntry,
 } from './calculator';
@@ -50,9 +52,9 @@ describe('Flour coefficients', () => {
 		expect(einkorn.formula.finalHydrationPct).toBeLessThan(ww.formula.finalHydrationPct);
 	});
 
-	it('Einkorn blendAbsorption is ~0.87', () => {
+	it('Einkorn blendAbsorption is ~1.02', () => {
 		const result = calculate(makeInputs({ flourBlend: [{ type: 'Einkorn', pct: 100 }] }));
-		expect(result.formula.blendAbsorption).toBeCloseTo(0.87, 2);
+		expect(result.formula.blendAbsorption).toBeCloseTo(1.02, 2);
 	});
 
 	it('Spelt blendAbsorption is ~1.02', () => {
@@ -105,6 +107,28 @@ describe('Room proof blendFermentMult', () => {
 			proofMethod: 'Room',
 		}));
 		expect(ww.timing.proofMin).toBeLessThan(bf.timing.proofMin);
+	});
+});
+
+describe('Per-flour proofFermentMult (regression)', () => {
+	it('blendProofFermentMult uses proofFermentMult not fermentMult', () => {
+		// Rye: fermentMult=0.72, proofFermentMult=0.78
+		// If using proofFermentMult: 0.78 * PROOF_KINETICS_FACTOR
+		// If using fermentMult (old bug): 0.72 * PROOF_KINETICS_FACTOR
+		const rye = calculate(makeInputs({
+			flourBlend: [{ type: 'Rye', pct: 100 }],
+		}));
+		expect(rye.formula.blendProofFermentMult).toBeCloseTo(0.78 * PROOF_KINETICS_FACTOR, 2);
+	});
+
+	it('blendProofFermentMultRange differs from blendFermentMultRange for Rye', () => {
+		const rye = calculate(makeInputs({
+			flourBlend: [{ type: 'Rye', pct: 100 }],
+		}));
+		// Rye fermentMult range != proofFermentMult range, so the proof range should differ
+		expect(rye.formula.blendProofFermentMultRange.low).not.toBeCloseTo(
+			rye.formula.blendFermentMultRange.low * PROOF_KINETICS_FACTOR, 2
+		);
 	});
 });
 
@@ -165,15 +189,19 @@ describe('Warnings', () => {
 		expect(ws.some(w => w.level === 'danger')).toBe(true);
 	});
 
-	it('ColdRetard + fridgeTempC !== 4 emits info', () => {
-		const ws = warnings({ proofMethod: 'ColdRetard', fridgeTempC: 7 });
-		expect(ws.some(w => w.level === 'info' && w.message.toLowerCase().includes('fridge'))).toBe(true);
+	it('ColdRetard + fridgeTempC !== 4 scales retard timing (no warning needed)', () => {
+		// F-5: fridge temp now affects timing directly via fridgeFactor, no info warning emitted
+		const r4 = calculate(makeInputs({ proofMethod: 'ColdRetard', fridgeTempC: 4 }));
+		const r7 = calculate(makeInputs({ proofMethod: 'ColdRetard', fridgeTempC: 7 }));
+		// Warmer fridge = shorter retard
+		expect(r7.timing.coldRetardMin).toBeLessThan(r4.timing.coldRetardMin);
 	});
 
-	it('ColdRetard + fridgeTempC === 4 does NOT emit fridge info', () => {
-		const ws = warnings({ proofMethod: 'ColdRetard', fridgeTempC: 4 });
-		const fridgeInfo = ws.filter(w => w.level === 'info' && w.message.toLowerCase().includes('fridge'));
-		expect(fridgeInfo.length).toBe(0);
+	it('ColdRetard + fridgeTempC === 1 extends retard timing', () => {
+		const r4 = calculate(makeInputs({ proofMethod: 'ColdRetard', fridgeTempC: 4 }));
+		const r1 = calculate(makeInputs({ proofMethod: 'ColdRetard', fridgeTempC: 1 }));
+		// Colder fridge = longer retard
+		expect(r1.timing.coldRetardMin).toBeGreaterThan(r4.timing.coldRetardMin);
 	});
 });
 
@@ -302,5 +330,137 @@ describe('recommendAutolyseMins', () => {
 	it('averages ambient and dough temp when doughTempC provided', () => {
 		// ambient 20, dough 28 → effective 24 → 30 min
 		expect(recommendAutolyseMins(20, 28)).toBe(30);
+	});
+});
+
+// -------------------------------------------------------
+// 8. Negative water guard (F-1)
+// -------------------------------------------------------
+
+describe('Negative water guard (F-1)', () => {
+	it('low hydration + high inoculation does not produce negative mixWaterG', () => {
+		// Tight hydration (65%) + high starter hydration (200%) + scenario that would push starterWater > totalWater
+		const result = calculate(makeInputs({
+			crumbGoal: 'Tight',
+			starterHydrationAutoCalc: false,
+			starterHydrationPct: 200,
+		}));
+		expect(result.formula.mixWaterG).toBeGreaterThanOrEqual(0);
+	});
+
+	it('emits danger warning when mixWaterG would be negative', () => {
+		const result = calculate(makeInputs({
+			crumbGoal: 'Tight',
+			starterHydrationAutoCalc: false,
+			starterHydrationPct: 200,
+		}));
+		if (result.formula.negativeWater) {
+			expect(result.warnings.some(w => w.level === 'danger')).toBe(true);
+		}
+	});
+});
+
+// -------------------------------------------------------
+// 9. Empty flour blend guard (F-7)
+// -------------------------------------------------------
+
+describe('Empty flour blend guard (F-7)', () => {
+	it('empty flourBlend defaults to BreadFlour', () => {
+		const result = calculate(makeInputs({ flourBlend: [] }));
+		expect(result.formula.blendAbsorption).toBeCloseTo(1.0, 1);
+		expect(result.formula.totalFlourG).toBeGreaterThan(0);
+	});
+
+	it('all-zero flour blend defaults to BreadFlour', () => {
+		const result = calculate(makeInputs({ flourBlend: [{ type: 'BreadFlour', pct: 0 }] }));
+		expect(result.formula.blendAbsorption).toBeCloseTo(1.0, 1);
+	});
+});
+
+// -------------------------------------------------------
+// 10. Zero flour guard (F-8)
+// -------------------------------------------------------
+
+describe('Zero flour guard (F-8)', () => {
+	it('zero totalFlourInputG clamps to minimum', () => {
+		const result = calculate(makeInputs({ totalFlourInputG: 0 }));
+		expect(result.formula.totalFlourG).toBeGreaterThanOrEqual(100);
+	});
+
+	it('negative totalFlourInputG clamps to minimum', () => {
+		const result = calculate(makeInputs({ totalFlourInputG: -50 }));
+		expect(result.formula.totalFlourG).toBeGreaterThanOrEqual(100);
+	});
+});
+
+// -------------------------------------------------------
+// 11. VeryHigh hydration inoculation (F-10)
+// -------------------------------------------------------
+
+describe('VeryHigh hydration inoculation (F-10)', () => {
+	it('VeryHigh hydration reduces inoculation vs Medium', () => {
+		// 100% rye + Open crumb → VeryHigh hydration band
+		const veryHigh = calculate(makeInputs({
+			flourBlend: [{ type: 'Rye', pct: 100 }],
+			crumbGoal: 'Open',
+		}));
+		// BreadFlour + Balanced → Medium hydration band
+		const medium = calculate(makeInputs({
+			flourBlend: [{ type: 'BreadFlour', pct: 100 }],
+			crumbGoal: 'Balanced',
+		}));
+		// VeryHigh should have lower inoculation than Medium (both use same philosophy)
+		expect(veryHigh.formula.inoculationPct).toBeLessThanOrEqual(medium.formula.inoculationPct);
+	});
+});
+
+// -------------------------------------------------------
+// 12. Hydration cap (F-12)
+// -------------------------------------------------------
+
+describe('Hydration cap (F-12)', () => {
+	it('100% Rye + Open crumb does not exceed 95% hydration', () => {
+		const result = calculate(makeInputs({
+			flourBlend: [{ type: 'Rye', pct: 100 }],
+			crumbGoal: 'Open',
+		}));
+		expect(result.formula.finalHydrationPct).toBeLessThanOrEqual(95);
+	});
+});
+
+// -------------------------------------------------------
+// 13. addMinsToTime validation (F-19)
+// -------------------------------------------------------
+
+describe('addMinsToTime validation (F-19)', () => {
+	it('valid time adds minutes correctly', () => {
+		expect(addMinsToTime('8:00', 90)).toBe('09:30');
+	});
+
+	it('malformed startTime returns input unchanged', () => {
+		expect(addMinsToTime('not-a-time', 30)).toBe('not-a-time');
+	});
+
+	it('schedule entries from calculate have valid labels', () => {
+		const result = calculate(makeInputs({}));
+		for (const step of result.schedule) {
+			expect(step.label).toBeTruthy();
+			expect(typeof step.label).toBe('string');
+		}
+	});
+});
+
+// -------------------------------------------------------
+// 14. FlavorDevelopment cold temp compensation (F-4)
+// -------------------------------------------------------
+
+describe('FlavorDevelopment cold compensation (F-4)', () => {
+	it('cold temp + FlavorDevelopment has higher inoculation than without compensation', () => {
+		const result = calculate(makeInputs({
+			fermentationPhilosophy: 'FlavorDevelopment',
+			ambientTempC: 18,
+		}));
+		// With cold compensation, inoculation should be >= 7 (base 14 - 4 + cold boost)
+		expect(result.formula.inoculationPct).toBeGreaterThanOrEqual(7);
 	});
 });

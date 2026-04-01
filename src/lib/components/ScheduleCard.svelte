@@ -17,17 +17,20 @@
   } = $props();
 
   // ------------------------------------------------------------------
-  // Completion state — local only, resets whenever `steps` changes
+  // Completion state — local only, resets only when step content changes
   // ------------------------------------------------------------------
   let completedSteps = $state<Set<number>>(new Set());
   let completedSets = $state<Map<number, Set<number>>>(new Map());
 
+  let lastStepsHash = $state('');
+
   $effect(() => {
-    // Re-run whenever `steps` identity changes (new calc result)
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    steps;
-    completedSteps = new Set();
-    completedSets = new Map();
+    const hash = JSON.stringify(steps.map(s => s.label + '|' + s.durationMins + '|' + s.rangeMinMins));
+    if (hash !== lastStepsHash) {
+      lastStepsHash = hash;
+      completedSteps = new Set();
+      completedSets = new Map();
+    }
   });
 
   function toggleStep(index: number) {
@@ -108,7 +111,7 @@
 <div class="shadow-sm card bg-base-100 ring-1 ring-base-300/70">
   <div class="p-5 card-body">
     <h2 class="mb-1 text-base font-semibold tracking-wide uppercase text-base-content">{t.schedule}</h2>
-    <p class="mb-3 text-xs italic text-base-content/60">Press to mark completed step</p>
+    <p class="mb-3 text-xs italic text-base-content/60">{t.scheduleComplete}</p>
 
     <ol class="relative space-y-0">
       {#each stepsWithTimes as { step, clockTime, endClockTime, topLevelIndex }, i}

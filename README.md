@@ -4,35 +4,6 @@ Sourdough formula, timing, and schedule calculator built with SvelteKit, Tailwin
 
 The app is static-build friendly and tuned for practical home baking inputs: flour blend, temperature, crumb goal, proof method, and schedule mode.
 
-## What Changed Recently
-
-### Formula & Bug Fixes
-- **Corrected flour coefficients** — Einkorn `absorptionCoeff` and Spelt/WholeWheat `fermentMult` values were wrong; all corrected to match physical reality.
-- **Temperature decay for long bulk ferments** — for bulk >3h, `effectiveTempC` now drifts toward `ambientTempC` at 0.3°C/hour, preventing over-estimation of fermentation speed in long cold bulk scenarios.
-- **Stage-specific kinetics** — proof fermentation runs ~15% faster than bulk (`PROOF_KINETICS_FACTOR = 1.15`) due to shaped-dough surface area; each flour now carries its own `proofFermentMult`.
-- **Fermentation philosophy → timing** — `FlavorDevelopment` philosophy now scales `proofMin/Max` ×1.2 and `coldRetardMin/Max` ×1.25, reflecting deliberately slower fermentation.
-- **`TempBand` boundary fix** — temperature band thresholds were misaligned at boundaries; corrected.
-- **Rye + open crumb guard** — high-rye doughs can't realistically achieve open crumb; the UI now blocks this invalid combination.
-- **Hydration band edge case fixes** — edge values at band boundaries now handled consistently.
-- **`fridgeTempC` out-of-range warning** — added validation; previously silent bad inputs could break the cold retard model.
-- **Warning threshold and message fixes** — several warnings fired at wrong thresholds or with misleading text.
-
-### Uncertainty & Confidence Ranges (A6)
-- **`RangedValue` type** — `absorptionCoeff`, `fermentMult`, and `proofFermentMult` in `FLOUR_PROPERTIES` are now `{ value, low, high }` instead of plain scalars. Per-flour uncertainty: BreadFlour/AP ±5%, WholeWheat ±10%, Spelt/Einkorn ±15%, Rye ±20%.
-- **Range propagation** — `calcFormula` exposes `blendAbsorptionRange` and `blendFermentMultRange`; `calcTiming` uses the bounds to widen `bulkMinRange/bulkMaxRange/proofMinRange`.
-- **Assumptions drawer** — blend coefficients now display as `"1.120 (1.008–1.232)"` with a timing confidence note.
-
-### i18n & UX
-- Added missing/hardcoded i18n strings across all locales (`en`, `es`, `sv`).
-- Added timing output disclaimers.
-- Cleaned up dead code and inconsistent rounding.
-
-### Infrastructure
-- **34-test suite added** (`src/lib/calculator.test.ts`) — covers `calcFormula`, `calcTiming`, `calcAssumptions`, all flour types, and edge cases (all-rye, high hydration, cold retard). All 34 pass.
-- **Vitest config separated** — moved to `vitest.config.ts` to avoid `svelte-check` type conflict with `vite.config.ts`.
-
----
-
 ## Quick Start
 
 ```bash
@@ -267,7 +238,7 @@ Room proof baseline is `[1.5h, 3h]` (24-26C reference), scaled by temperature + 
 | Predictability | ×1.0 | ×1.0 |
 | Flavor Development | ×1.2 | ×1.25 |
 
-Cold retard baseline is `[8h, 16h]`, adjusted by philosophy.
+Cold retard baseline is `[8h, 16h]`, scaled to `[8h, 20h]` with FlavorDevelopment philosophy (×1.25).
 
 Folds:
 
@@ -306,7 +277,7 @@ In UI, this is shown as a non-editable progress bar.
 | Open crumb | `crumbGoal='Open'` | warn |
 | High rye | `Rye > 30%` | warn |
 | Rye + open crumb | `Rye > 30% AND crumbGoal='Open'` | danger |
-| Fridge temp out of range | `fridgeTempC < 1 OR > 6` | warn |
+| Fridge temp out of range | `fridgeTempC !== 4` | info |
 
 ### 10) Schedule Order
 
@@ -357,6 +328,35 @@ src/
   app.css
 vitest.config.ts        # vitest config (separate from vite.config.ts)
 ```
+
+## What Changed Recently
+
+### Formula & Bug Fixes
+- **Corrected flour coefficients** — Einkorn `absorptionCoeff` and Spelt/WholeWheat `fermentMult` values were wrong; all corrected to match physical reality.
+- **Temperature decay for long bulk ferments** — for bulk >3h, `effectiveTempC` now drifts toward `ambientTempC` at 0.3°C/hour, preventing over-estimation of fermentation speed in long cold bulk scenarios.
+- **Stage-specific kinetics** — proof fermentation runs ~15% faster than bulk (`PROOF_KINETICS_FACTOR = 1.15`) due to shaped-dough surface area; each flour now carries its own `proofFermentMult`.
+- **Fermentation philosophy → timing** — `FlavorDevelopment` philosophy now scales `proofMin/Max` ×1.2 and `coldRetardMin/Max` ×1.25, reflecting deliberately slower fermentation.
+- **`TempBand` boundary fix** — temperature band thresholds were misaligned at boundaries; corrected.
+- **Rye + open crumb guard** — high-rye doughs can't realistically achieve open crumb; the UI now blocks this invalid combination.
+- **Hydration band edge case fixes** — edge values at band boundaries now handled consistently.
+- **`fridgeTempC` out-of-range warning** — added validation; previously silent bad inputs could break the cold retard model.
+- **Warning threshold and message fixes** — several warnings fired at wrong thresholds or with misleading text.
+
+### Uncertainty & Confidence Ranges (A6)
+- **`RangedValue` type** — `absorptionCoeff`, `fermentMult`, and `proofFermentMult` in `FLOUR_PROPERTIES` are now `{ value, low, high }` instead of plain scalars. Per-flour uncertainty: BreadFlour/AP ±5%, WholeWheat ±10%, Spelt/Einkorn ±15%, Rye ±20%.
+- **Range propagation** — `calcFormula` exposes `blendAbsorptionRange` and `blendFermentMultRange`; `calcTiming` uses the bounds to widen `bulkMinRange/bulkMaxRange/proofMinRange`.
+- **Assumptions drawer** — blend coefficients now display as `"1.120 (1.008–1.232)"` with a timing confidence note.
+
+### i18n & UX
+- Added missing/hardcoded i18n strings across all locales (`en`, `es`, `sv`).
+- Added timing output disclaimers.
+- Cleaned up dead code and inconsistent rounding.
+
+### Infrastructure
+- **34-test suite added** (`src/lib/calculator.test.ts`) — covers `calcFormula`, `calcTiming`, `calcAssumptions`, all flour types, and edge cases (all-rye, high hydration, cold retard). All 34 pass.
+- **Vitest config separated** — moved to `vitest.config.ts` to avoid `svelte-check` type conflict with `vite.config.ts`.
+
+---
 
 ## License
 

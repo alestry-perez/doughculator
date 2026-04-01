@@ -170,12 +170,17 @@
 	}
 
 	function onAmbientInput(e: Event) {
-		const val = parseFloat((e.target as HTMLInputElement).value);
-		if (!isNaN(val)) updateTemp('ambientTempC', val);
+		const input = e.target as HTMLInputElement;
+		let val = parseFloat(input.value);
+		if (!isNaN(val)) {
+			val = Math.min(tempMax, Math.max(tempMin, val));
+			updateTemp('ambientTempC', val);
+		}
 	}
 
 	function onDoughInput(e: Event) {
-		const raw = (e.target as HTMLInputElement).value;
+		const input = e.target as HTMLInputElement;
+		const raw = input.value;
 		if (raw === '') {
 			inputs.update((prev) => {
 				const next = { ...prev, doughTempC: null };
@@ -187,8 +192,11 @@
 				};
 			});
 		} else {
-			const val = parseFloat(raw);
-			if (!isNaN(val)) updateTemp('doughTempC', val);
+			let val = parseFloat(raw);
+			if (!isNaN(val)) {
+				val = Math.min(tempMax, Math.max(tempMin, val));
+				updateTemp('doughTempC', val);
+			}
 		}
 	}
 
@@ -206,12 +214,45 @@
 	}
 
 	function onFridgeTempInput(e: Event) {
-		const val = parseFloat((e.target as HTMLInputElement).value);
-		if (!isNaN(val)) updateTemp('fridgeTempC', val);
+		let val = parseFloat((e.target as HTMLInputElement).value);
+		if (!isNaN(val)) {
+			val = Math.min(fridgeTempMax, Math.max(fridgeTempMin, val));
+			updateTemp('fridgeTempC', val);
+		}
 	}
 
 	function clampPct(v: number) {
 		return Math.max(0, Math.min(100, v));
+	}
+
+	const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+	function trapFocus(node: HTMLElement, open: boolean) {
+		if (!open) return;
+		const focusables = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE));
+		if (focusables.length) focusables[0].focus();
+
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === 'Escape') {
+				philosophyModalOpen = false;
+				autolyseModalOpen = false;
+				return;
+			}
+			if (e.key !== 'Tab') return;
+			const first = focusables[0];
+			const last = focusables[focusables.length - 1];
+			if (e.shiftKey) {
+				if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+			} else {
+				if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+			}
+		}
+		node.addEventListener('keydown', onKeyDown);
+		return { destroy() { node.removeEventListener('keydown', onKeyDown); } };
+	}
+
+	function useTrapFocus(node: HTMLElement) {
+		return trapFocus(node, true);
 	}
 
 	const tempMin = $derived($inputs.tempUnit === 'F' ? 32 : 0);
@@ -668,6 +709,7 @@
 			role="dialog"
 			aria-modal="true"
 			aria-labelledby="philosophy-modal-title"
+			use:useTrapFocus
 		>
 			<!-- Header -->
 			<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
@@ -725,6 +767,7 @@
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="autolyse-modal-title"
+				use:useTrapFocus
 			>
 				<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
 					<h2 id="autolyse-modal-title" class="text-base font-semibold text-base-content">{t.autolyseModalTitle}</h2>

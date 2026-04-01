@@ -112,8 +112,9 @@ export const warningStrings = {
     ryeHighWarning: 'High rye (>30%) — fermentation may be faster than predicted. Watch your dough closely.',
     dangerOpenCrumbRye: 'Open crumb + high rye (>60%) is physically unrealistic. Rye lacks the gluten structure needed for an open crumb. Choose a tighter crumb goal or reduce rye.',
     warnStarterHydrationClamped: 'Starter hydration was outside the accepted range (50–200%) and has been clamped. Timing and hydration calculations used the clamped value.',
-    warnFridgeTempUnused: 'Your fridge temperature setting is not currently used in cold retard timing. Duration is estimated at 8–16 hours regardless of fridge temp.',
     dangerSubZeroTemp: 'Temperature at or below 0°C — fermentation will be completely halted. Check your temperature inputs.',
+    negativeWater: 'Warning: Starter water exceeds total water needed. Reduce inoculation or increase hydration.',
+    minFlourAmount: 'Minimum flour amount is 100g.',
   },
   es: {
     dangerLow: 'Temperatura peligrosamente baja — fermentación casi inactiva. Considera un lugar más cálido.',
@@ -128,8 +129,9 @@ export const warningStrings = {
     ryeHighWarning: 'Centeno alto (>30%) — la fermentación puede ser más rápida de lo previsto. Vigila tu masa de cerca.',
     dangerOpenCrumbRye: 'Miga abierta + centeno alto (>60%) no es realista. El centeno carece de la estructura de gluten necesaria para una miga abierta. Elige una meta de miga más cerrada o reduce el centeno.',
     warnStarterHydrationClamped: 'La hidratación del iniciador estaba fuera del rango aceptado (50–200%) y ha sido ajustada. Los cálculos usaron el valor ajustado.',
-    warnFridgeTempUnused: 'Tu ajuste de temperatura de nevera no se usa actualmente en los tiempos de fermentación en frío. La duración se estima en 8–16 horas independientemente de la temperatura.',
     dangerSubZeroTemp: 'Temperatura igual o inferior a 0°C — la fermentación estará completamente detenida. Revisa tus valores de temperatura.',
+    negativeWater: 'Advertencia: El agua del fermento excede el agua total necesaria. Reduzca la inoculación o aumente la hidratación.',
+    minFlourAmount: 'La cantidad mínima de harina es 100g.',
   },
   sv: {
     dangerLow: 'Degens temperatur farligt låg — jäsningen nästan inaktiv. Överväg en varmare plats.',
@@ -144,8 +146,9 @@ export const warningStrings = {
     ryeHighWarning: 'Hög rågandel (>30%) — jäsningen kan gå snabbare än beräknat. Övervaka degen noga.',
     dangerOpenCrumbRye: 'Öppen smulstruktur + hög rågandel (>60%) är fysiskt orealistiskt. Råg saknar den glutenstruktur som krävs för öppen smula. Välj ett tätare mål eller minska rågen.',
     warnStarterHydrationClamped: 'Surdeghydratation var utanför godkänt intervall (50–200%) och har justerats. Beräkningar använde det justerade värdet.',
-    warnFridgeTempUnused: 'Din kylskåpsinställning används inte i beräkning av kalljäsningstiden. Varaktigheten beräknas till 8–16 timmar oavsett kyltemperatur.',
     dangerSubZeroTemp: 'Temperatur vid eller under 0°C — jäsningen är helt stillastående. Kontrollera dina temperaturinmatningar.',
+    negativeWater: 'Varning: Starterns vatten överstiger det totala vattenbehovet. Minska inokulationen eller öka hydrationen.',
+    minFlourAmount: 'Minsta mjölmängd är 100g.',
   },
 };
 
@@ -368,7 +371,7 @@ const en = {
     },
   } as Record<string, {description: string; underFermented: string; overFermented: string}>,
   floatTest: 'Float test:',
-  floatTestDesc: 'Drop a small piece of dough in water — if it floats, bulk is done.',
+  floatTestDesc: 'The float test checks if your starter/levain is ready — a spoonful of ripe starter should float in water. This test is for starter readiness, not bulk dough.',
   pokeTest: 'Poke test:',
   pokeTestDesc: 'Poke proofed dough — slow, partial spring-back = ready to bake.',
   jiggleTest: 'Jiggle test:',
@@ -379,8 +382,8 @@ const en = {
   done: 'Done',
   // TempBand / HydrationBand display
   tempBands: {
+    VeryCold: 'Very Cold',
     Cold: 'Cold',
-    Freezing: 'Freezing',
     Standard: 'Standard',
     Warm: 'Warm',
     Hot: 'Hot',
@@ -389,7 +392,17 @@ const en = {
     Low: 'Low',
     Medium: 'Medium',
     High: 'High',
+    VeryHigh: 'Very High',
   } as Record<string, string>,
+  scheduleComplete: 'Press to mark completed step',
+  timingDisclaimer: 'Timing estimates are approximate (±30-60 min). Observe your dough, not just the clock.',
+  preFermentedFlour: 'pre-fermented flour',
+  flourBreadFlour: 'Bread Flour',
+  flourAllPurpose: 'All-Purpose',
+  flourWholeWheat: 'Whole Wheat',
+  flourRye: 'Rye',
+  flourSpelt: 'Spelt',
+  flourEinkorn: 'Einkorn',
 };
 
 export type Translations = typeof en;
@@ -556,7 +569,7 @@ const es: Translations = {
     },
   } as Record<string, {description: string; underFermented: string; overFermented: string}>,
   floatTest: 'Prueba de flotación:',
-  floatTestDesc: 'Suelta un trozo de masa en agua — si flota, la fermentación en masa terminó.',
+  floatTestDesc: 'La prueba de flotación comprueba si tu masa madre está lista — una cucharada de masa madre madura debe flotar en agua. Esta prueba es para la madurez del fermento, no para la masa en bulk.',
   pokeTest: 'Prueba del dedo:',
   pokeTestDesc: 'Presiona la masa fermentada — si recupera lento y parcialmente, está lista para hornear.',
   jiggleTest: 'Prueba del temblor:',
@@ -567,8 +580,8 @@ const es: Translations = {
   done: 'Listo',
   // TempBand / HydrationBand display
   tempBands: {
+    VeryCold: 'Muy frío',
     Cold: 'Frío',
-    Freezing: 'Muy frío',
     Standard: 'Estándar',
     Warm: 'Cálido',
     Hot: 'Caliente',
@@ -577,7 +590,17 @@ const es: Translations = {
     Low: 'Baja',
     Medium: 'Media',
     High: 'Alta',
+    VeryHigh: 'Muy Alta',
   } as Record<string, string>,
+  scheduleComplete: 'Pulsa para marcar el paso como completado',
+  timingDisclaimer: 'Los tiempos son aproximados (±30-60 min). Observe su masa, no solo el reloj.',
+  preFermentedFlour: 'harina prefermentada',
+  flourBreadFlour: 'Harina de Fuerza',
+  flourAllPurpose: 'Harina Normal',
+  flourWholeWheat: 'Harina Integral',
+  flourRye: 'Centeno',
+  flourSpelt: 'Espelta',
+  flourEinkorn: 'Escanda',
 };
 
 const sv: Translations = {
@@ -738,7 +761,7 @@ const sv: Translations = {
     },
   } as Record<string, {description: string; underFermented: string; overFermented: string}>,
   floatTest: 'Flottesttest:',
-  floatTestDesc: 'Släpp en liten degbit i vatten — om den flyter är bulkjäsningen klar.',
+  floatTestDesc: 'Flottesttestet kontrollerar om din surdeg är redo — en sked mogen surdeg ska flyta i vatten. Det här testet gäller surdegsmognad, inte bulkdegen.',
   pokeTest: 'Stickprov:',
   pokeTestDesc: 'Tryck på den jästa degen — långsam, delvis återfjädring = redo att baka.',
   jiggleTest: 'Skakprov:',
@@ -749,8 +772,8 @@ const sv: Translations = {
   done: 'Klar',
   // TempBand / HydrationBand display
   tempBands: {
+    VeryCold: 'Mycket kallt',
     Cold: 'Kallt',
-    Freezing: 'Mycket kallt',
     Standard: 'Standard',
     Warm: 'Varmt',
     Hot: 'Hett',
@@ -759,7 +782,17 @@ const sv: Translations = {
     Low: 'Låg',
     Medium: 'Medium',
     High: 'Hög',
+    VeryHigh: 'Mycket Hög',
   } as Record<string, string>,
+  scheduleComplete: 'Tryck för att markera steget som klart',
+  timingDisclaimer: 'Tidsuppskattningar är ungefärliga (±30-60 min). Observera din deg, inte bara klockan.',
+  preFermentedFlour: 'förjäst mjöl',
+  flourBreadFlour: 'Vetemjöl',
+  flourAllPurpose: 'Vetmjöl',
+  flourWholeWheat: 'Fullkornsmjöl',
+  flourRye: 'Rågmjöl',
+  flourSpelt: 'Dinkelmjöl',
+  flourEinkorn: 'Enkornsmjöl',
 };
 
 export const translations: Record<Lang, Translations> = {en, es, sv};

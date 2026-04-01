@@ -1,8 +1,11 @@
 <script lang="ts">
 	import type { TimingResult, FormulaResult } from '$lib/calculator';
 	import { formatMins } from '$lib/calculator';
-	import { lang } from '$lib/store';
+	import { lang, inputs } from '$lib/store';
 	import { translations } from '$lib/i18n';
+
+	const ACTIVE_TIME_BASE_MIN = 85; // mixing + shaping + scoring + bake
+	const ACTIVE_TIME_BASE_MAX = 95;
 
 	const t = $derived(translations[$lang]);
 
@@ -24,7 +27,7 @@
 	// Map temp band to daisyUI badge variant
 	const tempBandVariant: Record<string, string> = {
 		Cold: 'badge-info',
-		Freezing: 'badge-info',
+		VeryCold: 'badge-info',
 		Standard: 'badge-success',
 		Warm: 'badge-warning',
 		Hot: 'badge-error'
@@ -34,7 +37,8 @@
 	const hydrationBandVariant: Record<string, string> = {
 		Low: 'badge-warning',
 		Medium: 'badge-success',
-		High: 'badge-info'
+		High: 'badge-info',
+		VeryHigh: 'badge-error'
 	};
 
 	// Progress value (0–100) for bulk fermentation bars
@@ -64,7 +68,7 @@
 		<!-- Badges -->
 		<div class="flex flex-wrap gap-2">
 			<span class="badge badge-soft {tempBandVariant[formula.tempBand] ?? 'badge-ghost'} badge-md font-medium">
-				{t.tempBands[formula.tempBand]} ({formula.effectiveTempC.toFixed(1)}°C)
+				{t.tempBands[formula.tempBand]} ({$inputs.tempUnit === 'F' ? ((formula.effectiveTempC * 9/5) + 32).toFixed(1) + '°F' : formula.effectiveTempC.toFixed(1) + '°C'})
 			</span>
 			<span class="badge badge-soft {hydrationBandVariant[formula.hydrationBand] ?? 'badge-ghost'} badge-md font-medium">
 				{t.hydrationBands[formula.hydrationBand]} {t.hydration} ({formula.finalHydrationPct.toFixed(1)}%)
@@ -126,12 +130,12 @@
 		<div class="rounded-xl bg-secondary/10 ring-1 ring-secondary/20 px-4 py-3 text-sm">
 			<span class="text-base-content/70">{t.totalActiveTime}</span>
 			<span class="font-bold text-base-content ml-1">
-				{formatMins((timing.bulkMin + (proofMethod === 'Room' ? timing.proofMin : timing.coldRetardMin)) * 60 + 85)} –
-				{formatMins((timing.bulkMax + (proofMethod === 'Room' ? timing.proofMax : timing.coldRetardMax)) * 60 + 95)}
+				{formatMins((timing.bulkMin + (proofMethod === 'Room' ? timing.proofMin : timing.coldRetardMin)) * 60 + ACTIVE_TIME_BASE_MIN)} –
+				{formatMins((timing.bulkMax + (proofMethod === 'Room' ? timing.proofMax : timing.coldRetardMax)) * 60 + ACTIVE_TIME_BASE_MAX)}
 			</span>
 		</div>
 
-		<p class="text-xs text-base-content/50 text-center">Timing estimates are accurate to ±30–60 min.</p>
+		<p class="text-xs text-base-content/50 text-center">{t.timingDisclaimer}</p>
 	</div>
 </div>
 
