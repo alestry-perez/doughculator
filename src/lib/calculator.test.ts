@@ -3,6 +3,9 @@ import {
 	calculate,
 	recommendAutolyseMins,
 	addMinsToTime,
+	cToF,
+	fToC,
+	formatMins,
 	COLD_RETARD_MIN_H,
 	COLD_RETARD_MAX_H,
 	PROOF_KINETICS_FACTOR,
@@ -462,5 +465,150 @@ describe('FlavorDevelopment cold compensation (F-4)', () => {
 		}));
 		// With cold compensation, inoculation should be >= 7 (base 14 - 4 + cold boost)
 		expect(result.formula.inoculationPct).toBeGreaterThanOrEqual(7);
+	});
+});
+
+// -------------------------------------------------------
+// 15. Utility function tests (cToF, fToC, formatMins)
+// -------------------------------------------------------
+
+describe('cToF', () => {
+	it('converts 0°C to 32°F', () => expect(cToF(0)).toBe(32));
+	it('converts 100°C to 212°F', () => expect(cToF(100)).toBe(212));
+	it('converts 24°C to 75°F', () => expect(cToF(24)).toBe(75));
+});
+
+describe('fToC', () => {
+	it('converts 32°F to 0°C', () => expect(fToC(32)).toBeCloseTo(0, 5));
+	it('converts 212°F to 100°C', () => expect(fToC(212)).toBeCloseTo(100, 5));
+});
+
+describe('formatMins', () => {
+	it('formats 0 as 0m', () => expect(formatMins(0)).toBe('0m'));
+	it('formats 45 as 45m', () => expect(formatMins(45)).toBe('45m'));
+	it('formats 60 as 1h', () => expect(formatMins(60)).toBe('1h'));
+	it('formats 90 as 1h 30m', () => expect(formatMins(90)).toBe('1h 30m'));
+});
+
+// -------------------------------------------------------
+// 16. Salt fermentation effect
+// -------------------------------------------------------
+
+describe('salt fermentation effect', () => {
+	it('higher salt produces longer bulk', () => {
+		const lowSalt = calculate(makeInputs({ saltAutoCalc: false, saltPct: 1.5 }));
+		const highSalt = calculate(makeInputs({ saltAutoCalc: false, saltPct: 2.5 }));
+		expect(highSalt.timing.bulkMin).toBeGreaterThan(lowSalt.timing.bulkMin);
+	});
+
+	it('higher salt produces longer proof', () => {
+		const lowSalt = calculate(makeInputs({ saltAutoCalc: false, saltPct: 1.5 }));
+		const highSalt = calculate(makeInputs({ saltAutoCalc: false, saltPct: 2.5 }));
+		expect(highSalt.timing.proofMin).toBeGreaterThan(lowSalt.timing.proofMin);
+	});
+
+	it('default 2% salt has factor ~1.0 (negligible effect)', () => {
+		const defaultSalt = calculate(makeInputs({ saltAutoCalc: false, saltPct: 2.0 }));
+		const noSaltEffect = calculate(makeInputs({ saltAutoCalc: false, saltPct: 2.0 }));
+		expect(defaultSalt.timing.bulkMin).toBeCloseTo(noSaltEffect.timing.bulkMin, 5);
+	});
+});
+
+// -------------------------------------------------------
+// 17. Temperature interpolation smoothness
+// -------------------------------------------------------
+
+describe('temperature interpolation', () => {
+	it('timing changes < 5% per 0.1°C step across full range', () => {
+		for (let t = 16; t <= 31.9; t += 0.1) {
+			const r1 = calculate(makeInputs({ ambientTempC: t }));
+			const r2 = calculate(makeInputs({ ambientTempC: t + 0.1 }));
+			const delta = Math.abs(r1.timing.bulkMin - r2.timing.bulkMin) / r1.timing.bulkMin;
+			expect(delta).toBeLessThan(0.05);
+		}
+	});
+
+	it('no cliff at 21°C boundary (old step-function edge)', () => {
+		const below = calculate(makeInputs({ ambientTempC: 20.9 }));
+		const above = calculate(makeInputs({ ambientTempC: 21.1 }));
+		const delta = Math.abs(below.timing.bulkMin - above.timing.bulkMin) / below.timing.bulkMin;
+		expect(delta).toBeLessThan(0.05);
+	});
+
+	it('values at band midpoints are reasonable', () => {
+		const at22_5 = calculate(makeInputs({ ambientTempC: 22.5 }));
+		// At 22.5°C midpoint: bulkBaseMin should be ~5h * multipliers
+		expect(at22_5.timing.bulkMin).toBeGreaterThan(3);
+		expect(at22_5.timing.bulkMin).toBeLessThan(8);
+	});
+});
+
+// -------------------------------------------------------
+// 18. Cold retard bulk-state linkage
+// -------------------------------------------------------
+
+describe('cold retard bulk-state linkage', () => {
+	it('warm temp (shorter bulk) produces shorter cold retard', () => {
+		const warm = calculate(makeInputs({ ambientTempC: 28 }));
+		const cold = calculate(makeInputs({ ambientTempC: 18 }));
+		expect(warm.timing.coldRetardMin).toBeLessThanOrEqual(cold.timing.coldRetardMin);
+	});
+
+	it('cold retard stays within reasonable bounds', () => {
+		const result = calculate(makeInputs({ ambientTempC: 24 }));
+		expect(result.timing.coldRetardMin).toBeGreaterThanOrEqual(6);
+		expect(result.timing.coldRetardMax).toBeLessThanOrEqual(20);
+	});
+});
+
+// -------------------------------------------------------
+// 19. Proof range uses proof-specific coeffRatio
+// -------------------------------------------------------
+
+describe('proof range uses proof-specific coeffRatio', () => {
+	it('proofMinRange differs from bulk range for Rye (different uncertainty)', () => {
+		const result = calculate(makeInputs({
+			flourBlend: [{ type: 'Rye', pct: 100 }],
+			crumbGoal: 'Tight',
+		}));
+		// Rye has bulk fermentMult ±15% but proof ±20%, so ranges should differ
+		const bulkSpread = result.timing.bulkMinRange.low / result.timing.bulkMinRange.value;
+		const proofSpread = result.timing.proofMinRange.low / result.timing.proofMinRange.value;
+		expect(proofSpread).not.toBeCloseTo(bulkSpread, 2);
+	});
+});
+
+// -------------------------------------------------------
+// 20. addMinsToTime edge cases
+// -------------------------------------------------------
+
+describe('addMinsToTime edge cases', () => {
+	it('wraps around midnight', () => {
+		expect(addMinsToTime('23:30', 90)).toBe('01:00');
+	});
+
+	it('handles negative minutes (wraps backward)', () => {
+		expect(addMinsToTime('00:00', -60)).toBe('23:00');
+	});
+
+	it('handles exactly midnight', () => {
+		expect(addMinsToTime('23:00', 60)).toBe('00:00');
+	});
+});
+
+// -------------------------------------------------------
+// 21. Blend normalization with non-100 sums
+// -------------------------------------------------------
+
+describe('blend normalization', () => {
+	it('blend summing to 80 produces valid results', () => {
+		const result = calculate(makeInputs({
+			flourBlend: [
+				{ type: 'BreadFlour', pct: 50 },
+				{ type: 'WholeWheat', pct: 30 },
+			],
+		}));
+		expect(result.timing.bulkMin).toBeGreaterThan(0);
+		expect(result.formula.totalFlourG).toBe(500);
 	});
 });

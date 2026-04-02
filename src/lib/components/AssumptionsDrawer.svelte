@@ -17,7 +17,7 @@
 		type="button"
 		class="fixed inset-0 z-40 bg-neutral/40 backdrop-blur-sm"
 		onclick={close}
-		aria-label="Close assumptions drawer"
+		aria-label={t.ariaLabels.closeAssumptionsDrawer}
 	></button>
 
 	<!-- Drawer panel (bottom sheet) -->
@@ -33,7 +33,7 @@
 				type="button"
 				onclick={close}
 				class="btn btn-ghost btn-sm btn-circle"
-				aria-label="Close"
+				aria-label={t.ariaLabels.closeButton}
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

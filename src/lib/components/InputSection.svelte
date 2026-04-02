@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Inputs, CrumbGoal, FermentationPhilosophy, FlourType, FlourBlendEntry } from '$lib/calculator';
 	import { cToF, fToC, recommendAutolyseMins, WHOLE_GRAIN_FLOURS, ALL_FLOUR_TYPES } from '$lib/calculator';
-	import { inputs, result, lang } from '$lib/store';
+	import { inputs, result, lang, showBakingProfile, showFineTuning } from '$lib/store';
 	import { translations } from '$lib/i18n';
 
 	const t = $derived(translations[$lang]);
@@ -268,19 +268,9 @@
 </script>
 
 <div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden">
-	<!-- Header row with title and C/F toggle -->
-	<div class="flex items-center justify-between px-5 pt-5 pb-3">
+	<!-- Header -->
+	<div class="px-5 pt-5 pb-3">
 		<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.parameters}</h2>
-		<button
-			type="button"
-			onclick={toggleUnit}
-			class="btn btn-ghost btn-sm rounded-full border border-base-300 bg-base-100"
-			aria-label="Toggle temperature unit"
-		>
-			<span class={$inputs.tempUnit === 'C' ? 'text-secondary font-semibold' : 'text-base-content/50'}>°C</span>
-			<span class="text-base-content/30">/</span>
-			<span class={$inputs.tempUnit === 'F' ? 'text-secondary font-semibold' : 'text-base-content/50'}>°F</span>
-		</button>
 	</div>
 
 	<div class="px-5 pb-5 space-y-5">
@@ -321,8 +311,8 @@
 				{/each}
 			</div>
 
-			<!-- Selected flour percentage inputs -->
-			{#if $inputs.flourBlend.length > 0}
+			<!-- Selected flour percentage inputs (only shown for multi-flour blends) -->
+			{#if $inputs.flourBlend.length > 1}
 				<div class="mt-3 space-y-2">
 					{#each $inputs.flourBlend as entry (entry.type)}
 						<div class="flex items-center gap-2">
@@ -391,152 +381,198 @@
 			{/if}
 		</div>
 
-		<!-- Crumb goal -->
-		<div>
-			<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.crumbGoal}</p>
-			<div class="grid grid-cols-3 gap-2">
-				{#each crumbGoals as goal}
-					<button
-						type="button"
-						onclick={() => updateField('crumbGoal', goal)}
-						class="btn btn-sm rounded-xl border-2 flex-col h-auto py-3 px-2
-							{$inputs.crumbGoal === goal
-								? 'btn-secondary border-secondary text-secondary-content'
-								: 'btn-ghost border-base-300'}"
-					>
-						<span class="text-sm font-bold">{t.crumbGoalNames[goal]}</span>
-					</button>
-				{/each}
-			</div>
-			<p class="text-xs text-base-content/70 mt-2 leading-snug">{t.crumbDescriptions[$inputs.crumbGoal]}</p>
-		</div>
-
-		<!-- Fermentation philosophy -->
-		<div>
-			<div class="flex items-center gap-1.5 mb-2">
-				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fermentationPhilosophyLabel}</p>
+		<!-- Tier 1: Kitchen temp (moved from advanced — most impactful variable) -->
+		<div class="form-control">
+			<div class="flex items-center justify-between mb-1">
+				<label for="ambient-temp">
+					<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.kitchenTemp} (°{$inputs.tempUnit})</span>
+				</label>
 				<button
 					type="button"
-					onclick={() => (philosophyModalOpen = true)}
-					class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
-					aria-label="Learn about fermentation philosophy options"
+					onclick={toggleUnit}
+					class="btn btn-ghost btn-xs rounded-full border border-base-300 bg-base-100"
+					aria-label={t.ariaLabels.toggleTempUnit}
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-						<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-					</svg>
+					<span class={$inputs.tempUnit === 'C' ? 'text-secondary font-semibold' : 'text-base-content/50'}>°C</span>
+					<span class="text-base-content/30">/</span>
+					<span class={$inputs.tempUnit === 'F' ? 'text-secondary font-semibold' : 'text-base-content/50'}>°F</span>
 				</button>
 			</div>
-			<div class="grid grid-cols-2 gap-2">
-			{#each (['Predictability', 'FlavorDevelopment'] as const) as philosophy}
-				<button
-					type="button"
-					onclick={() => updateField('fermentationPhilosophy', philosophy)}
-					class="btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3
-						{$inputs.fermentationPhilosophy === philosophy
-							? 'btn-secondary border-secondary text-secondary-content'
-							: 'btn-ghost border-base-300'}"
-				>
-					{philosophy === 'Predictability' ? t.philosophyPredictability : t.philosophyFlavorDev}
-				</button>
-			{/each}
+			<input
+				id="ambient-temp"
+				type="number"
+				min={tempMin}
+				max={tempMax}
+				step="0.5"
+				value={ambientDisplay}
+				oninput={onAmbientInput}
+				class="input input-bordered w-full"
+			/>
 		</div>
-			<p class="text-xs text-base-content/70 mt-2 leading-snug">
-				{$inputs.fermentationPhilosophy === 'Predictability' ? t.philosophyPredictabilityDesc : t.philosophyFlavorDevDesc}
-			</p>
-		</div>
+	</div>
 
-		<!-- Proof method -->
-		<div>
-			<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.proofMethod}</p>
-			<div class="grid grid-cols-2 gap-2">
-				{#each (['Room', 'ColdRetard'] as const) as method}
+	<!-- Tier 2: Baking Profile (collapsible, default open) -->
+	<div class="border-t border-base-200">
+		<button
+			type="button"
+			onclick={() => showBakingProfile.update(v => !v)}
+			class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"
+		>
+			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.bakingProfile}</span>
+			<svg
+				class="w-4 h-4 text-base-content/40 transition-transform {$showBakingProfile ? 'rotate-180' : ''}"
+				xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+			>
+				<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+			</svg>
+		</button>
+
+		{#if $showBakingProfile}
+		<div class="px-5 pb-5 space-y-5">
+			<!-- Crumb goal -->
+			<div>
+				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.crumbGoal}</p>
+				<div class="grid grid-cols-3 gap-2">
+					{#each crumbGoals as goal}
+						<button
+							type="button"
+							onclick={() => updateField('crumbGoal', goal)}
+							class="btn btn-sm rounded-xl border-2 flex-col h-auto py-3 px-2
+								{$inputs.crumbGoal === goal
+									? 'btn-secondary border-secondary text-secondary-content'
+									: 'btn-ghost border-base-300'}"
+						>
+							<span class="text-sm font-bold">{t.crumbGoalNames[goal]}</span>
+						</button>
+					{/each}
+				</div>
+				<p class="text-xs text-base-content/70 mt-2 leading-snug">{t.crumbDescriptions[$inputs.crumbGoal]}</p>
+			</div>
+
+			<!-- Fermentation philosophy -->
+			<div>
+				<div class="flex items-center gap-1.5 mb-2">
+					<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fermentationPhilosophyLabel}</p>
 					<button
 						type="button"
-						onclick={() => updateField('proofMethod', method)}
+						onclick={() => (philosophyModalOpen = true)}
+						class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+						aria-label={t.ariaLabels.learnFermentationPhilosophy}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
+				<div class="grid grid-cols-2 gap-2">
+				{#each (['Predictability', 'FlavorDevelopment'] as const) as philosophy}
+					<button
+						type="button"
+						onclick={() => updateField('fermentationPhilosophy', philosophy)}
 						class="btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3
-							{$inputs.proofMethod === method
+							{$inputs.fermentationPhilosophy === philosophy
 								? 'btn-secondary border-secondary text-secondary-content'
 								: 'btn-ghost border-base-300'}"
 					>
-						{method === 'Room' ? t.roomTemp : t.coldRetard}
+						{philosophy === 'Predictability' ? t.philosophyPredictability : t.philosophyFlavorDev}
 					</button>
 				{/each}
 			</div>
+				<p class="text-xs text-base-content/70 mt-2 leading-snug">
+					{$inputs.fermentationPhilosophy === 'Predictability' ? t.philosophyPredictabilityDesc : t.philosophyFlavorDevDesc}
+				</p>
+			</div>
+
+			<!-- Proof method + nested fridge temp -->
+			<div>
+				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.proofMethod}</p>
+				<div class="grid grid-cols-2 gap-2">
+					{#each (['Room', 'ColdRetard'] as const) as method}
+						<button
+							type="button"
+							onclick={() => updateField('proofMethod', method)}
+							class="btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3
+								{$inputs.proofMethod === method
+									? 'btn-secondary border-secondary text-secondary-content'
+									: 'btn-ghost border-base-300'}"
+						>
+							{method === 'Room' ? t.roomTemp : t.coldRetard}
+						</button>
+					{/each}
+				</div>
+				{#if $inputs.proofMethod === 'ColdRetard'}
+					<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20">
+						<label for="fridge-temp" class="label">
+							<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fridgeTemp} (°{$inputs.tempUnit})</span>
+						</label>
+						<input
+							id="fridge-temp"
+							type="number"
+							min={fridgeTempMin}
+							max={fridgeTempMax}
+							step="0.5"
+							value={fridgeDisplay}
+							oninput={onFridgeTempInput}
+							class="input input-bordered w-full"
+						/>
+					</div>
+				{/if}
+			</div>
+
+			<!-- Schedule mode + nested start time -->
+			<div>
+				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.scheduleMode}</p>
+				<div class="grid grid-cols-2 gap-2">
+					{#each (['relative', 'clock'] as const) as mode}
+						<button
+							type="button"
+							onclick={() => updateField('scheduleMode', mode)}
+							class="btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3
+								{$inputs.scheduleMode === mode
+									? 'btn-secondary border-secondary text-secondary-content'
+									: 'btn-ghost border-base-300'}"
+						>
+							{mode === 'relative' ? t.relative : t.clock}
+						</button>
+					{/each}
+				</div>
+				{#if $inputs.scheduleMode === 'clock'}
+					<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20">
+						<label for="start-time" class="label">
+							<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.startTime}</span>
+						</label>
+						<input
+							id="start-time"
+							type="time"
+							value={$inputs.startTime ?? '08:00'}
+							oninput={(e) => updateField('startTime', (e.target as HTMLInputElement).value || null)}
+							class="input input-bordered w-full"
+						/>
+					</div>
+				{/if}
+			</div>
 		</div>
-
-		<!-- Fridge temp (only for cold retard) -->
-		{#if $inputs.proofMethod === 'ColdRetard'}
-			<div class="form-control">
-				<label for="fridge-temp" class="label">
-					<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fridgeTemp} (°{$inputs.tempUnit})</span>
-				</label>
-				<input
-					id="fridge-temp"
-					type="number"
-					min={fridgeTempMin}
-					max={fridgeTempMax}
-					step="0.5"
-					value={fridgeDisplay}
-					oninput={onFridgeTempInput}
-					class="input input-bordered w-full"
-				/>
-			</div>
 		{/if}
+	</div>
 
-		<!-- Schedule mode -->
-		<div>
-			<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.scheduleMode}</p>
-			<div class="grid grid-cols-2 gap-2">
-				{#each (['relative', 'clock'] as const) as mode}
-					<button
-						type="button"
-						onclick={() => updateField('scheduleMode', mode)}
-						class="btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3
-							{$inputs.scheduleMode === mode
-								? 'btn-secondary border-secondary text-secondary-content'
-								: 'btn-ghost border-base-300'}"
-					>
-						{mode === 'relative' ? t.relative : t.clock}
-					</button>
-				{/each}
-			</div>
-		</div>
+	<!-- Tier 3: Fine Tuning (collapsible, default closed) -->
+	<div class="border-t border-base-200">
+		<button
+			type="button"
+			onclick={() => showFineTuning.update(v => !v)}
+			class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"
+		>
+			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fineTuning}</span>
+			<svg
+				class="w-4 h-4 text-base-content/40 transition-transform {$showFineTuning ? 'rotate-180' : ''}"
+				xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+			>
+				<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+			</svg>
+		</button>
 
-		<!-- Start time (clock mode) -->
-		{#if $inputs.scheduleMode === 'clock'}
-			<div class="form-control">
-				<label for="start-time" class="label">
-					<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.startTime}</span>
-				</label>
-				<input
-					id="start-time"
-					type="time"
-					value={$inputs.startTime ?? '08:00'}
-					oninput={(e) => updateField('startTime', (e.target as HTMLInputElement).value || null)}
-					class="input input-bordered w-full"
-				/>
-			</div>
-		{/if}
-
-		<!-- Advanced options (always visible) -->
-		<div class="border-t border-base-200 pt-4 space-y-4">
-			<!-- Ambient temp -->
-			<div class="form-control">
-				<label for="ambient-temp" class="label">
-					<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.ambientTemp} (°{$inputs.tempUnit})</span>
-				</label>
-				<input
-					id="ambient-temp"
-					type="number"
-					min={tempMin}
-					max={tempMax}
-					step="0.5"
-					value={ambientDisplay}
-					oninput={onAmbientInput}
-					class="input input-bordered w-full"
-				/>
-			</div>
-
+		{#if $showFineTuning}
+		<div class="px-5 pb-5 space-y-4">
 			<!-- Dough temp (optional) -->
 			<div class="form-control">
 				<label for="dough-temp" class="label">
@@ -576,7 +612,7 @@
 							onchange={() => updateField('saltAutoCalc', !$inputs.saltAutoCalc)}
 							role="switch"
 							aria-checked={!$inputs.saltAutoCalc}
-							aria-label="Override salt"
+							aria-label={t.ariaLabels.overrideSalt}
 						/>
 						<span class="text-xs text-base-content/70">{t.saltOverride}</span>
 					</div>
@@ -614,7 +650,7 @@
 							onchange={() => updateField('starterHydrationAutoCalc', !$inputs.starterHydrationAutoCalc)}
 							role="switch"
 							aria-checked={!$inputs.starterHydrationAutoCalc}
-							aria-label="Override starter hydration"
+							aria-label={t.ariaLabels.overrideStarterHydration}
 						/>
 						<span class="text-xs text-base-content/70">{t.starterHydrationOverride}</span>
 					</div>
@@ -644,7 +680,7 @@
 							type="button"
 							onclick={() => (autolyseModalOpen = true)}
 							class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
-							aria-label="Learn about autolyse"
+							aria-label={t.ariaLabels.learnAutolyse}
 						>
 							<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
 								<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
@@ -662,7 +698,7 @@
 							onchange={toggleAutolyse}
 							role="switch"
 							aria-checked={$inputs.autolyseOn}
-							aria-label="Toggle autolyse auto mode"
+							aria-label={t.ariaLabels.toggleAutolyseAuto}
 						/>
 						<span class={$inputs.autolyseOn ? 'text-xs text-base-content/70 font-semibold' : 'text-xs text-base-content/40'}>
 							{t.auto}
@@ -679,7 +715,7 @@
 							class="progress progress-secondary progress-sm w-full"
 							value={autolyseProgressValue}
 							max={autolyseProgressMax}
-							aria-label="Autolyse duration progress"
+							aria-label={t.ariaLabels.autolyseDurationProgress}
 						></progress>
 						<div class="flex justify-between text-xs text-base-content/50 mt-0.5">
 							<span>{autolyseMinMins} min</span>
@@ -689,6 +725,7 @@
 				{/if}
 			</div>
 		</div>
+		{/if}
 	</div>
 </div>
 
@@ -700,7 +737,7 @@
 			type="button"
 			class="modal-backdrop"
 			onclick={() => (philosophyModalOpen = false)}
-			aria-label="Close fermentation philosophy modal"
+			aria-label={t.ariaLabels.closeFermentationPhilosophyModal}
 		></button>
 
 		<!-- Modal box -->
@@ -718,7 +755,7 @@
 					type="button"
 					onclick={() => (philosophyModalOpen = false)}
 					class="btn btn-ghost btn-sm btn-circle"
-					aria-label="Close"
+					aria-label={t.ariaLabels.closeButton}
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -759,7 +796,7 @@
 				type="button"
 				class="modal-backdrop"
 				onclick={() => (autolyseModalOpen = false)}
-				aria-label="Close autolyse info modal"
+				aria-label={t.ariaLabels.closeAutolyseModal}
 			></button>
 
 			<div
@@ -775,7 +812,7 @@
 						type="button"
 						onclick={() => (autolyseModalOpen = false)}
 						class="btn btn-ghost btn-sm btn-circle"
-						aria-label="Close"
+						aria-label={t.ariaLabels.closeButton}
 					>
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

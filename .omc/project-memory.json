@@ -140,6 +140,61 @@
       ]
     }
   },
-  "hotPaths": [],
+  "hotPaths": [
+    {
+      "path": "src/lib/i18n.ts",
+      "accessCount": 24,
+      "lastAccessed": 1775139644125,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 22,
+      "lastAccessed": 1775139969067,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 16,
+      "lastAccessed": 1775137831745,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/calculator.ts",
+      "accessCount": 9,
+      "lastAccessed": 1775138845176,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/store.ts",
+      "accessCount": 8,
+      "lastAccessed": 1775139657407,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/calculator.test.ts",
+      "accessCount": 6,
+      "lastAccessed": 1775137831160,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/FormulaCard.svelte",
+      "accessCount": 4,
+      "lastAccessed": 1775139180416,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/ScheduleCard.svelte",
+      "accessCount": 1,
+      "lastAccessed": 1775138808137,
+      "type": "file"
+    },
+    {
+      "path": "src/routes/+page.svelte",
+      "accessCount": 1,
+      "lastAccessed": 1775138984452,
+      "type": "file"
+    }
+  ],
   "userDirectives": []
 }

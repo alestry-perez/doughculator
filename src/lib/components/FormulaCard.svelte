@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { FormulaResult, FlourBlendEntry } from '$lib/calculator';
-	import { lang } from '$lib/store';
+	import { lang, showFullFormula } from '$lib/store';
 	import { translations } from '$lib/i18n';
 
 	const t = $derived(translations[$lang]);
@@ -21,93 +21,113 @@
 </script>
 
 <div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden">
-	<div class="px-5 pt-5 pb-3">
-		<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.formula}</h2>
-		<p class="text-xs text-base-content/50 mt-0.5">{t.bakersPctSubtitle}</p>
-	</div>
-
-	<table class="w-full text-sm">
-		<thead>
-			<tr class="border-b border-base-200">
-				<th class="text-left px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.ingredient}</th>
-				<th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.grams}</th>
-				<th class="text-right px-5 py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.bakersPct}</th>
-			</tr>
-		</thead>
-		<tbody class="divide-y divide-base-200">
-			<tr>
-				<td class="px-5 py-2.5 text-base-content font-medium">{t.totalFlourRow}</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalFlourG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">100%</td>
-			</tr>
-			{#each flourBlend as entry (entry.type)}
-				<tr class="bg-base-200/50">
-					<td class="px-5 py-2 text-base-content/70 text-xs pl-8">— {t.flourTypes[entry.type] ?? entry.type}</td>
-					<td class="px-5 py-2 text-right tabular-nums text-base-content/70 text-xs">{round(formula.totalFlourG * entry.pct / 100)}g</td>
-					<td class="px-5 py-2 text-right tabular-nums text-base-content/50 text-xs">{entry.pct}%</td>
-				</tr>
-			{/each}
-			<tr>
-				<td class="px-5 py-2.5 text-base-content font-medium">{t.water}</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalWaterG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">{formula.finalHydrationPct.toFixed(1)}%</td>
-			</tr>
-			<tr>
-				<td class="px-5 py-2.5 text-base-content font-medium">{t.saltRow}</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.saltG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">{pct(formula.saltG, formula.totalFlourG)}</td>
-			</tr>
-			<tr>
-				<td class="px-5 py-2.5 text-base-content font-medium">{t.starter}</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.starterTotalG)}g</td>
-				<td class="px-5 py-2.5 text-right tabular-nums text-base-content/70">
-					{pct(formula.starterFlourG, formula.totalFlourG)}
-					<span class="text-[10px] text-base-content/40 block leading-tight">{t.preFermentedFlour}</span>
-				</td>
-			</tr>
-		</tbody>
-		<tfoot>
-			<tr class="border-t-2 border-secondary/30 bg-secondary/10">
-				<td class="px-5 py-3 font-bold text-secondary">{t.totalDough}</td>
-				<td class="px-5 py-3 text-right tabular-nums font-bold text-secondary">{round(formula.totalDoughWeightG)}g</td>
-				<td class="px-5 py-3 text-right"></td>
-			</tr>
-		</tfoot>
-	</table>
-
-	<!-- Starter breakdown -->
-	<div class="px-5 py-4 border-t border-base-200 bg-base-200/60">
-		<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.starterBreakdown}</p>
-		<div class="grid grid-cols-3 gap-3 text-sm">
-			<div class="text-center">
-				<div class="text-lg font-bold tabular-nums text-base-content">{round(formula.starterFlourG)}g</div>
-				<div class="text-xs text-base-content/70 mt-0.5">{t.starterFlour}</div>
-			</div>
-			<div class="text-center">
-				<div class="text-lg font-bold tabular-nums text-base-content">{round(formula.starterWaterG)}g</div>
-				<div class="text-xs text-base-content/70 mt-0.5">{t.starterWater}</div>
-			</div>
-			<div class="text-center">
-				<div class="text-lg font-bold tabular-nums text-accent">{round(formula.starterTotalG)}g</div>
-				<div class="text-xs text-base-content/70 mt-0.5">{t.totalStarter}</div>
-			</div>
+	<!-- Header with title + dough weight badge -->
+	<div class="flex items-center justify-between px-5 pt-5 pb-3">
+		<div>
+			<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.formula}</h2>
+			<p class="text-xs text-base-content/50 mt-0.5">{t.bakersPctSubtitle}</p>
+		</div>
+		<div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">
+			{round(formula.totalDoughWeightG)}g
 		</div>
 	</div>
 
-	<!-- Mix additions -->
-	<div class="px-5 py-4 border-t border-base-200">
-		<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.mixAdditions}</p>
-		<div class="grid grid-cols-2 gap-3 text-sm">
-			<div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center">
-				<div class="text-lg font-bold tabular-nums text-base-content">{round(formula.mixFlourG)}g</div>
-				<div class="text-xs text-base-content/70 mt-0.5">{t.mixFlour}</div>
+	<!-- Zone 1: What You Add — hero section -->
+	<div class="px-5 pb-4">
+		<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-3">{t.mixAdditions}</p>
+		<div class="grid grid-cols-2 gap-3">
+			<div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center">
+				<div class="text-2xl font-bold tabular-nums text-base-content">{round(formula.mixFlourG)}g</div>
+				<div class="text-xs text-base-content/60 mt-1 font-medium">{t.mixFlour}</div>
 			</div>
-			<div class="rounded-lg bg-base-200/80 ring-1 ring-base-300/60 px-3 py-2 text-center">
-				<div class="text-lg font-bold tabular-nums text-base-content">{round(formula.mixWaterG)}g</div>
-				<div class="text-xs text-base-content/70 mt-0.5">{t.mixWater}</div>
+			<div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center">
+				<div class="text-2xl font-bold tabular-nums text-base-content">{round(formula.mixWaterG)}g</div>
+				<div class="text-xs text-base-content/60 mt-1 font-medium">{t.mixWater}</div>
+			</div>
+			<div class="rounded-xl bg-accent/10 ring-1 ring-accent/20 px-3 py-3 text-center">
+				<div class="text-2xl font-bold tabular-nums text-accent">{round(formula.starterTotalG)}g</div>
+				<div class="text-xs text-accent/70 mt-1 font-medium">{t.starter}</div>
+			</div>
+			<div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center">
+				<div class="text-2xl font-bold tabular-nums text-base-content">{round(formula.saltG)}g</div>
+				<div class="text-xs text-base-content/60 mt-1 font-medium">{t.saltRow}</div>
 			</div>
 		</div>
-		<p class="text-xs text-base-content/50 mt-2">{t.starterNote}</p>
+		<p class="text-xs text-base-content/50 mt-2.5 italic">
+			{t.starterContains(round(formula.starterFlourG), round(formula.starterWaterG))}
+		</p>
+	</div>
+
+	<!-- Zone 2: Full Baker's Formula — collapsible reference -->
+	<div class="border-t border-base-200">
+		<button
+			type="button"
+			onclick={() => showFullFormula.update(v => !v)}
+			class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"
+		>
+			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fullFormula}</span>
+			<svg
+				class="w-4 h-4 text-base-content/40 transition-transform {$showFullFormula ? 'rotate-180' : ''}"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 20 20"
+				fill="currentColor"
+			>
+				<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+			</svg>
+		</button>
+
+		{#if $showFullFormula}
+			<div class="px-5 pb-4">
+				<table class="w-full text-sm">
+					<thead>
+						<tr class="border-b border-base-200">
+							<th class="text-left py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.ingredient}</th>
+							<th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.grams}</th>
+							<th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">{t.bakersPct}</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-base-200">
+						<tr>
+							<td class="py-2.5 text-base-content font-medium">{t.totalFlourRow}</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalFlourG)}g</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content/70">100%</td>
+						</tr>
+						{#each flourBlend as entry (entry.type)}
+							<tr class="bg-base-200/30">
+								<td class="py-1.5 text-base-content/70 text-xs pl-4">— {t.flourTypes[entry.type] ?? entry.type}</td>
+								<td class="py-1.5 text-right tabular-nums text-base-content/70 text-xs">{round(formula.totalFlourG * entry.pct / 100)}g</td>
+								<td class="py-1.5 text-right tabular-nums text-base-content/50 text-xs">{entry.pct}%</td>
+							</tr>
+						{/each}
+						<tr>
+							<td class="py-2.5 text-base-content font-medium">{t.water}</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.totalWaterG)}g</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content/70">{formula.finalHydrationPct.toFixed(1)}%</td>
+						</tr>
+						<tr>
+							<td class="py-2.5 text-base-content font-medium">{t.saltRow}</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.saltG)}g</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content/70">{pct(formula.saltG, formula.totalFlourG)}</td>
+						</tr>
+						<tr>
+							<td class="py-2.5 text-base-content font-medium">{t.starter}</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content font-semibold">{round(formula.starterTotalG)}g</td>
+							<td class="py-2.5 text-right tabular-nums text-base-content/70">
+								{pct(formula.starterFlourG, formula.totalFlourG)}
+								<span class="text-[10px] text-base-content/40 block leading-tight">{t.preFermentedFlour}</span>
+							</td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr class="border-t-2 border-secondary/30 bg-secondary/10">
+							<td class="py-3 font-bold text-secondary">{t.totalDough}</td>
+							<td class="py-3 text-right tabular-nums font-bold text-secondary">{round(formula.totalDoughWeightG)}g</td>
+							<td class="py-3 text-right"></td>
+						</tr>
+					</tfoot>
+				</table>
+			</div>
+		{/if}
 	</div>
 </div>
 

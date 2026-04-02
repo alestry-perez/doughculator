@@ -458,6 +458,25 @@ function calcFormula(inputs: Inputs): FormulaResult {
 // Timing Calculation
 // ============================================================
 
+/** Linear interpolation over sorted anchor points [temp, value][] */
+function lerpAnchors(tempC: number, anchors: readonly [number, number][]): number {
+	if (tempC <= anchors[0][0]) return anchors[0][1];
+	if (tempC >= anchors[anchors.length - 1][0]) return anchors[anchors.length - 1][1];
+	for (let i = 0; i < anchors.length - 1; i++) {
+		const [t0, v0] = anchors[i];
+		const [t1, v1] = anchors[i + 1];
+		if (tempC >= t0 && tempC <= t1) {
+			return v0 + ((tempC - t0) / (t1 - t0)) * (v1 - v0);
+		}
+	}
+	return anchors[anchors.length - 1][1];
+}
+
+const BULK_MIN_ANCHORS: readonly [number, number][] = [[16, 8], [19.5, 8], [22.5, 5], [25.5, 3.5], [28, 3], [31, 2]];
+const BULK_MAX_ANCHORS: readonly [number, number][] = [[16, 12], [19.5, 12], [22.5, 8], [25.5, 6], [28, 5], [31, 4]];
+const PROOF_TEMP_MULT_ANCHORS: readonly [number, number][] = [[16, 2], [19.5, 2], [22.5, 1.4], [25.5, 1], [28, 0.75], [31, 0.6]];
+const FOLD_INTERVAL_ANCHORS: readonly [number, number][] = [[16, 35], [19.5, 30], [22.5, 25], [25.5, 22], [28, 20], [31, 20]];
+
 function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 	const { effectiveTempC: rawEffectiveTempC, hydrationBand, inoculationPct, blendFermentMult, blendFermentMultRange, blendProofFermentMult, blendProofFermentMultRange } = formula;
 	const { fermentationPhilosophy, ambientTempC } = inputs;
@@ -471,12 +490,7 @@ function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 	let effectiveTempC = rawEffectiveTempC;
 	{
 		// Preliminary bulk estimate using raw temp (just for computing temp correction magnitude)
-		let prelimBulkBaseMin: number;
-		if (rawEffectiveTempC < 21) prelimBulkBaseMin = 8;
-		else if (rawEffectiveTempC < 24) prelimBulkBaseMin = 5;
-		else if (rawEffectiveTempC < 27) prelimBulkBaseMin = 3.5;
-		else if (rawEffectiveTempC < 29) prelimBulkBaseMin = 3;
-		else prelimBulkBaseMin = 2;
+		const prelimBulkBaseMin = lerpAnchors(rawEffectiveTempC, BULK_MIN_ANCHORS);
 		const hydrationMultPrelim =
 			hydrationBand === 'Low' ? 1.15
 			: hydrationBand === 'High' ? 0.85
@@ -491,20 +505,9 @@ function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 		}
 	}
 
-	// Baseline bulk range (hours) by effective temp (now using corrected effectiveTempC)
-	let bulkBaseMin: number;
-	let bulkBaseMax: number;
-	if (effectiveTempC < 21) {
-		[bulkBaseMin, bulkBaseMax] = [8, 12];
-	} else if (effectiveTempC < 24) {
-		[bulkBaseMin, bulkBaseMax] = [5, 8];
-	} else if (effectiveTempC < 27) {
-		[bulkBaseMin, bulkBaseMax] = [3.5, 6];
-	} else if (effectiveTempC < 29) {
-		[bulkBaseMin, bulkBaseMax] = [3, 5];
-	} else {
-		[bulkBaseMin, bulkBaseMax] = [2, 4];
-	}
+	// Baseline bulk range (hours) by effective temp — continuous interpolation eliminates band-boundary cliffs
+	const bulkBaseMin = lerpAnchors(effectiveTempC, BULK_MIN_ANCHORS);
+	const bulkBaseMax = lerpAnchors(effectiveTempC, BULK_MAX_ANCHORS);
 
 	// Hydration multiplier — VeryHigh (>83%) ferments noticeably faster than High band
 	const hydrationMult =
@@ -516,37 +519,29 @@ function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 	// Inoculation scaling
 	const inocScale = Math.pow(20 / inoculationPct, 0.35);
 
+	// Salt inhibition: standard 2% is baseline; higher salt slows fermentation
+	const saltFermentFactor = 1 + (formula.effectiveSaltPct - 2.0) * 0.1;
+
 	// A6: center estimate uses blendFermentMult scalar; bounds use .low/.high from blendFermentMultRange
-	const bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult;
-	const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult;
-	const bulkMinLow  = bulkBaseMin * hydrationMult * inocScale * blendFermentMultRange.low;   // pessimistic (longer)
-	const bulkMaxHigh = bulkBaseMax * hydrationMult * inocScale * blendFermentMultRange.high;  // optimistic (shorter)
+	const bulkMin = bulkBaseMin * hydrationMult * inocScale * blendFermentMult * saltFermentFactor;
+	const bulkMax = bulkBaseMax * hydrationMult * inocScale * blendFermentMult * saltFermentFactor;
+	const bulkMinLow  = bulkBaseMin * hydrationMult * inocScale * blendFermentMultRange.low * saltFermentFactor;   // pessimistic (longer)
+	const bulkMaxHigh = bulkBaseMax * hydrationMult * inocScale * blendFermentMultRange.high * saltFermentFactor;  // optimistic (shorter)
 
 	// Room proof baseline at 24–26°C: [1.5, 3] hours, apply same multipliers
 	const proofBaseMin = 1.5;
 	const proofBaseMax = 3.0;
 
-	// Temp adjustment for proof (relative to 24-26 baseline)
-	let proofTempMult: number;
-	if (effectiveTempC < 21) {
-		proofTempMult = 2.0;
-	} else if (effectiveTempC < 24) {
-		proofTempMult = 1.4;
-	} else if (effectiveTempC < 27) {
-		proofTempMult = 1.0;
-	} else if (effectiveTempC < 29) {
-		proofTempMult = 0.75;
-	} else {
-		proofTempMult = 0.6;
-	}
+	// Temp adjustment for proof (relative to 24-26 baseline) — continuous interpolation
+	const proofTempMult = lerpAnchors(effectiveTempC, PROOF_TEMP_MULT_ANCHORS);
 
 	// C2: blendFermentMult applied to proof (was missing — whole-grain doughs proof faster too)
 	// A3: blendProofFermentMult already incorporates PROOF_KINETICS_FACTOR (computed in calcFormula)
 	// A6: coefficient range bounds widen the proof window
-	let proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMult;
-	let proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale * blendProofFermentMult;
-	let proofMinLow  = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMultRange.low;
-	let proofMinHigh = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMultRange.high;
+	let proofMin = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMult * saltFermentFactor;
+	let proofMax = proofBaseMax * proofTempMult * hydrationMult * inocScale * blendProofFermentMult * saltFermentFactor;
+	let proofMinLow  = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMultRange.low * saltFermentFactor;
+	let proofMinHigh = proofBaseMin * proofTempMult * hydrationMult * inocScale * blendProofFermentMultRange.high * saltFermentFactor;
 
 	// A5: fermentationPhilosophy extends to proof and cold retard.
 	// FlavorDevelopment: longer proof (+20%) and longer cold retard (+25%) to develop organic acids.
@@ -554,11 +549,16 @@ function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 	const baseRetardMin = COLD_RETARD_MIN_H;
 	const baseRetardMax = COLD_RETARD_MAX_H;
 
+	// Link cold retard to bulk state: aggressive bulk → shorter retard, conservative → longer
+	const bulkMidpoint = (bulkMin + bulkMax) / 2;
+	const bulkCompletionRatio = clamp(0.3, 1.0, bulkMidpoint / bulkMax);
+	const coldRetardBulkFactor = 1.15 - 0.2 * bulkCompletionRatio;
+
 	// F-5: scale cold retard by fridge temperature; 4°C is baseline, warmer = shorter retard
 	const { fridgeTempC } = inputs;
 	const fridgeFactor = clamp(0.7, 1.5, 1 - (fridgeTempC - 4) * 0.08); // warmer fridge → factor < 1 → shorter retard
-	let coldRetardMin = Math.round(baseRetardMin * fridgeFactor);
-	let coldRetardMax = Math.round(baseRetardMax * fridgeFactor);
+	let coldRetardMin = Math.round(baseRetardMin * fridgeFactor * coldRetardBulkFactor);
+	let coldRetardMax = Math.round(baseRetardMax * fridgeFactor * coldRetardBulkFactor);
 
 	if (fermentationPhilosophy === 'FlavorDevelopment') {
 		proofMin *= 1.2;
@@ -569,22 +569,18 @@ function calcTiming(formula: FormulaResult, inputs: Inputs): TimingResult {
 		coldRetardMax = Math.round(coldRetardMax * 1.25);
 	}
 
-	// Fold interval scales with temp: warmer = shorter intervals
-	let foldIntervalMins: number;
-	if (effectiveTempC >= 29) foldIntervalMins = 20;
-	else if (effectiveTempC >= 27) foldIntervalMins = 22;
-	else if (effectiveTempC >= 24) foldIntervalMins = 25;
-	else if (effectiveTempC >= 21) foldIntervalMins = 30;
-	else foldIntervalMins = 35;
+	// Fold interval scales with temp: warmer = shorter intervals — continuous interpolation
+	const foldIntervalMins = Math.round(lerpAnchors(effectiveTempC, FOLD_INTERVAL_ANCHORS));
 
 	// Folds during bulk — use actual foldIntervalMins instead of hardcoded 30
 	const foldCount = Math.min(4, Math.floor((bulkMin * 60) / foldIntervalMins));
 
 	// A6: coefficient-uncertainty range for bulk and proof
 	const coeffRatio = blendFermentMultRange.low / blendFermentMult;  // >1 when there's uncertainty
+	const proofCoeffRatio = blendProofFermentMultRange.low / blendProofFermentMult;  // proof-specific uncertainty
 	const bulkMinRange: RangedValue = { value: bulkMin, low: bulkMinLow, high: bulkMin / coeffRatio };
 	const bulkMaxRange: RangedValue = { value: bulkMax, low: bulkMax * coeffRatio, high: bulkMaxHigh };
-	const proofMinRange: RangedValue = { value: proofMin, low: proofMinLow, high: proofMin / coeffRatio };
+	const proofMinRange: RangedValue = { value: proofMin, low: proofMinLow, high: proofMin / proofCoeffRatio };
 
 	return {
 		bulkMin,
@@ -621,7 +617,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	// 1. Autolyse (if on)
 	if (autolyseOn) {
 		const scheduledAutolyse = recommendedAutolyse;
-		const userNote = autolyseMins !== recommendedAutolyse ? ` (your input: ${autolyseMins} min)` : '';
+		const userNote = autolyseMins !== recommendedAutolyse ? s.autolyseUserNote(autolyseMins) : '';
 		steps.push({
 			label: s.autolyse,
 			durationMins: scheduledAutolyse,
@@ -639,26 +635,9 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	// L2: distribute foldCount proportionally — S&F gets ~60%, coil gets remainder
 	const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
 	const cfSets = Math.max(0, foldCount - sfSets) + 1;
+	const foldTotalMins = (sfSets + cfSets) * foldIntervalMins;
 
-	// 3. Stretch & Fold
-	steps.push({
-		label: s.stretchFold,
-		durationMins: sfSets * foldIntervalMins,
-		notes: s.stretchFoldNote(foldIntervalMins, sfSets),
-		setCount: sfSets
-	});
-
-	// 4. Coil Folds (skip if cfSets === 0, e.g. very short bulk)
-	if (cfSets > 0) {
-		steps.push({
-			label: s.coilFolds,
-			durationMins: cfSets * foldIntervalMins,
-			notes: s.coilFoldsNote(foldIntervalMins, cfSets),
-			setCount: cfSets
-		});
-	}
-
-	// 5. Bulk Ferment
+	// 3. Bulk Fermentation — parent step (folds happen DURING bulk, not before it)
 	steps.push({
 		label: s.bulkFermentation,
 		durationMins: null,
@@ -666,6 +645,40 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		rangeMaxMins: Math.round(bulkMax * 60),
 		notes: s.bulkNote(bulkMinH, bulkMaxH)
 	});
+
+	// 3a. Stretch & Fold (sub-step within bulk)
+	steps.push({
+		label: s.stretchFold,
+		durationMins: sfSets * foldIntervalMins,
+		notes: s.stretchFoldNote(foldIntervalMins, sfSets),
+		setCount: sfSets,
+		isSubStep: true
+	});
+
+	// 3b. Coil Folds (sub-step within bulk, skip if cfSets === 0)
+	if (cfSets > 0) {
+		steps.push({
+			label: s.coilFolds,
+			durationMins: cfSets * foldIntervalMins,
+			notes: s.coilFoldsNote(foldIntervalMins, cfSets),
+			setCount: cfSets,
+			isSubStep: true
+		});
+	}
+
+	// 3c. Hands-off rise (sub-step — remainder of bulk after folds)
+	const handsOffMinMins = Math.max(0, Math.round(bulkMin * 60) - foldTotalMins);
+	const handsOffMaxMins = Math.max(0, Math.round(bulkMax * 60) - foldTotalMins);
+	if (handsOffMaxMins > 0) {
+		steps.push({
+			label: s.handsOffRise,
+			durationMins: null,
+			rangeMinMins: handsOffMinMins,
+			rangeMaxMins: handsOffMaxMins,
+			notes: s.handsOffRiseNote,
+			isSubStep: true
+		});
+	}
 
 	// 6. Preshape
 	steps.push({
@@ -700,7 +713,14 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		});
 	}
 
-	// 9. Bake — parent step (duration driven by sub-steps) + two phases
+	// 9. Score
+	steps.push({
+		label: s.score,
+		durationMins: 2,
+		notes: s.scoreNote
+	});
+
+	// 10. Bake — parent step (duration driven by sub-steps) + two phases
 	steps.push({
 		label: s.bake,
 		durationMins: null,
@@ -842,7 +862,7 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 	const timingConfidence = `${((blendFermentMultRange.low / blendFermentMult - 1) * 100).toFixed(0)}%`;
 	return {
 		[a.ambientTemp]: `${ambientTempC.toFixed(1)}°C`,
-		'Effective temp': `${effectiveTempC.toFixed(1)}°C`,
+		[a.effectiveTemp]: `${effectiveTempC.toFixed(1)}°C`,
 		[a.salt]: saltAutoCalc
 			? a.saltAuto(effectiveSaltPct.toFixed(2), autoSaltPct.toFixed(2))
 			: a.saltManual(saltPct),
@@ -856,7 +876,7 @@ function calcAssumptions(inputs: Inputs, formula: FormulaResult, lang: Lang): Re
 		[a.wwHydrationAdjust]: `${hydrationAdjustSign}${wwHydrationAdjust.toFixed(1)}%`,
 		[a.finalHydration]: `${finalHydrationPct.toFixed(1)}%`,
 		[a.autolyse]: autolyseOn ? a.autolyseMins(autolyseMins) : a.off,
-		'Timing confidence': `±${timingConfidence} from flour coefficient uncertainty`,
+		[a.timingConfidence]: a.timingConfidenceValue(timingConfidence),
 	};
 }
 
@@ -919,20 +939,11 @@ export const COLD_RETARD_MAX_H = 16;
 // A3: Shaped dough (final proof) has a tighter gluten network → CO2 escapes more slowly → proofs ~15% slower per unit of the same multiplier stack
 export const PROOF_KINETICS_FACTOR = 1.15;
 
-// A6: Per-flour-type coefficient uncertainty notes for UI display (does not affect calculations)
-export const COEFFICIENT_NOTES: Record<FlourType, string> = {
-	BreadFlour: 'Values vary by protein content (±5%)',
-	AllPurpose: 'Values vary by brand (±5%)',
-	WholeWheat: 'Values vary with bran content (±10%)',
-	Spelt: 'High variability by milling (±15%)',
-	Einkorn: 'High variability by variety (±20%)',
-	Rye: 'Values vary by extraction rate (±15%)',
-};
-export const BAKE_COVERED_MINS = 20;
-export const BAKE_UNCOVERED_MINS = 20;
-export const PRESHAPE_DURATION_MINS = 45;
-export const FINAL_SHAPE_DURATION_MINS = 10;
-export const MIX_DURATION_MINS = 45;
+const BAKE_COVERED_MINS = 20;
+const BAKE_UNCOVERED_MINS = 20;
+const PRESHAPE_DURATION_MINS = 45;
+const FINAL_SHAPE_DURATION_MINS = 10;
+const MIX_DURATION_MINS = 45;
 
 export const DEFAULT_INPUTS: Inputs = {
 	totalFlourInputG: 500,

@@ -69,12 +69,14 @@ Each flour type carries absorption coefficient, fermentation multiplier, and pro
 
 | Flour | Absorption Coeff | Ferment Mult | Proof Ferment Mult | Uncertainty |
 | --- | --- | --- | --- | --- |
-| Bread Flour | 1.00 | 1.00 | 1.15 | ±5% |
-| All-Purpose | 0.97 | 1.00 | 1.15 | ±5% |
-| Whole Wheat | 1.12 | 0.95 | 1.09 | ±10% |
-| Rye | 1.20 | 0.72 | 0.83 | ±20% |
-| Spelt | 0.95 | 0.82 | 0.94 | ±15% |
-| Einkorn | 1.12 | 0.90 | 1.04 | ±15% |
+| Bread Flour | 1.00 | 1.00 | 1.00 | ±5% |
+| All-Purpose | 0.97 | 1.00 | 1.00 | ±5% |
+| Whole Wheat | 1.12 | 0.85 | 0.88 | ±10% |
+| Rye | 1.20 | 0.72 | 0.78 | ±20% |
+| Spelt | 1.02 | 0.82 | 0.85 | ±15% |
+| Einkorn | 1.02 | 0.90 | 0.88 | ±15% |
+
+Note: `proofFermentMult` values are the raw per-flour coefficients stored in `FLOUR_PROPERTIES`. At runtime these are multiplied by `PROOF_KINETICS_FACTOR` (1.15) before use, reflecting that shaped dough proofs ~15% faster than an open bulk mass.
 
 Blend values are weighted averages across the active flour blend:
 
@@ -107,9 +109,12 @@ Example: a 100% Rye blend adds +20%; a 100% Spelt blend subtracts −5%.
 
 Hydration bands:
 
-- `Low`: `< 70%`
-- `Medium`: `70% - 75%`
-- `High`: `> 75%`
+| Band | Range | Hydration Mult | Inoculation Adj |
+| --- | --- | --- | --- |
+| Low | `< 70%` | 1.15 | +2 |
+| Medium | `70% - 75%` | 1.0 | 0 |
+| High | `> 75% - 83%` | 0.85 | -2 |
+| VeryHigh | `> 83%` | 0.75 | -3 |
 
 ### 3) Effective Temperature
 
@@ -118,21 +123,24 @@ effectiveTempC = (ambientTempC + doughTempC) / 2   // if dough temp provided
 effectiveTempC = ambientTempC                       // otherwise
 ```
 
-For bulk fermentations longer than 3 hours, effective temperature drifts toward ambient:
+For bulk fermentations longer than 3 hours, effective temperature drops by a flat 0.3°C per hour past the 3-hour mark, clamped so it never goes below ambient:
 
 ```txt
-effectiveTempC += (ambientTempC - effectiveTempC) * 0.3 * (bulkHours - 3)
+correctedTemp = rawEffectiveTempC - (bulkHours - 3) * 0.3
+effectiveTempC = clamp(ambientTempC, rawEffectiveTempC, correctedTemp)
 ```
 
 Temperature bands:
 
 | Band | Range |
 | --- | --- |
-| Freezing | `< 18C` |
+| VeryCold | `< 18C` |
 | Cold | `18C - <21C` |
 | Standard | `21C - <24C` |
 | Warm | `24C - <27C` |
 | Hot | `>= 27C` |
+
+Timing uses **continuous linear interpolation** between anchor points rather than step functions, eliminating discontinuities at band boundaries. Anchor points: `[16, 19.5, 22.5, 25.5, 28, 31]°C`.
 
 ### 4) Inoculation (Starter %)
 
@@ -172,7 +180,7 @@ Clamps:
 Salt:
 
 ```txt
-autoSaltPct = clamp(1.8, 2.2, 1.9 + wwRatio * 0.3)
+autoSaltPct = clamp(1.9, 2.2, 1.9 + wwRatio * 0.3)
 effectiveSaltPct = saltAutoCalc ? autoSaltPct : saltPct
 ```
 
@@ -210,11 +218,11 @@ Bulk baseline (hours):
 Multipliers:
 
 ```txt
-hydrationMult        = Low:1.15, Medium:1.0, High:0.85
+hydrationMult        = Low:1.15, Medium:1.0, High:0.85, VeryHigh:0.75
 inocScale            = (20 / inoculationPct) ^ 0.35
 blendFermentMult     = weighted average of per-flour fermentMult.value
 PROOF_KINETICS_FACTOR = 1.15
-blendProofFermentMult = blendFermentMult * PROOF_KINETICS_FACTOR
+blendProofFermentMult = weighted average of per-flour proofFermentMult.value * PROOF_KINETICS_FACTOR
 ```
 
 ```txt
@@ -243,11 +251,45 @@ Cold retard baseline is `[8h, 16h]`, scaled to `[8h, 20h]` with FlavorDevelopmen
 Folds:
 
 ```txt
-foldCount = min(4, floor(bulkMin * 60 / 30))
-foldIntervalMins = 30
+foldCount = min(4, floor(bulkMin * 60 / foldIntervalMins))
 ```
 
-### 8) Autolyse (Off/Auto)
+Fold interval scales continuously with temperature using linear interpolation between anchor points:
+
+| Temp | Interval |
+| --- | --- |
+| ≥ 29°C | 20 min |
+| ≥ 27°C | 22 min |
+| ≥ 24°C | 25 min |
+| ≥ 21°C | 30 min |
+| < 21°C | 35 min |
+
+Values between anchor points are continuously interpolated, eliminating step jumps at band boundaries.
+
+### 8) Salt Fermentation Effect
+
+Salt percentage affects fermentation timing via an inhibition factor applied to both bulk and proof:
+
+```txt
+saltFermentFactor = 1 + (effectiveSaltPct - 2.0) * 0.1
+```
+
+At the standard 2% salt baseline the factor is 1.0 (no change). Higher salt (e.g. 2.2%) gives a factor of 1.02, slightly extending bulk and proof times. This factor is multiplied into `bulkMin`, `bulkMax`, `proofMin`, and `proofMax`.
+
+### 9) Cold Retard and Bulk-State Linkage
+
+Cold retard duration scales based on how complete the bulk fermentation was before shaping. An aggressive bulk (dough near fully proofed) warrants a shorter retard; a conservative bulk warrants a longer one:
+
+```txt
+bulkCompletionRatio = clamp(0.3, 1.0, bulkMidpoint / bulkMax)
+coldRetardBulkFactor = 1.15 - 0.2 * bulkCompletionRatio
+coldRetardMin = baseRetardMin * fridgeFactor * coldRetardBulkFactor
+coldRetardMax = baseRetardMax * fridgeFactor * coldRetardBulkFactor
+```
+
+Base cold retard range is `[8h, 16h]`, further scaled by fridge temperature (`fridgeFactor`) and the `FlavorDevelopment` philosophy multiplier (×1.25 when active).
+
+### 10) Autolyse (Off/Auto)
 
 When `Autolyse` is toggled to `Auto`, minutes are derived from effective temperature.
 
@@ -262,7 +304,7 @@ When `Autolyse` is toggled to `Auto`, minutes are derived from effective tempera
 
 In UI, this is shown as a non-editable progress bar.
 
-### 9) Warnings
+### 12) Warnings
 
 | Warning | Condition | Level |
 | --- | --- | --- |
@@ -277,21 +319,20 @@ In UI, this is shown as a non-editable progress bar.
 | Open crumb | `crumbGoal='Open'` | warn |
 | High rye | `Rye > 30%` | warn |
 | Rye + open crumb | `Rye > 30% AND crumbGoal='Open'` | danger |
-| Fridge temp out of range | `fridgeTempC !== 4` | info |
 
-### 10) Schedule Order
+### 13) Schedule Order
 
 1. Autolyse (if enabled)
-2. Add starter + salt
-3. Bulk fermentation (range)
-4. Stretch and fold sets
-5. Rest (remaining bulk)
-6. Pre-shape
-7. Bench rest
-8. Final shape
-9. Proof (room or cold retard)
-10. Preheat oven
-11. Score + bake
+2. Mix (add starter + salt)
+3. Stretch & Fold sets
+4. Coil Folds sets
+5. Bulk Ferment (range)
+6. Preshape
+7. Final Shape
+8. Proof / Cold Retard (range)
+9. Bake
+   - Bake covered (lid on)
+   - Bake uncovered (lid off)
 
 ## Theme and UI Notes
 

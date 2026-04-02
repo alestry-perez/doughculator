@@ -210,7 +210,7 @@
 				<!-- Dark mode toggle -->
 				<label
 					class="swap swap-rotate inline-grid h-9 w-9 place-items-center rounded-full border border-transparent bg-transparent text-neutral-content/75 transition-colors duration-200 hover:border-neutral-content/35 hover:bg-neutral-content/10 hover:text-neutral-content focus-within:border-primary/45 focus-within:ring-2 focus-within:ring-primary/55 focus-within:ring-offset-2 focus-within:ring-offset-neutral/95"
-					aria-label="Toggle dark mode"
+					aria-label={t.ariaLabels.toggleDarkMode}
 				>
 					<input
 						type="checkbox"
@@ -227,7 +227,7 @@
 					</svg>
 				</label>
 				<!-- Language toggle -->
-				<div class="join border border-neutral-content/25 rounded-full bg-neutral-content/5 p-0.5" aria-label="Select language">
+				<div class="join border border-neutral-content/25 rounded-full bg-neutral-content/5 p-0.5" aria-label={t.ariaLabels.selectLanguage}>
 					<button
 						type="button"
 						onclick={() => toggleLang('en')}

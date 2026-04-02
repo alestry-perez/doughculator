@@ -89,3 +89,38 @@ export const result = derived([inputs, lang], ([$inputs, $lang]) => {
 
 // Drawer open state
 export const assumptionsOpen = writable(false);
+
+// Baker's formula display mode toggle
+const FULL_FORMULA_KEY = 'sourdough_cal_full_formula';
+
+function loadFullFormula(): boolean {
+	if (!browser) return false;
+	return localStorage.getItem(FULL_FORMULA_KEY) === 'true';
+}
+
+export const showFullFormula = writable<boolean>(loadFullFormula());
+
+showFullFormula.subscribe((val) => {
+	if (browser) localStorage.setItem(FULL_FORMULA_KEY, String(val));
+});
+
+// Collapsible section states for InputSection
+const BAKING_PROFILE_KEY = 'sourdough_cal_baking_profile';
+const FINE_TUNING_KEY = 'sourdough_cal_fine_tuning';
+
+function loadBool(key: string, defaultVal: boolean): boolean {
+	if (!browser) return defaultVal;
+	const stored = localStorage.getItem(key);
+	if (stored === null) return defaultVal;
+	return stored === 'true';
+}
+
+export const showBakingProfile = writable<boolean>(loadBool(BAKING_PROFILE_KEY, true));
+export const showFineTuning = writable<boolean>(loadBool(FINE_TUNING_KEY, false));
+
+showBakingProfile.subscribe((val) => {
+	if (browser) localStorage.setItem(BAKING_PROFILE_KEY, String(val));
+});
+showFineTuning.subscribe((val) => {
+	if (browser) localStorage.setItem(FINE_TUNING_KEY, String(val));
+});
