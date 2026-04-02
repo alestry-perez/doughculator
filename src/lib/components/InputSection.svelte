@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Inputs, CrumbGoal, FermentationPhilosophy, FlourType, FlourBlendEntry } from '$lib/calculator';
 	import { cToF, fToC, recommendAutolyseMins, WHOLE_GRAIN_FLOURS, ALL_FLOUR_TYPES } from '$lib/calculator';
-	import { inputs, result, lang, showBakingProfile } from '$lib/store';
+	import { inputs, result, lang } from '$lib/store';
 	import { translations } from '$lib/i18n';
 	import WarningsCard from './WarningsCard.svelte';
 
@@ -439,23 +439,11 @@
 		</div>
 	{/if}
 
-	<!-- Tier 2: Baking Profile (collapsible, default open) -->
+	<!-- Tier 2: Baking Profile (always visible) -->
 	<div class="border-t border-base-200">
-		<button
-			type="button"
-			onclick={() => showBakingProfile.update(v => !v)}
-			class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"
-		>
+		<div class="px-5 py-3">
 			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.bakingProfile}</span>
-			<svg
-				class="w-4 h-4 text-base-content/40 transition-transform {$showBakingProfile ? 'rotate-180' : ''}"
-				xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-			>
-				<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-			</svg>
-		</button>
-
-		{#if $showBakingProfile}
+		</div>
 		<div class="px-5 pb-5 space-y-5">
 			<!-- Crumb goal -->
 			<div>
@@ -580,7 +568,6 @@
 				{/if}
 			</div>
 		</div>
-		{/if}
 	</div>
 
 	<!-- Tier 3: Fine Tuning (always visible) -->
