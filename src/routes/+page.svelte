@@ -6,8 +6,6 @@
 	import FormulaCard from '$lib/components/FormulaCard.svelte';
 	import TimingCard from '$lib/components/TimingCard.svelte';
 	import ScheduleCard from '$lib/components/ScheduleCard.svelte';
-	import WarningsCard from '$lib/components/WarningsCard.svelte';
-	import GuidanceCard from '$lib/components/GuidanceCard.svelte';
 	import AssumptionsDrawer from '$lib/components/AssumptionsDrawer.svelte';
 
 	const t = $derived(translations[$lang]);
@@ -269,9 +267,6 @@
 		<InputSection />
 
 		{#if totalFlour > 0}
-			<!-- Warnings (shown first if any) -->
-			<WarningsCard warnings={$result.warnings} />
-
 			<!-- Formula -->
 			<FormulaCard formula={$result.formula} flourBlend={$inputs.flourBlend} />
 
@@ -288,9 +283,6 @@
 				scheduleMode={$inputs.scheduleMode}
 				startTime={$inputs.scheduleMode === 'clock' ? ($inputs.startTime ?? '08:00') : null}
 			/>
-
-			<!-- Guidance -->
-			<GuidanceCard crumbGoal={$inputs.crumbGoal} />
 		{:else}
 			<!-- Empty state -->
 			<div class="card bg-base-100/95 shadow-sm ring-1 ring-base-300/70">

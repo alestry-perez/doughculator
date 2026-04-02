@@ -3,6 +3,8 @@
 	import { cToF, fToC, recommendAutolyseMins, WHOLE_GRAIN_FLOURS, ALL_FLOUR_TYPES } from '$lib/calculator';
 	import { inputs, result, lang, showBakingProfile, showFineTuning } from '$lib/store';
 	import { translations } from '$lib/i18n';
+	import WarningsCard from './WarningsCard.svelte';
+	import GuidanceCard from './GuidanceCard.svelte';
 
 	const t = $derived(translations[$lang]);
 
@@ -410,6 +412,14 @@
 			/>
 		</div>
 	</div>
+
+	<!-- Warnings & Guidance inline after kitchen temp -->
+	{#if $inputs.totalFlourInputG > 0}
+		<div class="px-5 pb-3 space-y-3">
+			<WarningsCard warnings={$result.warnings} />
+			<GuidanceCard crumbGoal={$inputs.crumbGoal} />
+		</div>
+	{/if}
 
 	<!-- Tier 2: Baking Profile (collapsible, default open) -->
 	<div class="border-t border-base-200">
