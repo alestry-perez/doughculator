@@ -142,21 +142,27 @@
   },
   "hotPaths": [
     {
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 42,
+      "lastAccessed": 1775150711613,
+      "type": "file"
+    },
+    {
       "path": "src/lib/i18n.ts",
       "accessCount": 24,
       "lastAccessed": 1775139644125,
       "type": "directory"
     },
     {
-      "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 24,
-      "lastAccessed": 1775149304566,
-      "type": "file"
-    },
-    {
       "path": "README.md",
       "accessCount": 16,
       "lastAccessed": 1775137831745,
+      "type": "file"
+    },
+    {
+      "path": "src/routes/+page.svelte",
+      "accessCount": 10,
+      "lastAccessed": 1775149928146,
       "type": "file"
     },
     {
@@ -175,12 +181,6 @@
       "path": "src/lib/calculator.test.ts",
       "accessCount": 6,
       "lastAccessed": 1775137831160,
-      "type": "file"
-    },
-    {
-      "path": "src/routes/+page.svelte",
-      "accessCount": 5,
-      "lastAccessed": 1775149332019,
       "type": "file"
     },
     {
