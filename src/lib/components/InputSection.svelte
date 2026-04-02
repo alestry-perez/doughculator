@@ -325,7 +325,7 @@
 							step="50"
 							value={$inputs.totalFlourInputG}
 							oninput={onTotalFlourInput}
-							class="w-20 bg-transparent border-none text-center text-3xl font-bold text-base-content focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+							class="w-28 bg-transparent border-none text-center text-3xl font-bold text-base-content focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
 							placeholder="500"
 						/>
 						<span class="text-lg font-bold text-base-content/70 -ml-1">g</span>
