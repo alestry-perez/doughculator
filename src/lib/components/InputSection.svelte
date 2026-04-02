@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Inputs, CrumbGoal, FermentationPhilosophy, FlourType, FlourBlendEntry } from '$lib/calculator';
 	import { cToF, fToC, recommendAutolyseMins, WHOLE_GRAIN_FLOURS, ALL_FLOUR_TYPES } from '$lib/calculator';
-	import { inputs, result, lang, showBakingProfile, showFineTuning } from '$lib/store';
+	import { inputs, result, lang, showBakingProfile } from '$lib/store';
 	import { translations } from '$lib/i18n';
 	import WarningsCard from './WarningsCard.svelte';
 
@@ -410,6 +410,26 @@
 				class="input input-bordered w-full"
 			/>
 		</div>
+
+		<!-- Dough temp (optional) — directly under kitchen temp -->
+		<div class="form-control">
+			<label for="dough-temp" class="label">
+				<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">
+					{t.doughTemp} (°{$inputs.tempUnit}) <span class="font-normal text-base-content/50">{t.optional}</span>
+				</span>
+			</label>
+			<input
+				id="dough-temp"
+				type="number"
+				min={tempMin}
+				max={tempMax}
+				step="0.5"
+				value={doughDisplay}
+				oninput={onDoughInput}
+				placeholder={t.leaveBlankAmbient}
+				class="input input-bordered w-full placeholder:text-base-content/30"
+			/>
+		</div>
 	</div>
 
 	<!-- Warnings & Guidance inline after kitchen temp -->
@@ -563,44 +583,12 @@
 		{/if}
 	</div>
 
-	<!-- Tier 3: Fine Tuning (collapsible, default closed) -->
+	<!-- Tier 3: Fine Tuning (always visible) -->
 	<div class="border-t border-base-200">
-		<button
-			type="button"
-			onclick={() => showFineTuning.update(v => !v)}
-			class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"
-		>
+		<div class="px-5 py-3">
 			<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.fineTuning}</span>
-			<svg
-				class="w-4 h-4 text-base-content/40 transition-transform {$showFineTuning ? 'rotate-180' : ''}"
-				xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
-			>
-				<path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
-			</svg>
-		</button>
-
-		{#if $showFineTuning}
+		</div>
 		<div class="px-5 pb-5 space-y-4">
-			<!-- Dough temp (optional) -->
-			<div class="form-control">
-				<label for="dough-temp" class="label">
-					<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">
-						{t.doughTemp} (°{$inputs.tempUnit}) <span class="font-normal text-base-content/50">{t.optional}</span>
-					</span>
-				</label>
-				<input
-					id="dough-temp"
-					type="number"
-					min={tempMin}
-					max={tempMax}
-					step="0.5"
-					value={doughDisplay}
-					oninput={onDoughInput}
-					placeholder={t.leaveBlankAmbient}
-					class="input input-bordered w-full placeholder:text-base-content/30"
-				/>
-			</div>
-
 			<!-- Salt — auto-computed with optional override -->
 			<div>
 				<div class="flex items-center justify-between mb-1.5">
@@ -733,7 +721,6 @@
 				{/if}
 			</div>
 		</div>
-		{/if}
 	</div>
 </div>
 
