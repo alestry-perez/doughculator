@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1775053601068,
+  "lastScanned": 1775153355231,
   "projectRoot": "/Users/alestry.perez/Desktop/projects/coding/doughculator",
   "techStack": {
     "languages": [
@@ -85,7 +85,7 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 6,
-      "lastAccessed": 1775053601059,
+      "lastAccessed": 1775153355215,
       "keyFiles": [
         "404.html",
         "favicon.svg",
@@ -98,7 +98,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1775053601059,
+      "lastAccessed": 1775153355215,
       "keyFiles": [
         "app.css",
         "app.d.ts",
@@ -109,7 +109,7 @@
       "path": "static",
       "purpose": "Static files",
       "fileCount": 5,
-      "lastAccessed": 1775053601061,
+      "lastAccessed": 1775153355222,
       "keyFiles": [
         "favicon.svg",
         "icon-192.png",
@@ -122,7 +122,7 @@
       "path": "src/lib",
       "purpose": "Library code",
       "fileCount": 6,
-      "lastAccessed": 1775053601062,
+      "lastAccessed": 1775153355223,
       "keyFiles": [
         "calculator.test.ts",
         "calculator.ts",
@@ -133,7 +133,7 @@
       "path": "src/routes",
       "purpose": "Route handlers",
       "fileCount": 2,
-      "lastAccessed": 1775053601062,
+      "lastAccessed": 1775153355225,
       "keyFiles": [
         "+layout.svelte",
         "+page.svelte"
@@ -142,70 +142,46 @@
   },
   "hotPaths": [
     {
-      "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 42,
-      "lastAccessed": 1775150711613,
-      "type": "file"
-    },
-    {
       "path": "src/lib/i18n.ts",
-      "accessCount": 24,
-      "lastAccessed": 1775139644125,
-      "type": "directory"
-    },
-    {
-      "path": "README.md",
-      "accessCount": 16,
-      "lastAccessed": 1775137831745,
-      "type": "file"
-    },
-    {
-      "path": "src/routes/+page.svelte",
-      "accessCount": 10,
-      "lastAccessed": 1775149928146,
+      "accessCount": 9,
+      "lastAccessed": 1775158222791,
       "type": "file"
     },
     {
       "path": "src/lib/calculator.ts",
       "accessCount": 9,
-      "lastAccessed": 1775138845176,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/store.ts",
-      "accessCount": 8,
-      "lastAccessed": 1775139657407,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/calculator.test.ts",
-      "accessCount": 6,
-      "lastAccessed": 1775137831160,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/components/FormulaCard.svelte",
-      "accessCount": 4,
-      "lastAccessed": 1775139180416,
-      "type": "file"
+      "lastAccessed": 1775158232871,
+      "type": "directory"
     },
     {
       "path": "src/lib/components/ScheduleCard.svelte",
-      "accessCount": 1,
-      "lastAccessed": 1775138808137,
+      "accessCount": 2,
+      "lastAccessed": 1775158096368,
       "type": "file"
     },
     {
-      "path": "src/lib/components/WarningsCard.svelte",
+      "path": "src/routes/+page.svelte",
+      "accessCount": 2,
+      "lastAccessed": 1775158117898,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib",
       "accessCount": 1,
-      "lastAccessed": 1775146418447,
+      "lastAccessed": 1775157641188,
+      "type": "directory"
+    },
+    {
+      "path": "src/lib/components/FormulaCard.svelte",
+      "accessCount": 1,
+      "lastAccessed": 1775157847395,
       "type": "file"
     },
     {
-      "path": "src/lib/components/GuidanceCard.svelte",
+      "path": "src/routes",
       "accessCount": 1,
-      "lastAccessed": 1775146419041,
-      "type": "file"
+      "lastAccessed": 1775158110727,
+      "type": "directory"
     }
   ],
   "userDirectives": []

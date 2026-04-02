@@ -3,9 +3,9 @@ import { d as derived, w as writable } from "../../chunks/index.js";
 const scheduleStrings = {
   en: {
     autolyse: "Autolyse",
-    autolyseNote: () => "Mix flour and most of water (hold back ~50g water, all salt, all starter). Cover and rest.",
+    autolyseNote: (flourG, waterG) => `Mix ${Math.round(flourG)}g flour and ${Math.round(waterG)}g water (hold back all salt and all starter). Cover and rest.`,
     mix: "Mix",
-    mixNote: "Combine starter and water, stir until dissolved. Add flour to form a shaggy dough. Rest covered. After autolyse: now add held-back starter and remaining water.",
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Add ${Math.round(starterG)}g starter and ${Math.round(saltG)}g salt to the autolysed dough. Mix until incorporated.` : `Combine ${Math.round(starterG)}g starter and ${Math.round(waterG)}g water, stir until dissolved. Add ${Math.round(flourG)}g flour and ${Math.round(saltG)}g salt to form a shaggy dough. Rest covered.`,
     stretchFold: "Stretch & Fold",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} sets, ${intervalMins} min apart.`,
     coilFolds: "Coil Folds",
@@ -34,9 +34,9 @@ const scheduleStrings = {
   },
   es: {
     autolyse: "Autólisis",
-    autolyseNote: () => "Mezcla la harina y la mayor parte del agua (reserva ~50g de agua, toda la sal e iniciador). Tapa y reposa.",
+    autolyseNote: (flourG, waterG) => `Mezcla ${Math.round(flourG)}g de harina y ${Math.round(waterG)}g de agua (reserva toda la sal e iniciador). Tapa y reposa.`,
     mix: "Mezclar",
-    mixNote: "Combina iniciador y agua, mezcla hasta disolver. Agrega la harina para formar una masa irregular. Reposa tapado. Después de la autólisis: ahora añade el iniciador reservado y el agua restante.",
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Añade ${Math.round(starterG)}g de iniciador y ${Math.round(saltG)}g de sal a la masa autolizada. Mezcla hasta incorporar.` : `Combina ${Math.round(starterG)}g de iniciador y ${Math.round(waterG)}g de agua, mezcla hasta disolver. Agrega ${Math.round(flourG)}g de harina y ${Math.round(saltG)}g de sal para formar una masa irregular. Reposa tapado.`,
     stretchFold: "Estirado y Plegado",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} series, ${intervalMins} min de descanso entre cada una.`,
     coilFolds: "Pliegues en Espiral",
@@ -65,9 +65,9 @@ const scheduleStrings = {
   },
   sv: {
     autolyse: "Autolys",
-    autolyseNote: () => "Blanda mjöl och det mesta av vattnet (håll tillbaka ~50g vatten, allt salt och all surdeg). Täck och vila.",
+    autolyseNote: (flourG, waterG) => `Blanda ${Math.round(flourG)}g mjöl och ${Math.round(waterG)}g vatten (håll tillbaka allt salt och all surdeg). Täck och vila.`,
     mix: "Blanda",
-    mixNote: "Kombinera surdeg och vatten, rör tills upplöst. Tillsätt mjöl och forma en grov deg. Vila täckt. Efter autolys: tillsätt nu den sparade surdegen och resterande vatten.",
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Tillsätt ${Math.round(starterG)}g surdeg och ${Math.round(saltG)}g salt till den autolyserade degen. Blanda tills inkorporerat.` : `Kombinera ${Math.round(starterG)}g surdeg och ${Math.round(waterG)}g vatten, rör tills upplöst. Tillsätt ${Math.round(flourG)}g mjöl och ${Math.round(saltG)}g salt och forma en grov deg. Vila täckt.`,
     stretchFold: "Sträck & Vik",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} omgångar, ${intervalMins} min mellan varje.`,
     coilFolds: "Spiralvikningar",
@@ -1195,13 +1195,13 @@ function calcSchedule(inputs2, formula, timing, lang2) {
     steps.push({
       label: s.autolyse,
       durationMins: scheduledAutolyse,
-      notes: s.autolyseNote() + userNote
+      notes: s.autolyseNote(formula.mixFlourG, formula.mixWaterG) + userNote
     });
   }
   steps.push({
     label: s.mix,
     durationMins: MIX_DURATION_MINS,
-    notes: s.mixNote
+    notes: s.mixNote(autolyseOn, formula.mixFlourG, formula.mixWaterG, formula.starterTotalG, formula.saltG)
   });
   const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
   const cfSets = Math.max(0, foldCount - sfSets) + 1;
