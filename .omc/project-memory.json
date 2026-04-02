@@ -142,15 +142,27 @@
   },
   "hotPaths": [
     {
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 22,
+      "lastAccessed": 1775166512871,
+      "type": "file"
+    },
+    {
       "path": "src/lib/i18n.ts",
-      "accessCount": 9,
-      "lastAccessed": 1775158222791,
+      "accessCount": 16,
+      "lastAccessed": 1775165921811,
       "type": "file"
     },
     {
       "path": "src/lib/calculator.ts",
-      "accessCount": 9,
-      "lastAccessed": 1775158232871,
+      "accessCount": 10,
+      "lastAccessed": 1775165710580,
+      "type": "directory"
+    },
+    {
+      "path": "src/routes/+page.svelte",
+      "accessCount": 3,
+      "lastAccessed": 1775165684138,
       "type": "directory"
     },
     {
@@ -160,9 +172,9 @@
       "type": "file"
     },
     {
-      "path": "src/routes/+page.svelte",
+      "path": "",
       "accessCount": 2,
-      "lastAccessed": 1775158117898,
+      "lastAccessed": 1775165690569,
       "type": "directory"
     },
     {
@@ -182,6 +194,12 @@
       "accessCount": 1,
       "lastAccessed": 1775158110727,
       "type": "directory"
+    },
+    {
+      "path": "src/lib/store.ts",
+      "accessCount": 1,
+      "lastAccessed": 1775165694588,
+      "type": "file"
     }
   ],
   "userDirectives": []

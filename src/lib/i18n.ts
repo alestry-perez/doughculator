@@ -273,6 +273,7 @@ const en = {
   // InputSection
   parameters: 'Parameters',
   kitchenTemp: 'Kitchen temp',
+  temperatures: 'Temperatures',
   bakingProfile: 'Baking Profile',
   fineTuning: 'Fine Tuning',
   totalFlour: 'Total Flour (g)',
@@ -483,6 +484,7 @@ const es: Translations = {
   // InputSection
   parameters: 'Parámetros',
   kitchenTemp: 'Temp. de cocina',
+  temperatures: 'Temperaturas',
   bakingProfile: 'Perfil de Horneado',
   fineTuning: 'Ajuste Fino',
   totalFlour: 'Harina Total (g)',
@@ -695,6 +697,7 @@ const sv: Translations = {
   // InputSection
   parameters: 'Parametrar',
   kitchenTemp: 'Kökstemperatur',
+  temperatures: 'Temperaturer',
   bakingProfile: 'Bakprofil',
   fineTuning: 'Finjustering',
   totalFlour: 'Totalt Mjöl (g)',

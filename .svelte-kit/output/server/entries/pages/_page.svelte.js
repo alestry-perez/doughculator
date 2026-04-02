@@ -243,6 +243,7 @@ const en = {
   // InputSection
   parameters: "Parameters",
   kitchenTemp: "Kitchen temp",
+  temperatures: "Temperatures",
   bakingProfile: "Baking Profile",
   fineTuning: "Fine Tuning",
   totalFlour: "Total Flour (g)",
@@ -450,6 +451,7 @@ const es = {
   // InputSection
   parameters: "Parámetros",
   kitchenTemp: "Temp. de cocina",
+  temperatures: "Temperaturas",
   bakingProfile: "Perfil de Horneado",
   fineTuning: "Ajuste Fino",
   totalFlour: "Harina Total (g)",
@@ -661,6 +663,7 @@ const sv = {
   // InputSection
   parameters: "Parametrar",
   kitchenTemp: "Kökstemperatur",
+  temperatures: "Temperaturer",
   bakingProfile: "Bakprofil",
   fineTuning: "Finjustering",
   totalFlour: "Totalt Mjöl (g)",
@@ -1567,6 +1570,22 @@ function InputSection($$renderer, $$props) {
       Spelt: "#7C3AED",
       Einkorn: "#F43F5E"
     };
+    const RING_RADIUS = 80;
+    const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+    let ringSegments = derived$1(() => {
+      let offset = 0;
+      return store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.map((entry) => {
+        const segLength = entry.pct / 100 * RING_CIRCUMFERENCE;
+        const segment = {
+          type: entry.type,
+          color: flourColors[entry.type],
+          dasharray: `${segLength} ${RING_CIRCUMFERENCE - segLength}`,
+          dashoffset: -offset
+        };
+        offset += segLength;
+        return segment;
+      });
+    });
     let autoSaltPct = derived$1(() => store_get($$store_subs ??= {}, "$result", result).formula.autoSaltPct);
     let autoSaltG = derived$1(() => Math.round(store_get($$store_subs ??= {}, "$result", result).formula.saltG));
     let ambientDisplay = derived$1(() => {
@@ -1590,19 +1609,38 @@ function InputSection($$renderer, $$props) {
     const autolyseMaxMins = 60;
     const autolyseProgressMax = autolyseMaxMins - autolyseMinMins;
     const autolyseProgressValue = derived$1(() => Math.max(0, Math.min(autolyseProgressMax, store_get($$store_subs ??= {}, "$inputs", inputs).autolyseMins - autolyseMinMins)));
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().parameters)}</h2></div> <div class="px-5 pb-5 space-y-5"><div class="form-control"><label for="total-flour" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().totalFlour)}</span></label> <input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="input input-bordered w-full" placeholder="500"/></div> <div><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().flourSelection)}</span> <div class="grid grid-cols-3 gap-2 mt-2"><!--[-->`);
-    const each_array = ensure_array_like(ALL_FLOUR_TYPES);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="px-5 pt-5 pb-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().parameters)}</h2></div> <div class="px-5 pb-5 space-y-5"><div class="flex flex-col items-center"><div class="relative w-44 h-44"><svg viewBox="0 0 200 200" class="w-full h-full"><circle cx="100" cy="100"${attr("r", RING_RADIUS)} fill="none" class="stroke-base-300/30" stroke-width="18"></circle><!--[-->`);
+    const each_array = ensure_array_like(ringSegments());
     for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-      let flourType = each_array[$$index];
+      let seg = each_array[$$index];
+      $$renderer2.push(`<circle cx="100" cy="100"${attr("r", RING_RADIUS)} fill="none"${attr("stroke", seg.color)} stroke-width="18"${attr("stroke-dasharray", seg.dasharray)}${attr("stroke-dashoffset", seg.dashoffset)} stroke-linecap="butt" transform="rotate(-90 100 100)" class="transition-all duration-300"></circle>`);
+    }
+    $$renderer2.push(`<!--]--></svg> <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none"><div class="flex items-baseline pointer-events-auto"><input id="total-flour" type="number" min="0" step="50"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG)} class="w-20 bg-transparent border-none text-center text-3xl font-bold text-base-content focus:outline-none tabular-nums [appearance:textfield] [&amp;::-webkit-outer-spin-button]:appearance-none [&amp;::-webkit-inner-spin-button]:appearance-none" placeholder="500"/> <span class="text-lg font-bold text-base-content/70 -ml-1">g</span></div> <span class="text-xs text-base-content/50">${escape_html(t().totalFlour)}</span></div></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.length > 1) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="flex flex-wrap justify-center gap-x-3 gap-y-0.5 mt-1"><!--[-->`);
+      const each_array_1 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let entry = each_array_1[$$index_1];
+        $$renderer2.push(`<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums"><span class="inline-block w-2 h-2 rounded-full flex-shrink-0"${attr_style(`background-color: ${stringify(flourColors[entry.type])}`)}></span> ${escape_html(t().flourTypes[entry.type])}: ${escape_html(Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * entry.pct / 100))}g</span>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <div><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().flourSelection)}</span> <div class="grid grid-cols-3 gap-2 mt-2"><!--[-->`);
+    const each_array_2 = ensure_array_like(ALL_FLOUR_TYPES);
+    for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
+      let flourType = each_array_2[$$index_2];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2 px-1 text-xs ${stringify(isFlourSelected(flourType) ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(t().flourTypes[flourType])}</button>`);
     }
     $$renderer2.push(`<!--]--></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend.length > 1) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="mt-3 space-y-2"><!--[-->`);
-      const each_array_1 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
-      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-        let entry = each_array_1[$$index_1];
+      const each_array_3 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
+      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
+        let entry = each_array_3[$$index_3];
         $$renderer2.push(`<div class="flex items-center gap-2"><span class="inline-block w-3 h-3 rounded-full flex-shrink-0"${attr_style(`background-color: ${stringify(flourColors[entry.type])}`)}></span> <span class="text-xs text-base-content/70 flex-1 min-w-0 truncate">${escape_html(t().flourTypes[entry.type])}</span> <div class="flex items-center gap-2 flex-1"><input type="range" min="0" max="100" step="1"${attr("value", entry.pct)} class="range range-sm range-secondary flex-1"/> <input type="number" min="0" max="100" step="1"${attr("value", Math.round(entry.pct))} class="input input-xs w-14 text-right tabular-nums"/> <span class="text-xs text-base-content/70">%</span></div></div>`);
       }
       $$renderer2.push(`<!--]--></div> <div class="flex items-center justify-between mt-2"><span class="text-xs text-base-content/50">${escape_html(t().blendTotal)}: <span${attr_class(`font-semibold tabular-nums ${stringify(blendValid() ? "text-success" : "text-error")}`)}>${escape_html(Math.round(blendTotal()))}%</span></span> `);
@@ -1612,23 +1650,11 @@ function InputSection($$renderer, $$props) {
       } else {
         $$renderer2.push("<!--[-1-->");
       }
-      $$renderer2.push(`<!--]--></div> <div class="flex rounded-full overflow-hidden h-2 mt-2 gap-px"><!--[-->`);
-      const each_array_2 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
-      for (let $$index_2 = 0, $$length = each_array_2.length; $$index_2 < $$length; $$index_2++) {
-        let entry = each_array_2[$$index_2];
-        $$renderer2.push(`<div class="h-full"${attr_style(`width: ${stringify(Math.max(0, entry.pct))}%; background-color: ${stringify(flourColors[entry.type])}`)}${attr("title", `${stringify(t().flourTypes[entry.type])}: ${stringify(entry.pct)}%`)}></div>`);
-      }
-      $$renderer2.push(`<!--]--></div> <div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5"><!--[-->`);
-      const each_array_3 = ensure_array_like(store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend);
-      for (let $$index_3 = 0, $$length = each_array_3.length; $$index_3 < $$length; $$index_3++) {
-        let entry = each_array_3[$$index_3];
-        $$renderer2.push(`<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums"><span class="inline-block w-2 h-2 rounded-full flex-shrink-0"${attr_style(`background-color: ${stringify(flourColors[entry.type])}`)}></span> ${escape_html(t().flourTypes[entry.type])}: ${escape_html(Math.round(store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG * entry.pct / 100))}g</span>`);
-      }
       $$renderer2.push(`<!--]--></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div> <div class="form-control"><div class="flex items-center justify-between mb-1"><label for="ambient-temp"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().kitchenTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <button type="button" class="btn btn-ghost btn-xs rounded-full border border-base-300 bg-base-100"${attr("aria-label", t().ariaLabels.toggleTempUnit)}><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="input input-bordered w-full"/></div> <div class="form-control"><label for="dough-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().doughTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)}) <span class="font-normal text-base-content/50">${escape_html(t().optional)}</span></span></label> <input id="dough-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", doughDisplay())}${attr("placeholder", t().leaveBlankAmbient)} class="input input-bordered w-full placeholder:text-base-content/30"/></div></div> `);
+    $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-2"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().temperatures)}</span> <button type="button" class="btn btn-ghost btn-xs rounded-full border border-base-300 bg-base-100"${attr("aria-label", t().ariaLabels.toggleTempUnit)}><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <div class="grid grid-cols-2 gap-3"><div class="form-control"><label for="ambient-temp" class="label py-1"><span class="label-text text-xs text-base-content/70">${escape_html(t().kitchenTemp)}</span></label> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"/></div> <div class="form-control"><label for="dough-temp" class="label py-1"><span class="label-text text-xs text-base-content/70">${escape_html(t().doughTemp)} <span class="text-base-content/40">${escape_html(t().optional)}</span></span></label> <input id="dough-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", doughDisplay())}${attr("placeholder", t().leaveBlankAmbient)} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full placeholder:text-base-content/30"/></div></div></div></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG > 0) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="px-5 pb-3">`);
@@ -1660,7 +1686,7 @@ function InputSection($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).proofMethod === "ColdRetard") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20"><label for="fridge-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fridgeTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <input id="fridge-temp" type="number"${attr("min", fridgeTempMin())}${attr("max", fridgeTempMax())} step="0.5"${attr("value", fridgeDisplay())} class="input input-bordered w-full"/></div>`);
+      $$renderer2.push(`<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20"><label for="fridge-temp" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fridgeTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <input id="fridge-temp" type="number"${attr("min", fridgeTempMin())}${attr("max", fridgeTempMax())} step="0.5"${attr("value", fridgeDisplay())} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1673,7 +1699,7 @@ function InputSection($$renderer, $$props) {
     $$renderer2.push(`<!--]--></div> `);
     if (store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === "clock") {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20"><label for="start-time" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().startTime)}</span></label> <input id="start-time" type="time"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00")} class="input input-bordered w-full"/></div>`);
+      $$renderer2.push(`<div class="form-control mt-3 pl-4 border-l-2 border-secondary/20"><label for="start-time" class="label"><span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().startTime)}</span></label> <input id="start-time" type="time"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00")} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
@@ -1688,14 +1714,14 @@ function InputSection($$renderer, $$props) {
     $$renderer2.push(`<!--]--></span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc, true)} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc)}${attr("aria-label", t().ariaLabels.overrideSalt)}/> <span class="text-xs text-base-content/70">${escape_html(t().saltOverride)}</span></div></div> `);
     if (!store_get($$store_subs ??= {}, "$inputs", inputs).saltAutoCalc) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="form-control"><input id="salt-pct" type="number" min="1" max="3" step="0.1"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).saltPct)} class="input input-bordered w-full" placeholder="2.0"/></div> <p class="text-xs text-base-content/50 mt-1">${escape_html(t().saltBakersPct)}</p>`);
+      $$renderer2.push(`<div class="form-control"><input id="salt-pct" type="number" min="1" max="3" step="0.1"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).saltPct)} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full" placeholder="2.0"/></div> <p class="text-xs text-base-content/50 mt-1">${escape_html(t().saltBakersPct)}</p>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></div> <div><div class="flex items-center justify-between mb-1.5"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().starterHydration)}</span> <div class="flex items-center gap-2"><span class="text-xs text-base-content/50">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc ? t().starterHydrationDefaultLabel : t().starterHydrationManual)}</span> <input type="checkbox" class="toggle toggle-secondary toggle-sm"${attr("checked", !store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc, true)} role="switch"${attr("aria-checked", !store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc)}${attr("aria-label", t().ariaLabels.overrideStarterHydration)}/> <span class="text-xs text-base-content/70">${escape_html(t().starterHydrationOverride)}</span></div></div> `);
     if (!store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationAutoCalc) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="form-control"><input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="input input-bordered w-full"/></div>`);
+      $$renderer2.push(`<div class="form-control"><input id="starter-hyd" type="number" min="50" max="200" step="5"${attr("value", store_get($$store_subs ??= {}, "$inputs", inputs).starterHydrationPct)} class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"/></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
     }

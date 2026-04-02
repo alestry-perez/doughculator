@@ -120,6 +120,25 @@
 		Einkorn: '#F43F5E'
 	};
 
+	// Donut ring geometry
+	const RING_RADIUS = 80;
+	const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
+
+	let ringSegments = $derived.by(() => {
+		let offset = 0;
+		return $inputs.flourBlend.map(entry => {
+			const segLength = (entry.pct / 100) * RING_CIRCUMFERENCE;
+			const segment = {
+				type: entry.type,
+				color: flourColors[entry.type],
+				dasharray: `${segLength} ${RING_CIRCUMFERENCE - segLength}`,
+				dashoffset: -offset,
+			};
+			offset += segLength;
+			return segment;
+		});
+	});
+
 	// Auto salt display
 	let autoSaltPct = $derived($result.formula.autoSaltPct);
 	let autoSaltG = $derived(Math.round($result.formula.saltG));
@@ -275,21 +294,56 @@
 	</div>
 
 	<div class="px-5 pb-5 space-y-5">
-		<!-- Total flour input -->
-		<div class="form-control">
-			<label for="total-flour" class="label">
-				<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.totalFlour}</span>
-			</label>
-			<input
-				id="total-flour"
-				type="number"
-				min="0"
-				step="50"
-				value={$inputs.totalFlourInputG}
-				oninput={onTotalFlourInput}
-				class="input input-bordered w-full"
-				placeholder="500"
-			/>
+		<!-- Flour Donut Ring with editable center -->
+		<div class="flex flex-col items-center">
+			<div class="relative w-44 h-44">
+				<svg viewBox="0 0 200 200" class="w-full h-full">
+					<!-- Background track -->
+					<circle cx="100" cy="100" r={RING_RADIUS}
+						fill="none" class="stroke-base-300/30" stroke-width="18" />
+					<!-- Flour segments -->
+					{#each ringSegments as seg (seg.type)}
+						<circle cx="100" cy="100" r={RING_RADIUS}
+							fill="none"
+							stroke={seg.color}
+							stroke-width="18"
+							stroke-dasharray={seg.dasharray}
+							stroke-dashoffset={seg.dashoffset}
+							stroke-linecap="butt"
+							transform="rotate(-90 100 100)"
+							class="transition-all duration-300"
+						/>
+					{/each}
+				</svg>
+				<!-- Editable center overlay -->
+				<div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+					<div class="flex items-baseline pointer-events-auto">
+						<input
+							id="total-flour"
+							type="number"
+							min="0"
+							step="50"
+							value={$inputs.totalFlourInputG}
+							oninput={onTotalFlourInput}
+							class="w-20 bg-transparent border-none text-center text-3xl font-bold text-base-content focus:outline-none tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+							placeholder="500"
+						/>
+						<span class="text-lg font-bold text-base-content/70 -ml-1">g</span>
+					</div>
+					<span class="text-xs text-base-content/50">{t.totalFlour}</span>
+				</div>
+			</div>
+			<!-- Compact flour legend -->
+			{#if $inputs.flourBlend.length > 1}
+				<div class="flex flex-wrap justify-center gap-x-3 gap-y-0.5 mt-1">
+					{#each $inputs.flourBlend as entry (entry.type)}
+						<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums">
+							<span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {flourColors[entry.type]}"></span>
+							{t.flourTypes[entry.type]}: {Math.round($inputs.totalFlourInputG * entry.pct / 100)}g
+						</span>
+					{/each}
+				</div>
+			{/if}
 		</div>
 
 		<!-- Flour Selection -->
@@ -361,33 +415,13 @@
 					{/if}
 				</div>
 
-				<!-- Visual blend bar -->
-				<div class="flex rounded-full overflow-hidden h-2 mt-2 gap-px">
-					{#each $inputs.flourBlend as entry (entry.type)}
-						<div
-							class="h-full"
-							style="width: {Math.max(0, entry.pct)}%; background-color: {flourColors[entry.type]}"
-							title="{t.flourTypes[entry.type]}: {entry.pct}%"
-						></div>
-					{/each}
-				</div>
-				<div class="flex flex-wrap gap-x-3 gap-y-0.5 mt-1.5">
-					{#each $inputs.flourBlend as entry (entry.type)}
-						<span class="flex items-center gap-1 text-xs text-base-content/50 tabular-nums">
-							<span class="inline-block w-2 h-2 rounded-full flex-shrink-0" style="background-color: {flourColors[entry.type]}"></span>
-							{t.flourTypes[entry.type]}: {Math.round($inputs.totalFlourInputG * entry.pct / 100)}g
-						</span>
-					{/each}
-				</div>
 			{/if}
 		</div>
 
-		<!-- Tier 1: Kitchen temp (moved from advanced — most impactful variable) -->
-		<div class="form-control">
-			<div class="flex items-center justify-between mb-1">
-				<label for="ambient-temp">
-					<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.kitchenTemp} (°{$inputs.tempUnit})</span>
-				</label>
+		<!-- Temperatures — side by side -->
+		<div>
+			<div class="flex items-center justify-between mb-2">
+				<span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.temperatures}</span>
 				<button
 					type="button"
 					onclick={toggleUnit}
@@ -399,36 +433,41 @@
 					<span class={$inputs.tempUnit === 'F' ? 'text-secondary font-semibold' : 'text-base-content/50'}>°F</span>
 				</button>
 			</div>
-			<input
-				id="ambient-temp"
-				type="number"
-				min={tempMin}
-				max={tempMax}
-				step="0.5"
-				value={ambientDisplay}
-				oninput={onAmbientInput}
-				class="input input-bordered w-full"
-			/>
-		</div>
-
-		<!-- Dough temp (optional) — directly under kitchen temp -->
-		<div class="form-control">
-			<label for="dough-temp" class="label">
-				<span class="label-text text-xs font-semibold text-base-content/70 uppercase tracking-wide">
-					{t.doughTemp} (°{$inputs.tempUnit}) <span class="font-normal text-base-content/50">{t.optional}</span>
-				</span>
-			</label>
-			<input
-				id="dough-temp"
-				type="number"
-				min={tempMin}
-				max={tempMax}
-				step="0.5"
-				value={doughDisplay}
-				oninput={onDoughInput}
-				placeholder={t.leaveBlankAmbient}
-				class="input input-bordered w-full placeholder:text-base-content/30"
-			/>
+			<div class="grid grid-cols-2 gap-3">
+				<div class="form-control">
+					<label for="ambient-temp" class="label py-1">
+						<span class="label-text text-xs text-base-content/70">{t.kitchenTemp}</span>
+					</label>
+					<input
+						id="ambient-temp"
+						type="number"
+						min={tempMin}
+						max={tempMax}
+						step="0.5"
+						value={ambientDisplay}
+						oninput={onAmbientInput}
+						class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"
+					/>
+				</div>
+				<div class="form-control">
+					<label for="dough-temp" class="label py-1">
+						<span class="label-text text-xs text-base-content/70">
+							{t.doughTemp} <span class="text-base-content/40">{t.optional}</span>
+						</span>
+					</label>
+					<input
+						id="dough-temp"
+						type="number"
+						min={tempMin}
+						max={tempMax}
+						step="0.5"
+						value={doughDisplay}
+						oninput={onDoughInput}
+						placeholder={t.leaveBlankAmbient}
+						class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full placeholder:text-base-content/30"
+					/>
+				</div>
+			</div>
 		</div>
 	</div>
 
@@ -529,7 +568,7 @@
 							step="0.5"
 							value={fridgeDisplay}
 							oninput={onFridgeTempInput}
-							class="input input-bordered w-full"
+							class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"
 						/>
 					</div>
 				{/if}
@@ -562,7 +601,7 @@
 							type="time"
 							value={$inputs.startTime ?? '08:00'}
 							oninput={(e) => updateField('startTime', (e.target as HTMLInputElement).value || null)}
-							class="input input-bordered w-full"
+							class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"
 						/>
 					</div>
 				{/if}
@@ -610,7 +649,7 @@
 							step="0.1"
 							value={$inputs.saltPct}
 							oninput={(e) => updateField('saltPct', parseFloat((e.target as HTMLInputElement).value) || 2)}
-							class="input input-bordered w-full"
+							class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"
 							placeholder="2.0"
 						/>
 					</div>
@@ -648,7 +687,7 @@
 							step="5"
 							value={$inputs.starterHydrationPct}
 							oninput={(e) => updateField('starterHydrationPct', parseFloat((e.target as HTMLInputElement).value) || 100)}
-							class="input input-bordered w-full"
+							class="input border-0 border-b-2 border-base-300 rounded-none focus:border-secondary focus:outline-none bg-transparent w-full"
 						/>
 					</div>
 				{/if}
