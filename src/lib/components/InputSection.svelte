@@ -4,7 +4,6 @@
 	import { inputs, result, lang, showBakingProfile, showFineTuning } from '$lib/store';
 	import { translations } from '$lib/i18n';
 	import WarningsCard from './WarningsCard.svelte';
-	import GuidanceCard from './GuidanceCard.svelte';
 
 	const t = $derived(translations[$lang]);
 
@@ -415,9 +414,8 @@
 
 	<!-- Warnings & Guidance inline after kitchen temp -->
 	{#if $inputs.totalFlourInputG > 0}
-		<div class="px-5 pb-3 space-y-3">
+		<div class="px-5 pb-3">
 			<WarningsCard warnings={$result.warnings} />
-			<GuidanceCard crumbGoal={$inputs.crumbGoal} />
 		</div>
 	{/if}
 
