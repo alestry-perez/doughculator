@@ -149,8 +149,8 @@
     },
     {
       "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 22,
-      "lastAccessed": 1775139969067,
+      "accessCount": 24,
+      "lastAccessed": 1775149304566,
       "type": "file"
     },
     {
@@ -178,6 +178,12 @@
       "type": "file"
     },
     {
+      "path": "src/routes/+page.svelte",
+      "accessCount": 5,
+      "lastAccessed": 1775149332019,
+      "type": "file"
+    },
+    {
       "path": "src/lib/components/FormulaCard.svelte",
       "accessCount": 4,
       "lastAccessed": 1775139180416,
@@ -190,9 +196,15 @@
       "type": "file"
     },
     {
-      "path": "src/routes/+page.svelte",
+      "path": "src/lib/components/WarningsCard.svelte",
       "accessCount": 1,
-      "lastAccessed": 1775138984452,
+      "lastAccessed": 1775146418447,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/GuidanceCard.svelte",
+      "accessCount": 1,
+      "lastAccessed": 1775146419041,
       "type": "file"
     }
   ],

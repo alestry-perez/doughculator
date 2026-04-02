@@ -1,4 +1,4 @@
-import { e as escape_html, a6 as attr, a7 as store_get, a8 as ensure_array_like, a9 as attr_class, aa as stringify, ab as attr_style, ac as clsx, ad as unsubscribe_stores, a5 as derived$1, h as head } from "../../chunks/index2.js";
+import { e as escape_html, a6 as ensure_array_like, a7 as attr_class, a8 as stringify, a5 as derived$1, a9 as store_get, aa as unsubscribe_stores, ab as attr, ac as attr_style, ad as clsx, h as head } from "../../chunks/index2.js";
 import { d as derived, w as writable } from "../../chunks/index.js";
 const scheduleStrings = {
   en: {
@@ -1512,6 +1512,54 @@ showBakingProfile.subscribe((val) => {
 });
 showFineTuning.subscribe((val) => {
 });
+function WarningsCard($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    var $$store_subs;
+    const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
+    let { warnings } = $$props;
+    const alertVariant = {
+      info: "alert-info alert-soft",
+      warn: "alert-warning alert-soft",
+      danger: "alert-error alert-soft"
+    };
+    if (warnings.length > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5 gap-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().notesWarnings)}</h2> <!--[-->`);
+      const each_array = ensure_array_like(warnings);
+      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
+        let w = each_array[$$index];
+        $$renderer2.push(`<div${attr_class(`alert ${stringify(alertVariant[w.level] ?? "alert-info")} text-sm py-3 px-4`)}><span class="shrink-0 text-base leading-none">`);
+        if (w.level === "info") {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`ℹ`);
+        } else if (w.level === "warn") {
+          $$renderer2.push("<!--[1-->");
+          $$renderer2.push(`⚠`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+          $$renderer2.push(`✕`);
+        }
+        $$renderer2.push(`<!--]--></span> <p class="leading-snug">${escape_html(w.message)}</p></div>`);
+      }
+      $$renderer2.push(`<!--]--></div></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
+    if ($$store_subs) unsubscribe_stores($$store_subs);
+  });
+}
+function GuidanceCard($$renderer, $$props) {
+  $$renderer.component(($$renderer2) => {
+    var $$store_subs;
+    const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
+    let { crumbGoal } = $$props;
+    const info = derived$1(() => t().guidance[crumbGoal]);
+    const translatedGoal = derived$1(() => t().crumbGoalNames[crumbGoal]);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-3">${escape_html(t().readingYourCrumb)}</h2> <div class="text-sm text-base-content space-y-2"><p><span class="font-semibold text-secondary">${escape_html(t().target(translatedGoal()))}</span> ${escape_html(info().description)}</p> <p><span class="font-semibold text-warning">${escape_html(t().underFermented)}</span> ${escape_html(info().underFermented)}</p> <p><span class="font-semibold text-error">${escape_html(t().overFermented)}</span> ${escape_html(info().overFermented)}</p></div> <div class="mt-4 pt-4 border-t border-base-200 text-xs text-base-content/70 space-y-1"><p><strong>${escape_html(t().floatTest)}</strong> ${escape_html(t().floatTestDesc)}</p> <p><strong>${escape_html(t().pokeTest)}</strong> ${escape_html(t().pokeTestDesc)}</p> <p><strong>${escape_html(t().jiggleTest)}</strong> ${escape_html(t().jiggleTestDesc)}</p></div></div></div>`);
+    if ($$store_subs) unsubscribe_stores($$store_subs);
+  });
+}
 function InputSection($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
@@ -1591,7 +1639,22 @@ function InputSection($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div> <div class="form-control"><div class="flex items-center justify-between mb-1"><label for="ambient-temp"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().kitchenTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <button type="button" class="btn btn-ghost btn-xs rounded-full border border-base-300 bg-base-100"${attr("aria-label", t().ariaLabels.toggleTempUnit)}><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="input input-bordered w-full"/></div></div> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().bakingProfile)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showBakingProfile", showBakingProfile) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
+    $$renderer2.push(`<!--]--></div> <div class="form-control"><div class="flex items-center justify-between mb-1"><label for="ambient-temp"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().kitchenTemp)} (°${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit)})</span></label> <button type="button" class="btn btn-ghost btn-xs rounded-full border border-base-300 bg-base-100"${attr("aria-label", t().ariaLabels.toggleTempUnit)}><span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "C" ? "text-secondary font-semibold" : "text-base-content/50"))}>°C</span> <span class="text-base-content/30">/</span> <span${attr_class(clsx(store_get($$store_subs ??= {}, "$inputs", inputs).tempUnit === "F" ? "text-secondary font-semibold" : "text-base-content/50"))}>°F</span></button></div> <input id="ambient-temp" type="number"${attr("min", tempMin())}${attr("max", tempMax())} step="0.5"${attr("value", ambientDisplay())} class="input input-bordered w-full"/></div></div> `);
+    if (store_get($$store_subs ??= {}, "$inputs", inputs).totalFlourInputG > 0) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="px-5 pb-3 space-y-3">`);
+      WarningsCard($$renderer2, {
+        warnings: store_get($$store_subs ??= {}, "$result", result).warnings
+      });
+      $$renderer2.push(`<!----> `);
+      GuidanceCard($$renderer2, {
+        crumbGoal: store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal
+      });
+      $$renderer2.push(`<!----></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().bakingProfile)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showBakingProfile", showBakingProfile) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
     if (store_get($$store_subs ??= {}, "$showBakingProfile", showBakingProfile)) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="px-5 pb-5 space-y-5"><div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().crumbGoal)}</p> <div class="grid grid-cols-3 gap-2"><!--[-->`);
@@ -1893,54 +1956,6 @@ function ScheduleCard($$renderer, $$props) {
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }
-function WarningsCard($$renderer, $$props) {
-  $$renderer.component(($$renderer2) => {
-    var $$store_subs;
-    const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
-    let { warnings } = $$props;
-    const alertVariant = {
-      info: "alert-info alert-soft",
-      warn: "alert-warning alert-soft",
-      danger: "alert-error alert-soft"
-    };
-    if (warnings.length > 0) {
-      $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5 gap-3"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().notesWarnings)}</h2> <!--[-->`);
-      const each_array = ensure_array_like(warnings);
-      for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
-        let w = each_array[$$index];
-        $$renderer2.push(`<div${attr_class(`alert ${stringify(alertVariant[w.level] ?? "alert-info")} text-sm py-3 px-4`)}><span class="shrink-0 text-base leading-none">`);
-        if (w.level === "info") {
-          $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`ℹ`);
-        } else if (w.level === "warn") {
-          $$renderer2.push("<!--[1-->");
-          $$renderer2.push(`⚠`);
-        } else {
-          $$renderer2.push("<!--[-1-->");
-          $$renderer2.push(`✕`);
-        }
-        $$renderer2.push(`<!--]--></span> <p class="leading-snug">${escape_html(w.message)}</p></div>`);
-      }
-      $$renderer2.push(`<!--]--></div></div>`);
-    } else {
-      $$renderer2.push("<!--[-1-->");
-    }
-    $$renderer2.push(`<!--]-->`);
-    if ($$store_subs) unsubscribe_stores($$store_subs);
-  });
-}
-function GuidanceCard($$renderer, $$props) {
-  $$renderer.component(($$renderer2) => {
-    var $$store_subs;
-    const t = derived$1(() => translations[store_get($$store_subs ??= {}, "$lang", lang)]);
-    let { crumbGoal } = $$props;
-    const info = derived$1(() => t().guidance[crumbGoal]);
-    const translatedGoal = derived$1(() => t().crumbGoalNames[crumbGoal]);
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70"><div class="card-body p-5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide mb-3">${escape_html(t().readingYourCrumb)}</h2> <div class="text-sm text-base-content space-y-2"><p><span class="font-semibold text-secondary">${escape_html(t().target(translatedGoal()))}</span> ${escape_html(info().description)}</p> <p><span class="font-semibold text-warning">${escape_html(t().underFermented)}</span> ${escape_html(info().underFermented)}</p> <p><span class="font-semibold text-error">${escape_html(t().overFermented)}</span> ${escape_html(info().overFermented)}</p></div> <div class="mt-4 pt-4 border-t border-base-200 text-xs text-base-content/70 space-y-1"><p><strong>${escape_html(t().floatTest)}</strong> ${escape_html(t().floatTestDesc)}</p> <p><strong>${escape_html(t().pokeTest)}</strong> ${escape_html(t().pokeTestDesc)}</p> <p><strong>${escape_html(t().jiggleTest)}</strong> ${escape_html(t().jiggleTestDesc)}</p></div></div></div>`);
-    if ($$store_subs) unsubscribe_stores($$store_subs);
-  });
-}
 function AssumptionsDrawer($$renderer, $$props) {
   $$renderer.component(($$renderer2) => {
     var $$store_subs;
@@ -1983,10 +1998,6 @@ function _page($$renderer, $$props) {
     $$renderer2.push(`<!----> `);
     if (totalFlour() > 0) {
       $$renderer2.push("<!--[0-->");
-      WarningsCard($$renderer2, {
-        warnings: store_get($$store_subs ??= {}, "$result", result).warnings
-      });
-      $$renderer2.push(`<!----> `);
       FormulaCard($$renderer2, {
         formula: store_get($$store_subs ??= {}, "$result", result).formula,
         flourBlend: store_get($$store_subs ??= {}, "$inputs", inputs).flourBlend
@@ -2002,10 +2013,6 @@ function _page($$renderer, $$props) {
         steps: store_get($$store_subs ??= {}, "$result", result).schedule,
         scheduleMode: store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode,
         startTime: store_get($$store_subs ??= {}, "$inputs", inputs).scheduleMode === "clock" ? store_get($$store_subs ??= {}, "$inputs", inputs).startTime ?? "08:00" : null
-      });
-      $$renderer2.push(`<!----> `);
-      GuidanceCard($$renderer2, {
-        crumbGoal: store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal
       });
       $$renderer2.push(`<!---->`);
     } else {
