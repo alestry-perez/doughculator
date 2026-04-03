@@ -4,6 +4,9 @@
 	import { inputs, result, lang } from '$lib/store';
 	import { translations } from '$lib/i18n';
 	import WarningsCard from './WarningsCard.svelte';
+	import CrumbTight from './icons/CrumbTight.svelte';
+	import CrumbBalanced from './icons/CrumbBalanced.svelte';
+	import CrumbOpen from './icons/CrumbOpen.svelte';
 
 	const t = $derived(translations[$lang]);
 
@@ -12,6 +15,11 @@
 	let proofMethodModalOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
+	const crumbIcons: Record<CrumbGoal, typeof CrumbTight> = {
+		Tight: CrumbTight,
+		Balanced: CrumbBalanced,
+		Open: CrumbOpen,
+	};
 
 	// Flour blend helpers
 	let blendTotal = $derived($inputs.flourBlend.reduce((s, e) => s + e.pct, 0));
@@ -491,15 +499,17 @@
 				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.crumbGoal}</p>
 				<div class="grid grid-cols-3 gap-2">
 					{#each crumbGoals as goal}
+						{@const Icon = crumbIcons[goal]}
 						<button
 							type="button"
 							onclick={() => updateField('crumbGoal', goal)}
-							class="btn btn-sm rounded-xl border-2 flex-col h-auto py-3 px-2
+							class="btn rounded-xl border-2 flex-col h-auto py-3 px-2 gap-1.5
 								{$inputs.crumbGoal === goal
 									? 'btn-secondary border-secondary text-secondary-content'
 									: 'btn-ghost border-base-300'}"
 						>
-							<span class="text-sm font-bold">{t.crumbGoalNames[goal]}</span>
+							<Icon class="w-[147px] h-[105px]" />
+							<span class="text-xs font-bold">{t.crumbGoalNames[goal]}</span>
 						</button>
 					{/each}
 				</div>

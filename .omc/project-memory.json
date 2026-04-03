@@ -142,15 +142,15 @@
   },
   "hotPaths": [
     {
-      "path": "src/lib/i18n.ts",
-      "accessCount": 45,
-      "lastAccessed": 1775216231130,
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 47,
+      "lastAccessed": 1775224938917,
       "type": "file"
     },
     {
-      "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 38,
-      "lastAccessed": 1775216267166,
+      "path": "src/lib/i18n.ts",
+      "accessCount": 45,
+      "lastAccessed": 1775216231130,
       "type": "file"
     },
     {
@@ -181,6 +181,24 @@
       "path": "src/lib/components/WarningsCard.svelte",
       "accessCount": 3,
       "lastAccessed": 1775216472511,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/icons/CrumbTight.svelte",
+      "accessCount": 3,
+      "lastAccessed": 1775224825209,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/icons/CrumbBalanced.svelte",
+      "accessCount": 3,
+      "lastAccessed": 1775224848493,
+      "type": "file"
+    },
+    {
+      "path": "src/lib/components/icons/CrumbOpen.svelte",
+      "accessCount": 3,
+      "lastAccessed": 1775224849434,
       "type": "file"
     },
     {
