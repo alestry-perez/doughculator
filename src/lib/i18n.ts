@@ -364,7 +364,7 @@ const en = {
   mixFlour: 'Flour',
   mixWater: 'Water',
   starterNote: 'Starter flour/water is already counted in total formula above.',
-  starterContains: (flour: string, water: string) => `Starter contains ${flour}g flour + ${water}g water`,
+  starterContains: (flour: string, water: string, ratio: string) => `Starter contains ${flour}g flour + ${water}g water (ratio ${ratio})`,
   // TimingCard
   timing: 'Timing',
   bulkFermentation: 'Bulk Fermentation',
@@ -584,7 +584,7 @@ const es: Translations = {
   mixFlour: 'Harina',
   mixWater: 'Agua',
   starterNote: 'La harina/agua del iniciador ya está contada en la fórmula total.',
-  starterContains: (flour: string, water: string) => `El iniciador contiene ${flour}g harina + ${water}g agua`,
+  starterContains: (flour: string, water: string, ratio: string) => `El iniciador contiene ${flour}g harina + ${water}g agua (proporción ${ratio})`,
   // TimingCard
   timing: 'Tiempos',
   bulkFermentation: 'Fermentación en Masa',
@@ -798,7 +798,7 @@ const sv: Translations = {
   mixFlour: 'Mjöl',
   mixWater: 'Vatten',
   starterNote: 'Surdegsmjöl/vatten är redan inkluderat i totalformeln ovan.',
-  starterContains: (flour: string, water: string) => `Surdegen innehåller ${flour}g mjöl + ${water}g vatten`,
+  starterContains: (flour: string, water: string, ratio: string) => `Surdegen innehåller ${flour}g mjöl + ${water}g vatten (förhållande ${ratio})`,
   // TimingCard
   timing: 'Timing',
   bulkFermentation: 'Bulkjäsning',

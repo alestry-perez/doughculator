@@ -143,8 +143,8 @@
   "hotPaths": [
     {
       "path": "src/lib/i18n.ts",
-      "accessCount": 34,
-      "lastAccessed": 1775215872018,
+      "accessCount": 37,
+      "lastAccessed": 1775215982564,
       "type": "file"
     },
     {
@@ -161,8 +161,8 @@
     },
     {
       "path": "src/lib/components/FormulaCard.svelte",
-      "accessCount": 8,
-      "lastAccessed": 1775215889389,
+      "accessCount": 10,
+      "lastAccessed": 1775215993502,
       "type": "file"
     },
     {

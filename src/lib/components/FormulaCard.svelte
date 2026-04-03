@@ -19,6 +19,15 @@
 		return Math.round(n).toString();
 	}
 
+	function ratio(flour: number, water: number): string {
+		const f = Math.round(flour);
+		const w = Math.round(water);
+		if (f <= 0 || w <= 0) return '—';
+		let a = f, b = w;
+		while (b) { [a, b] = [b, a % b]; }
+		return `${f / a}:${w / a}`;
+	}
+
 	let formulaModalOpen = $state(false);
 
 	const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
@@ -97,7 +106,7 @@
 			</div>
 		</div>
 		<p class="text-xs text-base-content/50 mt-2.5 italic">
-			{t.starterContains(round(formula.starterFlourG), round(formula.starterWaterG))}
+			{t.starterContains(round(formula.starterFlourG), round(formula.starterWaterG), ratio(formula.starterFlourG, formula.starterWaterG))}
 		</p>
 	</div>
 
