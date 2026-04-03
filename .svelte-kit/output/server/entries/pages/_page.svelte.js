@@ -232,6 +232,7 @@ const en = {
   // Footer
   footerLine1: "Sourdough Calculator — open source, runs entirely in your browser.",
   footerLine2: "All calculations are guidelines. Your dough knows best.",
+  redditBadge: "Share your bake on r/Sourdough!",
   // Copy text
   copyTitle: "🍞 SOURDOUGH RECIPE",
   copyDivider: "===================",
@@ -456,6 +457,7 @@ const es = {
   // Footer
   footerLine1: "Calculadora de masa madre — código abierto, funciona en tu navegador.",
   footerLine2: "Todos los cálculos son orientativos. Tu masa lo sabe mejor.",
+  redditBadge: "Comparte tu horneada en r/Sourdough!",
   // Copy text
   copyTitle: "🍞 RECETA DE MASA MADRE",
   copyDivider: "=======================",
@@ -684,6 +686,7 @@ const sv = {
   // Footer
   footerLine1: "Surdegskalkylator — öppen källkod, körs i din webbläsare.",
   footerLine2: "Alla beräkningar är riktlinjer. Din deg vet bäst.",
+  redditBadge: "Dela ditt bak på r/Sourdough!",
   // Copy text
   copyTitle: "🍞 SURDEGRECEPT",
   copyDivider: "===============",
@@ -3341,7 +3344,7 @@ function _page($$renderer, $$props) {
       GuidanceCard($$renderer2, {
         crumbGoal: store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal
       });
-      $$renderer2.push(`<!---->`);
+      $$renderer2.push(`<!----> <div class="flex justify-center mt-4"><a href="https://www.reddit.com/r/Sourdough/s/AeZMGcjrV1" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost gap-2 text-base-content/60 hover:text-[#FF4500]"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14.238 15.348c.085.084.085.221 0 .306-.465.462-1.194.687-2.231.687l-.008-.002-.008.002c-1.036 0-1.766-.225-2.231-.688-.085-.084-.085-.221 0-.305.084-.084.222-.084.307 0 .379.377 1.008.561 1.924.561l.008.002.008-.002c.915 0 1.544-.184 1.924-.561.085-.084.223-.084.307 0zm-3.44-2.418c0-.507-.414-.919-.922-.919-.509 0-.922.412-.922.919 0 .506.414.918.922.918.508 0 .922-.412.922-.918zm4.04-.919c-.509 0-.922.412-.922.919 0 .506.414.918.922.918.508 0 .922-.412.922-.918 0-.507-.414-.919-.922-.919zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.492 13.612c.018.162.028.326.028.492 0 2.51-2.924 4.546-6.528 4.546-3.606 0-6.53-2.036-6.53-4.546 0-.166.012-.33.028-.492a1.252 1.252 0 0 1-.464-.993c0-.694.565-1.257 1.262-1.257.334 0 .637.134.857.353 1.063-.731 2.528-1.202 4.147-1.26l.786-3.693.003-.013a.282.282 0 0 1 .34-.208l2.614.591c.163-.36.534-.614.965-.614.585 0 1.06.474 1.06 1.057 0 .584-.475 1.058-1.06 1.058-.583 0-1.054-.472-1.058-1.052l-2.35-.531-.693 3.263c1.594.07 3.034.543 4.08 1.265.219-.218.521-.351.853-.351.698 0 1.262.563 1.262 1.257 0 .427-.214.805-.547.998z"></path></svg> ${escape_html(t().redditBadge)}</a></div>`);
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="card bg-base-100/95 shadow-sm ring-1 ring-base-300/70"><div class="card-body items-center text-center"><div class="text-4xl mb-3" aria-hidden="true">⚖️</div> <p class="text-base-content/70 font-medium">${escape_html(t().emptyStateTitle)}</p> <p class="text-base-content/50 text-sm mt-1">${escape_html(t().emptyStateSubtitle)}</p></div></div>`);

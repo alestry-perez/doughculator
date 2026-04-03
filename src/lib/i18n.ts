@@ -262,6 +262,7 @@ const en = {
   // Footer
   footerLine1: 'Sourdough Calculator — open source, runs entirely in your browser.',
   footerLine2: 'All calculations are guidelines. Your dough knows best.',
+  redditBadge: 'Share your bake on r/Sourdough!',
   // Copy text
   copyTitle: '🍞 SOURDOUGH RECIPE',
   copyDivider: '===================',
@@ -489,6 +490,7 @@ const es: Translations = {
   // Footer
   footerLine1: 'Calculadora de masa madre — código abierto, funciona en tu navegador.',
   footerLine2: 'Todos los cálculos son orientativos. Tu masa lo sabe mejor.',
+  redditBadge: 'Comparte tu horneada en r/Sourdough!',
   // Copy text
   copyTitle: '🍞 RECETA DE MASA MADRE',
   copyDivider: '=======================',
@@ -718,6 +720,7 @@ const sv: Translations = {
   // Footer
   footerLine1: 'Surdegskalkylator — öppen källkod, körs i din webbläsare.',
   footerLine2: 'Alla beräkningar är riktlinjer. Din deg vet bäst.',
+  redditBadge: 'Dela ditt bak på r/Sourdough!',
   // Copy text
   copyTitle: '🍞 SURDEGRECEPT',
   copyDivider: '===============',

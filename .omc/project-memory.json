@@ -143,8 +143,8 @@
   "hotPaths": [
     {
       "path": "src/lib/i18n.ts",
-      "accessCount": 60,
-      "lastAccessed": 1775225632782,
+      "accessCount": 68,
+      "lastAccessed": 1775229846318,
       "type": "file"
     },
     {
@@ -157,6 +157,12 @@
       "path": "src/lib/calculator.ts",
       "accessCount": 18,
       "lastAccessed": 1775216466291,
+      "type": "directory"
+    },
+    {
+      "path": "src/routes/+page.svelte",
+      "accessCount": 13,
+      "lastAccessed": 1775229938397,
       "type": "directory"
     },
     {
@@ -178,12 +184,6 @@
       "type": "file"
     },
     {
-      "path": "src/routes/+page.svelte",
-      "accessCount": 3,
-      "lastAccessed": 1775165684138,
-      "type": "directory"
-    },
-    {
       "path": "src/lib/components/WarningsCard.svelte",
       "accessCount": 3,
       "lastAccessed": 1775216472511,
@@ -202,6 +202,12 @@
       "type": "file"
     },
     {
+      "path": "src/lib/components",
+      "accessCount": 3,
+      "lastAccessed": 1775229689914,
+      "type": "directory"
+    },
+    {
       "path": "src/lib/components/ScheduleCard.svelte",
       "accessCount": 2,
       "lastAccessed": 1775158096368,
@@ -214,9 +220,9 @@
       "type": "directory"
     },
     {
-      "path": "src/lib/components",
+      "path": "src/routes",
       "accessCount": 2,
-      "lastAccessed": 1775216426665,
+      "lastAccessed": 1775229689233,
       "type": "directory"
     },
     {
@@ -226,15 +232,27 @@
       "type": "directory"
     },
     {
-      "path": "src/routes",
-      "accessCount": 1,
-      "lastAccessed": 1775158110727,
-      "type": "directory"
-    },
-    {
       "path": "src/lib/store.ts",
       "accessCount": 1,
       "lastAccessed": 1775165694588,
+      "type": "file"
+    },
+    {
+      "path": "src/routes/+layout.svelte",
+      "accessCount": 1,
+      "lastAccessed": 1775229681918,
+      "type": "file"
+    },
+    {
+      "path": "package.json",
+      "accessCount": 1,
+      "lastAccessed": 1775229682175,
+      "type": "file"
+    },
+    {
+      "path": "README.md",
+      "accessCount": 1,
+      "lastAccessed": 1775229683197,
       "type": "file"
     }
   ],
