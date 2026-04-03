@@ -336,6 +336,9 @@ const en = {
   relative: 'Relative',
   clock: 'Clock',
   startTime: 'Start Time (HH:MM)',
+  formulaInfoTitle: 'Understanding Your Formula',
+  formulaInfoMixBody: '"What You Add" shows the amounts you physically measure and mix — flour, water, starter, and salt. The flour and water here exclude what\'s already inside your starter.',
+  formulaInfoFormulaBody: 'The "Full Baker\'s Formula" shows total flour and water in the entire dough, including the flour and water contributed by your starter. Baker\'s percentages are always calculated relative to this total flour — that\'s why the flour amount here is higher than what you physically add.',
   // FormulaCard
   formula: 'Formula',
   bakersPctSubtitle: "Baker's percentages relative to total flour",
@@ -449,6 +452,8 @@ const en = {
     autolyseDurationProgress: 'Autolyse duration progress',
     closeFermentationPhilosophyModal: 'Close fermentation philosophy modal',
     closeAutolyseModal: 'Close autolyse info modal',
+    learnFormula: 'Learn about the formula sections',
+    closeFormulaModal: 'Close formula info modal',
   },
 };
 
@@ -551,6 +556,9 @@ const es: Translations = {
   relative: 'Duración',
   clock: 'Reloj',
   startTime: 'Hora de Inicio (HH:MM)',
+  formulaInfoTitle: 'Entendiendo Tu Fórmula',
+  formulaInfoMixBody: '"Lo que añades" muestra las cantidades que mides y mezclas físicamente — harina, agua, masa madre y sal. La harina y el agua aquí excluyen lo que ya está dentro de tu masa madre.',
+  formulaInfoFormulaBody: 'La "Fórmula Completa del Panadero" muestra la harina y el agua totales en toda la masa, incluyendo la harina y el agua que aporta tu masa madre. Los porcentajes del panadero siempre se calculan respecto a esta harina total — por eso la cantidad de harina aquí es mayor que lo que añades físicamente.',
   // FormulaCard
   formula: 'Fórmula',
   bakersPctSubtitle: 'Porcentajes del panadero relativos a la harina total',
@@ -664,6 +672,8 @@ const es: Translations = {
     autolyseDurationProgress: 'Progreso de duración de autólisis',
     closeFermentationPhilosophyModal: 'Cerrar modal de filosofía de fermentación',
     closeAutolyseModal: 'Cerrar modal de información de autólisis',
+    learnFormula: 'Conocer las secciones de la fórmula',
+    closeFormulaModal: 'Cerrar modal de información de la fórmula',
   },
 };
 
@@ -760,6 +770,9 @@ const sv: Translations = {
   relative: 'Relativt',
   clock: 'Klocka',
   startTime: 'Starttid (HH:MM)',
+  formulaInfoTitle: 'Förstå Din Formel',
+  formulaInfoMixBody: '"Det du tillsätter" visar mängderna du fysiskt mäter upp och blandar — mjöl, vatten, surdeg och salt. Mjölet och vattnet här exkluderar det som redan finns i din surdeg.',
+  formulaInfoFormulaBody: '"Fullständig Bagarformel" visar totalt mjöl och vatten i hela degen, inklusive mjölet och vattnet som din surdeg bidrar med. Bagarprocent beräknas alltid relativt detta totala mjöl — därför är mjölmängden här högre än vad du fysiskt tillsätter.',
   // FormulaCard
   formula: 'Formel',
   bakersPctSubtitle: 'Bagarprocent relativt totalt mjöl',
@@ -873,6 +886,8 @@ const sv: Translations = {
     autolyseDurationProgress: 'Autolysens tidsförlopp',
     closeFermentationPhilosophyModal: 'Stäng jäsningsfilosofimodal',
     closeAutolyseModal: 'Stäng autolys-infomodal',
+    learnFormula: 'Lär dig om formelsektionerna',
+    closeFormulaModal: 'Stäng formelinfomodal',
   },
 };
 

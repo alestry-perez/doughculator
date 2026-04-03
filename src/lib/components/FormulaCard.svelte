@@ -18,13 +18,56 @@
 	function round(n: number): string {
 		return Math.round(n).toString();
 	}
+
+	let formulaModalOpen = $state(false);
+
+	const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+	function trapFocus(node: HTMLElement, open: boolean) {
+		if (!open) return;
+		const focusables = Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE));
+		if (focusables.length) focusables[0].focus();
+
+		function onKeyDown(e: KeyboardEvent) {
+			if (e.key === 'Escape') {
+				formulaModalOpen = false;
+				return;
+			}
+			if (e.key !== 'Tab') return;
+			const first = focusables[0];
+			const last = focusables[focusables.length - 1];
+			if (e.shiftKey) {
+				if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+			} else {
+				if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+			}
+		}
+		node.addEventListener('keydown', onKeyDown);
+		return { destroy() { node.removeEventListener('keydown', onKeyDown); } };
+	}
+
+	function useTrapFocus(node: HTMLElement) {
+		return trapFocus(node, true);
+	}
 </script>
 
 <div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden">
 	<!-- Header with title + dough weight badge -->
 	<div class="flex items-center justify-between px-5 pt-5 pb-3">
 		<div>
-			<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.formula}</h2>
+			<div class="flex items-center gap-1.5">
+				<h2 class="text-base font-semibold text-base-content uppercase tracking-wide">{t.formula}</h2>
+				<button
+					type="button"
+					onclick={() => (formulaModalOpen = true)}
+					class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+					aria-label={t.ariaLabels.learnFormula}
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+						<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+					</svg>
+				</button>
+			</div>
 			<p class="text-xs text-base-content/50 mt-0.5">{t.bakersPctSubtitle}</p>
 		</div>
 		<div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">
@@ -130,6 +173,61 @@
 		{/if}
 	</div>
 </div>
+
+<!-- Formula info modal -->
+{#if formulaModalOpen}
+	<div class="modal modal-open">
+		<button
+			type="button"
+			class="modal-backdrop"
+			onclick={() => (formulaModalOpen = false)}
+			aria-label={t.ariaLabels.closeFormulaModal}
+		></button>
+
+		<div
+			class="modal-box w-full max-w-sm p-0 overflow-hidden"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="formula-modal-title"
+			use:useTrapFocus
+		>
+			<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+				<h2 id="formula-modal-title" class="text-base font-semibold text-base-content">{t.formulaInfoTitle}</h2>
+				<button
+					type="button"
+					onclick={() => (formulaModalOpen = false)}
+					class="btn btn-ghost btn-sm btn-circle"
+					aria-label={t.ariaLabels.closeFormulaModal}
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<div class="px-5 py-4 space-y-4">
+				<div>
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.mixAdditions}</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.formulaInfoMixBody}</p>
+				</div>
+				<div class="border-t border-base-200 pt-4">
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.fullFormula}</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.formulaInfoFormulaBody}</p>
+				</div>
+			</div>
+
+			<div class="px-5 pb-5">
+				<button
+					type="button"
+					onclick={() => (formulaModalOpen = false)}
+					class="btn btn-primary w-full"
+				>
+					{t.done}
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style lang="scss">
 	// No extra styles needed

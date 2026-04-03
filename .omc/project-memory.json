@@ -142,27 +142,39 @@
   },
   "hotPaths": [
     {
-      "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 23,
-      "lastAccessed": 1775166871501,
+      "path": "src/lib/i18n.ts",
+      "accessCount": 34,
+      "lastAccessed": 1775215872018,
       "type": "file"
     },
     {
-      "path": "src/lib/i18n.ts",
-      "accessCount": 16,
-      "lastAccessed": 1775165921811,
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 29,
+      "lastAccessed": 1775211763892,
       "type": "file"
     },
     {
       "path": "src/lib/calculator.ts",
-      "accessCount": 10,
-      "lastAccessed": 1775165710580,
+      "accessCount": 14,
+      "lastAccessed": 1775211498519,
       "type": "directory"
+    },
+    {
+      "path": "src/lib/components/FormulaCard.svelte",
+      "accessCount": 8,
+      "lastAccessed": 1775215889389,
+      "type": "file"
     },
     {
       "path": "src/routes/+page.svelte",
       "accessCount": 3,
       "lastAccessed": 1775165684138,
+      "type": "directory"
+    },
+    {
+      "path": "src",
+      "accessCount": 3,
+      "lastAccessed": 1775211750660,
       "type": "directory"
     },
     {
@@ -184,12 +196,6 @@
       "type": "directory"
     },
     {
-      "path": "src/lib/components/FormulaCard.svelte",
-      "accessCount": 1,
-      "lastAccessed": 1775157847395,
-      "type": "file"
-    },
-    {
       "path": "src/routes",
       "accessCount": 1,
       "lastAccessed": 1775158110727,
@@ -200,6 +206,12 @@
       "accessCount": 1,
       "lastAccessed": 1775165694588,
       "type": "file"
+    },
+    {
+      "path": "src/lib/components",
+      "accessCount": 1,
+      "lastAccessed": 1775211236951,
+      "type": "directory"
     }
   ],
   "userDirectives": []

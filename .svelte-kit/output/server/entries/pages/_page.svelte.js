@@ -306,6 +306,9 @@ const en = {
   relative: "Relative",
   clock: "Clock",
   startTime: "Start Time (HH:MM)",
+  formulaInfoTitle: "Understanding Your Formula",
+  formulaInfoMixBody: `"What You Add" shows the amounts you physically measure and mix — flour, water, starter, and salt. The flour and water here exclude what's already inside your starter.`,
+  formulaInfoFormulaBody: `The "Full Baker's Formula" shows total flour and water in the entire dough, including the flour and water contributed by your starter. Baker's percentages are always calculated relative to this total flour — that's why the flour amount here is higher than what you physically add.`,
   // FormulaCard
   formula: "Formula",
   bakersPctSubtitle: "Baker's percentages relative to total flour",
@@ -418,7 +421,9 @@ const en = {
     toggleAutolyseAuto: "Toggle autolyse auto mode",
     autolyseDurationProgress: "Autolyse duration progress",
     closeFermentationPhilosophyModal: "Close fermentation philosophy modal",
-    closeAutolyseModal: "Close autolyse info modal"
+    closeAutolyseModal: "Close autolyse info modal",
+    learnFormula: "Learn about the formula sections",
+    closeFormulaModal: "Close formula info modal"
   }
 };
 const es = {
@@ -518,6 +523,9 @@ const es = {
   relative: "Duración",
   clock: "Reloj",
   startTime: "Hora de Inicio (HH:MM)",
+  formulaInfoTitle: "Entendiendo Tu Fórmula",
+  formulaInfoMixBody: '"Lo que añades" muestra las cantidades que mides y mezclas físicamente — harina, agua, masa madre y sal. La harina y el agua aquí excluyen lo que ya está dentro de tu masa madre.',
+  formulaInfoFormulaBody: 'La "Fórmula Completa del Panadero" muestra la harina y el agua totales en toda la masa, incluyendo la harina y el agua que aporta tu masa madre. Los porcentajes del panadero siempre se calculan respecto a esta harina total — por eso la cantidad de harina aquí es mayor que lo que añades físicamente.',
   // FormulaCard
   formula: "Fórmula",
   bakersPctSubtitle: "Porcentajes del panadero relativos a la harina total",
@@ -630,7 +638,9 @@ const es = {
     toggleAutolyseAuto: "Alternar modo automático de autólisis",
     autolyseDurationProgress: "Progreso de duración de autólisis",
     closeFermentationPhilosophyModal: "Cerrar modal de filosofía de fermentación",
-    closeAutolyseModal: "Cerrar modal de información de autólisis"
+    closeAutolyseModal: "Cerrar modal de información de autólisis",
+    learnFormula: "Conocer las secciones de la fórmula",
+    closeFormulaModal: "Cerrar modal de información de la fórmula"
   }
 };
 const sv = {
@@ -726,6 +736,9 @@ const sv = {
   relative: "Relativt",
   clock: "Klocka",
   startTime: "Starttid (HH:MM)",
+  formulaInfoTitle: "Förstå Din Formel",
+  formulaInfoMixBody: '"Det du tillsätter" visar mängderna du fysiskt mäter upp och blandar — mjöl, vatten, surdeg och salt. Mjölet och vattnet här exkluderar det som redan finns i din surdeg.',
+  formulaInfoFormulaBody: '"Fullständig Bagarformel" visar totalt mjöl och vatten i hela degen, inklusive mjölet och vattnet som din surdeg bidrar med. Bagarprocent beräknas alltid relativt detta totala mjöl — därför är mjölmängden här högre än vad du fysiskt tillsätter.',
   // FormulaCard
   formula: "Formel",
   bakersPctSubtitle: "Bagarprocent relativt totalt mjöl",
@@ -838,7 +851,9 @@ const sv = {
     toggleAutolyseAuto: "Växla autoläge för autolys",
     autolyseDurationProgress: "Autolysens tidsförlopp",
     closeFermentationPhilosophyModal: "Stäng jäsningsfilosofimodal",
-    closeAutolyseModal: "Stäng autolys-infomodal"
+    closeAutolyseModal: "Stäng autolys-infomodal",
+    learnFormula: "Lär dig om formelsektionerna",
+    closeFormulaModal: "Stäng formelinfomodal"
   }
 };
 const translations = { en, es, sv };
@@ -1756,7 +1771,7 @@ function FormulaCard($$renderer, $$props) {
     function round(n) {
       return Math.round(n).toString();
     }
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><div><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">${escape_html(round(formula.totalDoughWeightG))}g</div></div> <div class="px-5 pb-4"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-3">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3"><div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixFlour)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixWater)}</div></div> <div class="rounded-xl bg-accent/10 ring-1 ring-accent/20 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-accent/70 mt-1 font-medium">${escape_html(t().starter)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.saltG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().saltRow)}</div></div></div> <p class="text-xs text-base-content/50 mt-2.5 italic">${escape_html(t().starterContains(round(formula.starterFlourG), round(formula.starterWaterG)))}</p></div> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fullFormula)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><div><div class="flex items-center gap-1.5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0"${attr("aria-label", t().ariaLabels.learnFormula)}><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">${escape_html(round(formula.totalDoughWeightG))}g</div></div> <div class="px-5 pb-4"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-3">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3"><div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixFlour)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixWater)}</div></div> <div class="rounded-xl bg-accent/10 ring-1 ring-accent/20 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-accent/70 mt-1 font-medium">${escape_html(t().starter)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.saltG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().saltRow)}</div></div></div> <p class="text-xs text-base-content/50 mt-2.5 italic">${escape_html(t().starterContains(round(formula.starterFlourG), round(formula.starterWaterG)))}</p></div> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fullFormula)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
     if (store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula)) {
       $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="px-5 pb-4"><table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><!--[-->`);
@@ -1769,7 +1784,11 @@ function FormulaCard($$renderer, $$props) {
     } else {
       $$renderer2.push("<!--[-1-->");
     }
-    $$renderer2.push(`<!--]--></div></div>`);
+    $$renderer2.push(`<!--]--></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]-->`);
     if ($$store_subs) unsubscribe_stores($$store_subs);
   });
 }

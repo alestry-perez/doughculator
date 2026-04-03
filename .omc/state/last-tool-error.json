@@ -1,7 +1,7 @@
 {
   "tool_name": "Read",
-  "tool_input_preview": "{\"file_path\":\"/Users/alestry.perez/Desktop/projects/coding/doughculator/src/lib/components/InputSection.svelte\"}",
-  "error": "File content (10875 tokens) exceeds maximum allowed tokens (10000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
-  "timestamp": "2026-04-02T21:34:43.619Z",
+  "tool_input_preview": "{\"file_path\":\"/Users/alestry.perez/Desktop/projects/coding/doughculator/src/lib/calculator.ts\"}",
+  "error": "File content (13407 tokens) exceeds maximum allowed tokens (10000). Use offset and limit parameters to read specific portions of the file, or search for specific content instead of reading the whole file.",
+  "timestamp": "2026-04-03T10:18:06.924Z",
   "retry_count": 2
 }
