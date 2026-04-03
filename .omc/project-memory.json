@@ -142,15 +142,15 @@
   },
   "hotPaths": [
     {
-      "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 49,
-      "lastAccessed": 1775225250124,
+      "path": "src/lib/i18n.ts",
+      "accessCount": 60,
+      "lastAccessed": 1775225632782,
       "type": "file"
     },
     {
-      "path": "src/lib/i18n.ts",
-      "accessCount": 45,
-      "lastAccessed": 1775216231130,
+      "path": "src/lib/components/InputSection.svelte",
+      "accessCount": 59,
+      "lastAccessed": 1775225670867,
       "type": "file"
     },
     {

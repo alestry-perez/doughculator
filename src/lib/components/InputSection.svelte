@@ -13,6 +13,7 @@
 	let philosophyModalOpen = $state(false);
 	let autolyseModalOpen = $state(false);
 	let proofMethodModalOpen = $state(false);
+	let crumbGoalModalOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
 	const crumbIcons: Record<CrumbGoal, typeof CrumbTight> = {
@@ -266,6 +267,7 @@
 				philosophyModalOpen = false;
 				autolyseModalOpen = false;
 				proofMethodModalOpen = false;
+				crumbGoalModalOpen = false;
 				return;
 			}
 			if (e.key !== 'Tab') return;
@@ -496,7 +498,19 @@
 		<div class="px-5 pb-5 space-y-5">
 			<!-- Crumb goal -->
 			<div>
-				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.crumbGoal}</p>
+				<div class="flex items-center gap-1.5 mb-2">
+					<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.crumbGoal}</p>
+					<button
+						type="button"
+						onclick={() => (crumbGoalModalOpen = true)}
+						class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+						aria-label={t.ariaLabels.learnCrumbGoal}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
 				<div class="grid grid-cols-3 gap-2">
 					{#each crumbGoals as goal}
 						{@const Icon = crumbIcons[goal]}
@@ -953,6 +967,70 @@
 				</div>
 			</div>
 		</div>
+	{/if}
+
+	<!-- Crumb goal info modal -->
+	{#if crumbGoalModalOpen}
+	<div class="modal modal-open">
+		<!-- Backdrop -->
+		<button
+			type="button"
+			class="modal-backdrop"
+			onclick={() => (crumbGoalModalOpen = false)}
+			aria-label={t.ariaLabels.closeCrumbGoalModal}
+		></button>
+
+		<!-- Modal box -->
+		<div
+			class="modal-box w-full max-w-sm p-0 overflow-hidden"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="crumb-goal-modal-title"
+			use:useTrapFocus
+		>
+			<!-- Header -->
+			<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+				<h2 id="crumb-goal-modal-title" class="text-base font-semibold text-base-content">{t.crumbModalTitle}</h2>
+				<button
+					type="button"
+					onclick={() => (crumbGoalModalOpen = false)}
+					class="btn btn-ghost btn-sm btn-circle"
+					aria-label={t.ariaLabels.closeButton}
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+					</svg>
+				</button>
+			</div>
+
+			<!-- Body -->
+			<div class="px-5 py-4 space-y-4">
+				<div>
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.crumbGoalNames.Tight}</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.crumbModalTightBody}</p>
+				</div>
+				<div class="border-t border-base-200 pt-4">
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.crumbGoalNames.Balanced}</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.crumbModalBalancedBody}</p>
+				</div>
+				<div class="border-t border-base-200 pt-4">
+					<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.crumbGoalNames.Open}</p>
+					<p class="text-sm text-base-content/70 leading-relaxed">{t.crumbModalOpenBody}</p>
+				</div>
+			</div>
+
+			<!-- Footer -->
+			<div class="px-5 pb-5">
+				<button
+					type="button"
+					onclick={() => (crumbGoalModalOpen = false)}
+					class="btn btn-primary w-full"
+				>
+					{t.done}
+				</button>
+			</div>
+		</div>
+	</div>
 	{/if}
 
 <style lang="scss">

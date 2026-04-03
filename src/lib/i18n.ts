@@ -296,6 +296,10 @@ const en = {
     Balanced: 'Medium bubbles, versatile crumb. Classic sourdough.',
     Open: 'Large holes, translucent walls. Advanced technique required.',
   } as Record<string, string>,
+  crumbModalTitle: 'Crumb Goal Guide',
+  crumbModalTightBody: 'A tight crumb has small, evenly distributed bubbles throughout the bread. This structure is ideal for sandwich loaves and toast, as it holds spreads and toppings without falling through. Achieved with lower hydration (60–68%), shorter bulk fermentation, and thorough shaping to de-gas the dough.',
+  crumbModalBalancedBody: 'A balanced crumb features a mix of small and medium-sized holes, offering both structure and airiness. This is the classic sourdough look — versatile for everyday baking. Typical hydration ranges from 68–75%, with moderate bulk fermentation and gentle shaping.',
+  crumbModalOpenBody: 'An open crumb has large, irregular holes with thin, translucent walls. It requires high hydration (75–85%+), extended bulk fermentation with careful stretch-and-folds, and minimal shaping to preserve gas. This is an advanced technique that rewards patience and practice.',
   advancedOptions: 'Advanced Options',
   ambientTemp: 'Ambient Temperature',
   doughTemp: 'Dough Temperature',
@@ -459,6 +463,8 @@ const en = {
     closeFormulaModal: 'Close formula info modal',
     learnProofMethod: 'Learn about proof methods',
     closeProofMethodModal: 'Close proof method info modal',
+    learnCrumbGoal: 'Learn about crumb goals',
+    closeCrumbGoalModal: 'Close crumb goal info modal',
   },
 };
 
@@ -521,6 +527,10 @@ const es: Translations = {
     Balanced: 'Burbujas medianas, miga versátil. Masa madre clásica.',
     Open: 'Agujeros grandes, paredes translúcidas. Requiere técnica avanzada.',
   } as Record<string, string>,
+  crumbModalTitle: 'Guía de Objetivo de Miga',
+  crumbModalTightBody: 'Una miga cerrada tiene burbujas pequeñas y uniformes. Esta estructura es ideal para pan de molde y tostadas, ya que sostiene ingredientes sin que se caigan. Se logra con menor hidratación (60–68%), fermentación en bloque más corta y formado firme para desgasificar la masa.',
+  crumbModalBalancedBody: 'Una miga equilibrada tiene una mezcla de agujeros pequeños y medianos, ofreciendo tanto estructura como ligereza. Es el aspecto clásico de la masa madre — versátil para el horneado diario. La hidratación típica va del 68–75%, con fermentación moderada y formado suave.',
+  crumbModalOpenBody: 'Una miga abierta tiene agujeros grandes e irregulares con paredes finas y translúcidas. Requiere alta hidratación (75–85%+), fermentación en bloque extendida con pliegues cuidadosos y formado mínimo para preservar el gas. Es una técnica avanzada que premia la paciencia y la práctica.',
   advancedOptions: 'Opciones Avanzadas',
   ambientTemp: 'Temperatura Ambiente',
   doughTemp: 'Temperatura de la Masa',
@@ -684,6 +694,8 @@ const es: Translations = {
     closeFormulaModal: 'Cerrar modal de información de la fórmula',
     learnProofMethod: 'Conocer los métodos de fermentación final',
     closeProofMethodModal: 'Cerrar modal de métodos de fermentación final',
+    learnCrumbGoal: 'Conocer los objetivos de miga',
+    closeCrumbGoalModal: 'Cerrar modal de objetivos de miga',
   },
 };
 
@@ -740,6 +752,10 @@ const sv: Translations = {
     Balanced: 'Medelstora bubblor, mångsidig smul. Klassisk surdeg.',
     Open: 'Stora hål, genomskinliga väggar. Avancerad teknik krävs.',
   } as Record<string, string>,
+  crumbModalTitle: 'Guide för Smulmål',
+  crumbModalTightBody: 'En tät smul har små, jämnt fördelade bubblor. Denna struktur är idealisk för rostbröd och smörgåsar, eftersom den håller pålägg utan att det faller igenom. Uppnås med lägre hydrering (60–68%), kortare bulkjäsning och noggrann formning för att avlägsna gas.',
+  crumbModalBalancedBody: 'En balanserad smul har en blandning av små och medelstora hål som ger både struktur och luftighet. Detta är det klassiska surdegsbrödet — mångsidigt för vardagsbak. Typisk hydrering är 68–75%, med måttlig bulkjäsning och försiktig formning.',
+  crumbModalOpenBody: 'En öppen smul har stora, oregelbundna hål med tunna, genomskinliga väggar. Kräver hög hydrering (75–85%+), förlängd bulkjäsning med försiktiga sträck-och-vik, och minimal formning för att bevara gasen. Detta är en avancerad teknik som belönar tålamod och övning.',
   advancedOptions: 'Avancerade Alternativ',
   ambientTemp: 'Omgivningstemperatur',
   doughTemp: 'Degtemperatur',
@@ -903,6 +919,8 @@ const sv: Translations = {
     closeFormulaModal: 'Stäng formelinfomodal',
     learnProofMethod: 'Lär dig om jäsningsmetoder',
     closeProofMethodModal: 'Stäng jäsningsmetodmodal',
+    learnCrumbGoal: 'Lär dig om smulmål',
+    closeCrumbGoalModal: 'Stäng smulmålsmodal',
   },
 };
 
