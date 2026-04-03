@@ -508,7 +508,7 @@
 									? 'btn-secondary border-secondary text-secondary-content'
 									: 'btn-ghost border-base-300'}"
 						>
-							<Icon class="w-[147px] h-[105px]" />
+							<Icon class="w-full h-auto max-h-full" />
 							<span class="text-xs font-bold">{t.crumbGoalNames[goal]}</span>
 						</button>
 					{/each}

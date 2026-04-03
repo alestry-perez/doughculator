@@ -143,8 +143,8 @@
   "hotPaths": [
     {
       "path": "src/lib/components/InputSection.svelte",
-      "accessCount": 47,
-      "lastAccessed": 1775224938917,
+      "accessCount": 49,
+      "lastAccessed": 1775225250124,
       "type": "file"
     },
     {
@@ -172,6 +172,12 @@
       "type": "directory"
     },
     {
+      "path": "src/lib/components/icons/CrumbTight.svelte",
+      "accessCount": 4,
+      "lastAccessed": 1775225212751,
+      "type": "file"
+    },
+    {
       "path": "src/routes/+page.svelte",
       "accessCount": 3,
       "lastAccessed": 1775165684138,
@@ -181,12 +187,6 @@
       "path": "src/lib/components/WarningsCard.svelte",
       "accessCount": 3,
       "lastAccessed": 1775216472511,
-      "type": "file"
-    },
-    {
-      "path": "src/lib/components/icons/CrumbTight.svelte",
-      "accessCount": 3,
-      "lastAccessed": 1775224825209,
       "type": "file"
     },
     {

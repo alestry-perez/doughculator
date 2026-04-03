@@ -1,7 +1,7 @@
 {
-  "tool_name": "mcp__plugin_context-mode_context-mode__ctx_execute",
-  "tool_input_preview": "{\"language\":\"python\",\"code\":\"from PIL import Image\\n\\nimg = Image.open('/tmp/stitch-crumb-hires.png')\\nw, h = img.size\\nprint(f\\\"Image size: {w}x{h}\\\")\\n\\n# Convert to grayscale to find the boundaries...",
-  "error": "Exit code: 1\n\nstdout:\nImage size: 1024x659\n\n\nstderr:\nTraceback (most recent call last):\n  File \"/var/folders/zx/fq4j67ys2xn28fpkhgy9zpbc0000gn/T/ctx-mode-bJJ9Ks/script.py\", line 9, in <module>\n    import numpy as np\nModuleNotFoundError: No module named 'numpy'",
-  "timestamp": "2026-04-03T13:49:52.250Z",
+  "tool_name": "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+  "tool_input_preview": "{\"commands\":[{\"label\":\"Get CrumbTight SVG structure\",\"command\":\"head -15 /Users/alestry.perez/Desktop/projects/coding/doughculator/src/lib/components/icons/CrumbTight.svelte\"},{\"label\":\"Verify CrumbBa...",
+  "error": "MCP error -32602: Input validation error: Invalid arguments for tool ctx_batch_execute: [\n  {\n    \"code\": \"too_small\",\n    \"minimum\": 1,\n    \"type\": \"array\",\n    \"inclusive\": true,\n    \"exact\": false,\n    \"message\": \"Array must contain at least 1 element(s)\",\n    \"path\": [\n      \"queries\"\n    ]\n  }\n]",
+  "timestamp": "2026-04-03T14:06:32.072Z",
   "retry_count": 1
 }
