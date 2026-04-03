@@ -329,6 +329,9 @@ const en = {
   philosophyModalPredictabilityBody: 'Predictability uses a higher inoculation rate when temperatures drop. This keeps fermentation on a reliable schedule regardless of season or kitchen conditions — ideal when you want consistent results and a repeatable bake-day routine.',
   philosophyModalFlavorDevBody: 'Flavor Development lowers inoculation in cold conditions, letting the dough ferment slowly over a longer window. Extended time produces more acetic and lactic acids, yielding a more complex, tangy flavor — great for cold retard bakes or when you can be flexible with timing.',
   proofMethod: 'Proof Method',
+  proofMethodModalTitle: 'Proof Methods',
+  proofMethodRoomBody: 'Room temperature proofing lets your shaped dough rise at ambient temperature. It\'s faster (typically 1–3 hours) and produces a milder flavor. Watch the dough closely — it can over-proof quickly in a warm kitchen.',
+  proofMethodColdRetardBody: 'Cold retard places your shaped dough in the fridge (typically 8–16 hours overnight). The slow, cold fermentation develops more complex, tangy flavors and gives you a flexible baking window — pull it out when you\'re ready to bake.',
   roomTemp: 'Room Temp',
   coldRetard: 'Cold Retard',
   fridgeTemp: 'Fridge Temperature',
@@ -454,6 +457,8 @@ const en = {
     closeAutolyseModal: 'Close autolyse info modal',
     learnFormula: 'Learn about the formula sections',
     closeFormulaModal: 'Close formula info modal',
+    learnProofMethod: 'Learn about proof methods',
+    closeProofMethodModal: 'Close proof method info modal',
   },
 };
 
@@ -549,6 +554,9 @@ const es: Translations = {
   philosophyModalPredictabilityBody: 'Consistencia usa una tasa de inoculación más alta cuando bajan las temperaturas. Esto mantiene la fermentación en un calendario fiable independientemente de la estación o las condiciones de cocina — ideal si buscas resultados consistentes y una rutina de horneado reproducible.',
   philosophyModalFlavorDevBody: 'Sabor reduce la inoculación en condiciones frías, dejando que la masa fermente lentamente durante más tiempo. Este proceso produce más ácidos acético y láctico, generando un sabor más complejo y ácido — ideal para fermentaciones en frío o cuando tienes flexibilidad de tiempo.',
   proofMethod: 'Método de Fermentación Final',
+  proofMethodModalTitle: 'Métodos de Fermentación Final',
+  proofMethodRoomBody: 'La fermentación a temperatura ambiente deja que tu masa formada suba a temperatura del entorno. Es más rápida (normalmente 1–3 horas) y produce un sabor más suave. Vigila la masa de cerca — puede sobre-fermentar rápidamente en una cocina cálida.',
+  proofMethodColdRetardBody: 'La fermentación en frío coloca tu masa formada en la nevera (normalmente 8–16 horas durante la noche). La fermentación lenta y fría desarrolla sabores más complejos y ácidos, y te da flexibilidad horaria — sácala cuando estés listo para hornear.',
   roomTemp: 'Temp. Ambiente',
   coldRetard: 'Frío (Nevera)',
   fridgeTemp: 'Temperatura de Nevera',
@@ -674,6 +682,8 @@ const es: Translations = {
     closeAutolyseModal: 'Cerrar modal de información de autólisis',
     learnFormula: 'Conocer las secciones de la fórmula',
     closeFormulaModal: 'Cerrar modal de información de la fórmula',
+    learnProofMethod: 'Conocer los métodos de fermentación final',
+    closeProofMethodModal: 'Cerrar modal de métodos de fermentación final',
   },
 };
 
@@ -763,6 +773,9 @@ const sv: Translations = {
   philosophyModalPredictabilityBody: 'Förutsägbarhet använder en högre inokulationsgrad när temperaturen sjunker. Det håller jäsningen på ett pålitligt schema oavsett årstid eller köksförhållanden — idealiskt när du vill ha konsekventa resultat och en repeterbar bakrutin.',
   philosophyModalFlavorDevBody: 'Smakutveckling sänker inokulationen i kalla förhållanden och låter degen jäsa långsamt under längre tid. Den förlängda tiden producerar mer ättiksyra och mjölksyra, vilket ger en mer komplex och syrlig smak — perfekt för kall jäsning eller när du har flexibel timing.',
   proofMethod: 'Jäsningsmetod',
+  proofMethodModalTitle: 'Jäsningsmetoder',
+  proofMethodRoomBody: 'Rumstemperaturjäsning låter din formade deg jäsa vid omgivningstemperatur. Det går snabbare (vanligtvis 1–3 timmar) och ger en mildare smak. Håll koll på degen — den kan överjäsa snabbt i ett varmt kök.',
+  proofMethodColdRetardBody: 'Kall jäsning placerar din formade deg i kylskåpet (vanligtvis 8–16 timmar över natten). Den långsamma, kalla jäsningen utvecklar mer komplexa, syrliga smaker och ger dig ett flexibelt bakfönster — ta ut den när du är redo att baka.',
   roomTemp: 'Rumstemperatur',
   coldRetard: 'Kall Jäsning',
   fridgeTemp: 'Kylskåpstemperatur',
@@ -888,6 +901,8 @@ const sv: Translations = {
     closeAutolyseModal: 'Stäng autolys-infomodal',
     learnFormula: 'Lär dig om formelsektionerna',
     closeFormulaModal: 'Stäng formelinfomodal',
+    learnProofMethod: 'Lär dig om jäsningsmetoder',
+    closeProofMethodModal: 'Stäng jäsningsmetodmodal',
   },
 };
 

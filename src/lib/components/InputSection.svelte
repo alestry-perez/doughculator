@@ -9,6 +9,7 @@
 
 	let philosophyModalOpen = $state(false);
 	let autolyseModalOpen = $state(false);
+	let proofMethodModalOpen = $state(false);
 
 	const crumbGoals: CrumbGoal[] = ['Tight', 'Balanced', 'Open'];
 
@@ -256,6 +257,7 @@
 			if (e.key === 'Escape') {
 				philosophyModalOpen = false;
 				autolyseModalOpen = false;
+				proofMethodModalOpen = false;
 				return;
 			}
 			if (e.key !== 'Tab') return;
@@ -540,7 +542,19 @@
 
 			<!-- Proof method + nested fridge temp -->
 			<div>
-				<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">{t.proofMethod}</p>
+				<div class="flex items-center gap-1.5 mb-2">
+					<p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">{t.proofMethod}</p>
+					<button
+						type="button"
+						onclick={() => (proofMethodModalOpen = true)}
+						class="btn btn-ghost btn-xs btn-circle flex-shrink-0"
+						aria-label={t.ariaLabels.learnProofMethod}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+							<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
 				<div class="grid grid-cols-2 gap-2">
 					{#each (['Room', 'ColdRetard'] as const) as method}
 						<button
@@ -867,6 +881,61 @@
 					<button
 						type="button"
 						onclick={() => (autolyseModalOpen = false)}
+						class="btn btn-primary w-full"
+					>
+						{t.done}
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
+
+	<!-- Proof Method info modal -->
+	{#if proofMethodModalOpen}
+		<div class="modal modal-open">
+			<button
+				type="button"
+				class="modal-backdrop"
+				onclick={() => (proofMethodModalOpen = false)}
+				aria-label={t.ariaLabels.closeProofMethodModal}
+			></button>
+
+			<div
+				class="modal-box w-full max-w-sm p-0 overflow-hidden"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="proof-method-modal-title"
+				use:useTrapFocus
+			>
+				<div class="flex items-center justify-between px-5 py-4 border-b border-base-200">
+					<h2 id="proof-method-modal-title" class="text-base font-semibold text-base-content">{t.proofMethodModalTitle}</h2>
+					<button
+						type="button"
+						onclick={() => (proofMethodModalOpen = false)}
+						class="btn btn-ghost btn-sm btn-circle"
+						aria-label={t.ariaLabels.closeProofMethodModal}
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+						</svg>
+					</button>
+				</div>
+
+				<div class="px-5 py-4 space-y-4">
+					<div>
+						<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.roomTemp}</p>
+						<p class="text-sm text-base-content/70 leading-relaxed">{t.proofMethodRoomBody}</p>
+					</div>
+					<div class="border-t border-base-200 pt-4">
+						<p class="text-xs font-semibold text-secondary uppercase tracking-wide mb-1">{t.coldRetard}</p>
+						<p class="text-sm text-base-content/70 leading-relaxed">{t.proofMethodColdRetardBody}</p>
+					</div>
+				</div>
+
+				<div class="px-5 pb-5">
+					<button
+						type="button"
+						onclick={() => (proofMethodModalOpen = false)}
 						class="btn btn-primary w-full"
 					>
 						{t.done}

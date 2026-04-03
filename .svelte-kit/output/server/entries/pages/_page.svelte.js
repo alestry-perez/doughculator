@@ -299,6 +299,9 @@ const en = {
   philosophyModalPredictabilityBody: "Predictability uses a higher inoculation rate when temperatures drop. This keeps fermentation on a reliable schedule regardless of season or kitchen conditions — ideal when you want consistent results and a repeatable bake-day routine.",
   philosophyModalFlavorDevBody: "Flavor Development lowers inoculation in cold conditions, letting the dough ferment slowly over a longer window. Extended time produces more acetic and lactic acids, yielding a more complex, tangy flavor — great for cold retard bakes or when you can be flexible with timing.",
   proofMethod: "Proof Method",
+  proofMethodModalTitle: "Proof Methods",
+  proofMethodRoomBody: "Room temperature proofing lets your shaped dough rise at ambient temperature. It's faster (typically 1–3 hours) and produces a milder flavor. Watch the dough closely — it can over-proof quickly in a warm kitchen.",
+  proofMethodColdRetardBody: "Cold retard places your shaped dough in the fridge (typically 8–16 hours overnight). The slow, cold fermentation develops more complex, tangy flavors and gives you a flexible baking window — pull it out when you're ready to bake.",
   roomTemp: "Room Temp",
   coldRetard: "Cold Retard",
   fridgeTemp: "Fridge Temperature",
@@ -423,7 +426,9 @@ const en = {
     closeFermentationPhilosophyModal: "Close fermentation philosophy modal",
     closeAutolyseModal: "Close autolyse info modal",
     learnFormula: "Learn about the formula sections",
-    closeFormulaModal: "Close formula info modal"
+    closeFormulaModal: "Close formula info modal",
+    learnProofMethod: "Learn about proof methods",
+    closeProofMethodModal: "Close proof method info modal"
   }
 };
 const es = {
@@ -516,6 +521,9 @@ const es = {
   philosophyModalPredictabilityBody: "Consistencia usa una tasa de inoculación más alta cuando bajan las temperaturas. Esto mantiene la fermentación en un calendario fiable independientemente de la estación o las condiciones de cocina — ideal si buscas resultados consistentes y una rutina de horneado reproducible.",
   philosophyModalFlavorDevBody: "Sabor reduce la inoculación en condiciones frías, dejando que la masa fermente lentamente durante más tiempo. Este proceso produce más ácidos acético y láctico, generando un sabor más complejo y ácido — ideal para fermentaciones en frío o cuando tienes flexibilidad de tiempo.",
   proofMethod: "Método de Fermentación Final",
+  proofMethodModalTitle: "Métodos de Fermentación Final",
+  proofMethodRoomBody: "La fermentación a temperatura ambiente deja que tu masa formada suba a temperatura del entorno. Es más rápida (normalmente 1–3 horas) y produce un sabor más suave. Vigila la masa de cerca — puede sobre-fermentar rápidamente en una cocina cálida.",
+  proofMethodColdRetardBody: "La fermentación en frío coloca tu masa formada en la nevera (normalmente 8–16 horas durante la noche). La fermentación lenta y fría desarrolla sabores más complejos y ácidos, y te da flexibilidad horaria — sácala cuando estés listo para hornear.",
   roomTemp: "Temp. Ambiente",
   coldRetard: "Frío (Nevera)",
   fridgeTemp: "Temperatura de Nevera",
@@ -640,7 +648,9 @@ const es = {
     closeFermentationPhilosophyModal: "Cerrar modal de filosofía de fermentación",
     closeAutolyseModal: "Cerrar modal de información de autólisis",
     learnFormula: "Conocer las secciones de la fórmula",
-    closeFormulaModal: "Cerrar modal de información de la fórmula"
+    closeFormulaModal: "Cerrar modal de información de la fórmula",
+    learnProofMethod: "Conocer los métodos de fermentación final",
+    closeProofMethodModal: "Cerrar modal de métodos de fermentación final"
   }
 };
 const sv = {
@@ -729,6 +739,9 @@ const sv = {
   philosophyModalPredictabilityBody: "Förutsägbarhet använder en högre inokulationsgrad när temperaturen sjunker. Det håller jäsningen på ett pålitligt schema oavsett årstid eller köksförhållanden — idealiskt när du vill ha konsekventa resultat och en repeterbar bakrutin.",
   philosophyModalFlavorDevBody: "Smakutveckling sänker inokulationen i kalla förhållanden och låter degen jäsa långsamt under längre tid. Den förlängda tiden producerar mer ättiksyra och mjölksyra, vilket ger en mer komplex och syrlig smak — perfekt för kall jäsning eller när du har flexibel timing.",
   proofMethod: "Jäsningsmetod",
+  proofMethodModalTitle: "Jäsningsmetoder",
+  proofMethodRoomBody: "Rumstemperaturjäsning låter din formade deg jäsa vid omgivningstemperatur. Det går snabbare (vanligtvis 1–3 timmar) och ger en mildare smak. Håll koll på degen — den kan överjäsa snabbt i ett varmt kök.",
+  proofMethodColdRetardBody: "Kall jäsning placerar din formade deg i kylskåpet (vanligtvis 8–16 timmar över natten). Den långsamma, kalla jäsningen utvecklar mer komplexa, syrliga smaker och ger dig ett flexibelt bakfönster — ta ut den när du är redo att baka.",
   roomTemp: "Rumstemperatur",
   coldRetard: "Kall Jäsning",
   fridgeTemp: "Kylskåpstemperatur",
@@ -853,7 +866,9 @@ const sv = {
     closeFermentationPhilosophyModal: "Stäng jäsningsfilosofimodal",
     closeAutolyseModal: "Stäng autolys-infomodal",
     learnFormula: "Lär dig om formelsektionerna",
-    closeFormulaModal: "Stäng formelinfomodal"
+    closeFormulaModal: "Stäng formelinfomodal",
+    learnProofMethod: "Lär dig om jäsningsmetoder",
+    closeProofMethodModal: "Stäng jäsningsmetodmodal"
   }
 };
 const translations = { en, es, sv };
@@ -1692,7 +1707,7 @@ function InputSection($$renderer, $$props) {
       let philosophy = each_array_5[$$index_5];
       $$renderer2.push(`<button type="button"${attr_class(`btn btn-sm rounded-xl border-2 h-auto py-2.5 px-3 ${stringify(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === philosophy ? "btn-secondary border-secondary text-secondary-content" : "btn-ghost border-base-300")}`)}>${escape_html(philosophy === "Predictability" ? t().philosophyPredictability : t().philosophyFlavorDev)}</button>`);
     }
-    $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-2">${escape_html(t().proofMethod)}</p> <div class="grid grid-cols-2 gap-2"><!--[-->`);
+    $$renderer2.push(`<!--]--></div> <p class="text-xs text-base-content/70 mt-2 leading-snug">${escape_html(store_get($$store_subs ??= {}, "$inputs", inputs).fermentationPhilosophy === "Predictability" ? t().philosophyPredictabilityDesc : t().philosophyFlavorDevDesc)}</p></div> <div><div class="flex items-center gap-1.5 mb-2"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().proofMethod)}</p> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0"${attr("aria-label", t().ariaLabels.learnProofMethod)}><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <div class="grid grid-cols-2 gap-2"><!--[-->`);
     const each_array_6 = ensure_array_like(["Room", "ColdRetard"]);
     for (let $$index_6 = 0, $$length = each_array_6.length; $$index_6 < $$length; $$index_6++) {
       let method = each_array_6[$$index_6];
@@ -1748,6 +1763,10 @@ function InputSection($$renderer, $$props) {
       $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]--></div></div></div></div> `);
+    {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--> `);
     {
       $$renderer2.push("<!--[-1-->");
     }
