@@ -10,6 +10,7 @@
 	// Map warning level to daisyUI alert variant
 	const alertVariant: Record<string, string> = {
 		info: 'alert-info alert-soft',
+		success: 'alert-success alert-soft',
 		warn: 'alert-warning alert-soft',
 		danger: 'alert-error alert-soft'
 	};
@@ -22,7 +23,7 @@
 			{#each warnings as w}
 				<div class="alert {alertVariant[w.level] ?? 'alert-info'} text-sm py-3 px-4">
 					<span class="shrink-0 text-base leading-none">
-						{#if w.level === 'info'}ℹ{:else if w.level === 'warn'}⚠{:else}✕{/if}
+						{#if w.level === 'success'}✓{:else if w.level === 'info'}ℹ{:else if w.level === 'warn'}⚠{:else}✕{/if}
 					</span>
 					<p class="leading-snug">{w.message}</p>
 				</div>

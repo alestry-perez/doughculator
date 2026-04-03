@@ -112,7 +112,7 @@ export interface ScheduleStep {
 }
 
 export interface WarningMessage {
-	level: 'info' | 'warn' | 'danger';
+	level: 'info' | 'success' | 'warn' | 'danger';
 	message: string;
 }
 
@@ -781,7 +781,7 @@ function calcWarnings(inputs: Inputs, formula: FormulaResult, lang: Lang): Warni
 	}
 
 	if (effectiveTempC >= 24 && effectiveTempC < 27) {
-		warnings.push({ level: 'info', message: w.infoSweet });
+		warnings.push({ level: 'success', message: w.infoSweet });
 	}
 
 	if (effectiveTempC >= 20 && effectiveTempC < 24) {

@@ -1350,7 +1350,7 @@ function calcWarnings(inputs2, formula, lang2) {
     warnings.push({ level: "warn", message: w.warnHigh });
   }
   if (effectiveTempC >= 24 && effectiveTempC < 27) {
-    warnings.push({ level: "info", message: w.infoSweet });
+    warnings.push({ level: "success", message: w.infoSweet });
   }
   if (effectiveTempC >= 20 && effectiveTempC < 24) {
     warnings.push({ level: "info", message: w.infoSlow });
@@ -1552,6 +1552,7 @@ function WarningsCard($$renderer, $$props) {
     let { warnings } = $$props;
     const alertVariant = {
       info: "alert-info alert-soft",
+      success: "alert-success alert-soft",
       warn: "alert-warning alert-soft",
       danger: "alert-error alert-soft"
     };
@@ -1562,11 +1563,14 @@ function WarningsCard($$renderer, $$props) {
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let w = each_array[$$index];
         $$renderer2.push(`<div${attr_class(`alert ${stringify(alertVariant[w.level] ?? "alert-info")} text-sm py-3 px-4`)}><span class="shrink-0 text-base leading-none">`);
-        if (w.level === "info") {
+        if (w.level === "success") {
           $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`✓`);
+        } else if (w.level === "info") {
+          $$renderer2.push("<!--[1-->");
           $$renderer2.push(`ℹ`);
         } else if (w.level === "warn") {
-          $$renderer2.push("<!--[1-->");
+          $$renderer2.push("<!--[2-->");
           $$renderer2.push(`⚠`);
         } else {
           $$renderer2.push("<!--[-1-->");
