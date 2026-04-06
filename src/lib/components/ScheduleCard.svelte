@@ -174,9 +174,9 @@
                 </span>
                 <div class="text-right shrink-0">
                   {#if scheduleMode === 'clock' && clockTime}
-                    <div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{clockTime}</div>
+                    <div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{t.clockStart} {clockTime}</div>
                     {#if endClockTime && endClockTime !== clockTime}
-                      <div class="text-[10px] tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-base-content/50'}">→ {endClockTime}</div>
+                      <div class="text-[10px] tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-base-content/50'}">{t.clockEnd} {endClockTime}</div>
                     {/if}
                   {:else}
                     <div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{durationLabel(step)}</div>
@@ -246,9 +246,9 @@
                 </span>
                 <div class="text-right shrink-0">
                   {#if scheduleMode === 'clock' && clockTime}
-                    <div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{clockTime}</div>
+                    <div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{t.clockStart} {clockTime}</div>
                     {#if endClockTime && endClockTime !== clockTime}
-                      <div class="text-xs text-base-content/50 tabular-nums {completedSteps.has(i) ? 'line-through' : ''}">→ {endClockTime}</div>
+                      <div class="text-xs text-base-content/50 tabular-nums {completedSteps.has(i) ? 'line-through' : ''}">{t.clockEnd} {endClockTime}</div>
                     {/if}
                   {:else}
                     <div class="text-xs font-bold tabular-nums {completedSteps.has(i) ? 'text-base-content/50 line-through' : 'text-secondary'}">{durationLabel(step)}</div>

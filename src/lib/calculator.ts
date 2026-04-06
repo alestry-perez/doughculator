@@ -675,7 +675,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 			durationMins: null,
 			rangeMinMins: handsOffMinMins,
 			rangeMaxMins: handsOffMaxMins,
-			notes: s.handsOffRiseNote,
+			notes: s.handsOffRiseNote(formatMins(handsOffMinMins) + ' – ' + formatMins(handsOffMaxMins)),
 			isSubStep: true
 		});
 	}
@@ -684,31 +684,26 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	steps.push({
 		label: s.preShape,
 		durationMins: PRESHAPE_DURATION_MINS,
-		notes: s.preShapeNote
+		notes: s.preShapeNote(formatMins(PRESHAPE_DURATION_MINS))
 	});
 
-	// 7. Final Shape
-	steps.push({
-		label: s.finalShape,
-		durationMins: FINAL_SHAPE_DURATION_MINS,
-		notes: s.finalShapeNote
-	});
-
-	// 8. Proof
+	// 7. Final Shape & Proof (combined)
 	if (proofMethod === 'Room') {
+		const proofMinMins = FINAL_SHAPE_DURATION_MINS + Math.round(proofMin * 60);
+		const proofMaxMins = FINAL_SHAPE_DURATION_MINS + Math.round(proofMax * 60);
 		steps.push({
 			label: s.roomProof,
 			durationMins: null,
-			rangeMinMins: Math.round(proofMin * 60),
-			rangeMaxMins: Math.round(proofMax * 60),
-			notes: s.roomProofNote
+			rangeMinMins: proofMinMins,
+			rangeMaxMins: proofMaxMins,
+			notes: s.roomProofNote(formatMins(proofMinMins) + ' – ' + formatMins(proofMaxMins))
 		});
 	} else {
 		steps.push({
 			label: s.coldRetard,
 			durationMins: null,
-			rangeMinMins: coldRetardMin * 60,
-			rangeMaxMins: coldRetardMax * 60,
+			rangeMinMins: FINAL_SHAPE_DURATION_MINS + coldRetardMin * 60,
+			rangeMaxMins: FINAL_SHAPE_DURATION_MINS + coldRetardMax * 60,
 			notes: s.coldRetardNote(coldRetardMin, coldRetardMax)
 		});
 	}
@@ -717,7 +712,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	steps.push({
 		label: s.score,
 		durationMins: 2,
-		notes: s.scoreNote
+		notes: s.scoreNote(formatMins(2))
 	});
 
 	// 10. Bake — parent step (duration driven by sub-steps) + two phases
@@ -729,13 +724,13 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	steps.push({
 		label: s.bakeCovered,
 		durationMins: BAKE_COVERED_MINS,
-		notes: s.bakeCoveredNote,
+		notes: s.bakeCoveredNote(formatMins(BAKE_COVERED_MINS)),
 		isSubStep: true
 	});
 	steps.push({
 		label: s.bakeUncovered,
 		durationMins: BAKE_UNCOVERED_MINS,
-		notes: s.bakeUncoveredNote,
+		notes: s.bakeUncoveredNote(formatMins(BAKE_UNCOVERED_MINS)),
 		isSubStep: true
 	});
 

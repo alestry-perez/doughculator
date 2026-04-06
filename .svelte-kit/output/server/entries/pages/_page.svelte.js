@@ -11,25 +11,23 @@ const scheduleStrings = {
     coilFolds: "Coil Folds",
     coilFoldsNote: (intervalMins, sets) => `${sets ?? 2} sets, ${intervalMins} min apart.`,
     bulkFermentation: "Bulk Ferment",
-    bulkNote: (minH, maxH) => `Ferment at room temp until puffy.`,
+    bulkNote: (minH, maxH) => `Ferment at room temp for ${minH}–${maxH}h until puffy.`,
     preShape: "Preshape",
-    preShapeNote: "Shape into a round ball. Rest covered.",
-    finalShape: "Final Shape",
-    finalShapeNote: "Shape and place into a floured proofing basket.",
-    roomProof: "Room Temperature Proof",
-    roomProofNote: "Cover banneton. Dough should puff and pass the poke test (slow spring-back).",
-    coldRetard: "Cold Proof",
-    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigerate ${min}–${max} hours.`,
+    preShapeNote: (restTime) => `Shape into a round ball. Rest covered for ${restTime}.`,
+    roomProof: "Final Shape & Room Proof",
+    roomProofNote: (restTime) => `Shape and place into a floured proofing basket. Cover and rest for ${restTime}. Dough should puff and pass the poke test (slow spring-back).`,
+    coldRetard: "Final Shape & Cold Proof",
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Shape and place into a floured proofing basket. Refrigerate ${min}–${max} hours.`,
     bake: "Bake",
     bakeNote: "Preheat oven + Dutch oven to 230°C (450°F). Score and load.",
     bakeCovered: "Covered (lid on)",
-    bakeCoveredNote: "Bake with lid on — steam builds crust structure.",
+    bakeCoveredNote: (restTime) => `Bake with lid on for ${restTime} — steam builds crust structure.`,
     handsOffRise: "Hands-off Rise",
-    handsOffRiseNote: "Leave dough undisturbed. Watch for 50–75% volume increase.",
+    handsOffRiseNote: (restTime) => `Leave dough undisturbed for ${restTime}. Watch for 50–75% volume increase.`,
     score: "Score",
-    scoreNote: "Use a lame or razor blade. Score just before loading into the oven.",
+    scoreNote: (restTime) => `Use a lame or razor blade (${restTime}). Score just before loading into the oven.`,
     bakeUncovered: "Uncovered (lid off)",
-    bakeUncoveredNote: "Remove lid and bake until deep golden brown.",
+    bakeUncoveredNote: (restTime) => `Remove lid and bake for ${restTime} until deep golden brown.`,
     autolyseUserNote: (mins) => ` (your input: ${mins} min)`
   },
   es: {
@@ -42,25 +40,23 @@ const scheduleStrings = {
     coilFolds: "Pliegues en Espiral",
     coilFoldsNote: (intervalMins, sets) => `${sets ?? 2} series, ${intervalMins} min de descanso entre cada una.`,
     bulkFermentation: "Fermentación en Masa",
-    bulkNote: (minH, maxH) => `Fermenta a temperatura ambiente hasta que esté esponjosa.`,
+    bulkNote: (minH, maxH) => `Fermenta a temperatura ambiente por ${minH}–${maxH}h hasta que esté esponjosa.`,
     preShape: "Pre-formado",
-    preShapeNote: "Forma una bola redonda. Reposa tapado.",
-    finalShape: "Formado Final",
-    finalShapeNote: "Forma y coloca en el banneton enharinado.",
-    roomProof: "Fermentación a Temperatura Ambiente",
-    roomProofNote: "Tapa el banneton. La masa debe hincharse y pasar la prueba del dedo (recuperación lenta).",
-    coldRetard: "Fermentación en Frío",
-    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Refrigera ${min}–${max} horas.`,
+    preShapeNote: (restTime) => `Forma una bola redonda. Reposa tapado por ${restTime}.`,
+    roomProof: "Formado Final & Fermentación Ambiente",
+    roomProofNote: (restTime) => `Forma y coloca en el banneton enharinado. Tapa y reposa por ${restTime}. La masa debe hincharse y pasar la prueba del dedo (recuperación lenta).`,
+    coldRetard: "Formado Final & Fermentación en Frío",
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Forma y coloca en el banneton enharinado. Refrigera ${min}–${max} horas.`,
     bake: "Hornear",
     bakeNote: "Precalienta el horno + olla holandesa a 230°C (450°F). Greña y carga.",
     bakeCovered: "Tapado (con tapa)",
-    bakeCoveredNote: "Hornea con tapa — el vapor forma la estructura de la corteza.",
+    bakeCoveredNote: (restTime) => `Hornea con tapa por ${restTime} — el vapor forma la estructura de la corteza.`,
     handsOffRise: "Reposo sin tocar",
-    handsOffRiseNote: "Deja la masa sin tocar. Observa un aumento de volumen del 50–75%.",
+    handsOffRiseNote: (restTime) => `Deja la masa sin tocar por ${restTime}. Observa un aumento de volumen del 50–75%.`,
     score: "Greñar",
-    scoreNote: "Usa una cuchilla o navaja. Greña justo antes de cargar en el horno.",
+    scoreNote: (restTime) => `Usa una cuchilla o navaja (${restTime}). Greña justo antes de cargar en el horno.`,
     bakeUncovered: "Destapado (sin tapa)",
-    bakeUncoveredNote: "Retira la tapa y hornea hasta que esté dorado oscuro.",
+    bakeUncoveredNote: (restTime) => `Retira la tapa y hornea por ${restTime} hasta que esté dorado oscuro.`,
     autolyseUserNote: (mins) => ` (tu elección: ${mins} min)`
   },
   sv: {
@@ -73,25 +69,23 @@ const scheduleStrings = {
     coilFolds: "Spiralvikningar",
     coilFoldsNote: (intervalMins, sets) => `${sets ?? 2} omgångar, ${intervalMins} min mellan varje.`,
     bulkFermentation: "Bulkjäsning",
-    bulkNote: (minH, maxH) => `Jäs i rumstemperatur tills degen är luftig.`,
+    bulkNote: (minH, maxH) => `Jäs i rumstemperatur i ${minH}–${maxH}h tills degen är luftig.`,
     preShape: "Förformning",
-    preShapeNote: "Forma till en rund boll. Vila täckt.",
-    finalShape: "Slutformning",
-    finalShapeNote: "Forma och lägg i mjölat jäskorg.",
-    roomProof: "Jäsning i Rumstemperatur",
-    roomProofNote: "Täck jäskorgen. Degen ska puffa upp och klara stickprovet (långsam återfjädring).",
-    coldRetard: "Kall Jäsning",
-    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Kyl i ${min}–${max} timmar.`,
+    preShapeNote: (restTime) => `Forma till en rund boll. Vila täckt i ${restTime}.`,
+    roomProof: "Slutformning & Rumstemperaturjäsning",
+    roomProofNote: (restTime) => `Forma och lägg i mjölat jäskorg. Täck och vila i ${restTime}. Degen ska puffa upp och klara stickprovet (långsam återfjädring).`,
+    coldRetard: "Slutformning & Kall Jäsning",
+    coldRetardNote: (min = COLD_RETARD_MIN_H, max = COLD_RETARD_MAX_H) => `Forma och lägg i mjölat jäskorg. Kyl i ${min}–${max} timmar.`,
     bake: "Baka",
     bakeNote: "Förvärm ugn + gryta till 230°C (450°F). Snitta och lägg in.",
     bakeCovered: "Med lock",
-    bakeCoveredNote: "Baka med lock — ångan bygger skorpans struktur.",
+    bakeCoveredNote: (restTime) => `Baka med lock i ${restTime} — ångan bygger skorpans struktur.`,
     handsOffRise: "Vila utan att röra",
-    handsOffRiseNote: "Låt degen vila ostörd. Titta efter 50–75% volymökning.",
+    handsOffRiseNote: (restTime) => `Låt degen vila ostörd i ${restTime}. Titta efter 50–75% volymökning.`,
     score: "Snitta",
-    scoreNote: "Använd en lame eller rakblad. Snitta precis innan du laddar ugnen.",
+    scoreNote: (restTime) => `Använd en lame eller rakblad (${restTime}). Snitta precis innan du laddar ugnen.`,
     bakeUncovered: "Utan lock",
-    bakeUncoveredNote: "Ta bort locket och baka tills djupt gyllenbrun.",
+    bakeUncoveredNote: (restTime) => `Ta bort locket och baka i ${restTime} tills djupt gyllenbrun.`,
     autolyseUserNote: (mins) => ` (ditt val: ${mins} min)`
   }
 };
@@ -313,6 +307,8 @@ const en = {
   scheduleMode: "Schedule Mode",
   relative: "Relative",
   clock: "Clock",
+  clockStart: "Start",
+  clockEnd: "End",
   startTime: "Start Time (HH:MM)",
   formulaInfoTitle: "Understanding Your Formula",
   formulaInfoMixBody: `"What You Add" shows the amounts you physically measure and mix — flour, water, starter, and salt. The flour and water here exclude what's already inside your starter.`,
@@ -542,6 +538,8 @@ const es = {
   scheduleMode: "Modo de Programa",
   relative: "Duración",
   clock: "Reloj",
+  clockStart: "Inicio",
+  clockEnd: "Fin",
   startTime: "Hora de Inicio (HH:MM)",
   formulaInfoTitle: "Entendiendo Tu Fórmula",
   formulaInfoMixBody: '"Lo que añades" muestra las cantidades que mides y mezclas físicamente — harina, agua, masa madre y sal. La harina y el agua aquí excluyen lo que ya está dentro de tu masa madre.',
@@ -767,6 +765,8 @@ const sv = {
   scheduleMode: "Schemaläge",
   relative: "Relativt",
   clock: "Klocka",
+  clockStart: "Start",
+  clockEnd: "Slut",
   startTime: "Starttid (HH:MM)",
   formulaInfoTitle: "Förstå Din Formel",
   formulaInfoMixBody: '"Det du tillsätter" visar mängderna du fysiskt mäter upp och blandar — mjöl, vatten, surdeg och salt. Mjölet och vattnet här exkluderar det som redan finns i din surdeg.',
@@ -1291,41 +1291,38 @@ function calcSchedule(inputs2, formula, timing, lang2) {
       durationMins: null,
       rangeMinMins: handsOffMinMins,
       rangeMaxMins: handsOffMaxMins,
-      notes: s.handsOffRiseNote,
+      notes: s.handsOffRiseNote(formatMins(handsOffMinMins) + " – " + formatMins(handsOffMaxMins)),
       isSubStep: true
     });
   }
   steps.push({
     label: s.preShape,
     durationMins: PRESHAPE_DURATION_MINS,
-    notes: s.preShapeNote
-  });
-  steps.push({
-    label: s.finalShape,
-    durationMins: FINAL_SHAPE_DURATION_MINS,
-    notes: s.finalShapeNote
+    notes: s.preShapeNote(formatMins(PRESHAPE_DURATION_MINS))
   });
   if (proofMethod === "Room") {
+    const proofMinMins = FINAL_SHAPE_DURATION_MINS + Math.round(proofMin * 60);
+    const proofMaxMins = FINAL_SHAPE_DURATION_MINS + Math.round(proofMax * 60);
     steps.push({
       label: s.roomProof,
       durationMins: null,
-      rangeMinMins: Math.round(proofMin * 60),
-      rangeMaxMins: Math.round(proofMax * 60),
-      notes: s.roomProofNote
+      rangeMinMins: proofMinMins,
+      rangeMaxMins: proofMaxMins,
+      notes: s.roomProofNote(formatMins(proofMinMins) + " – " + formatMins(proofMaxMins))
     });
   } else {
     steps.push({
       label: s.coldRetard,
       durationMins: null,
-      rangeMinMins: coldRetardMin * 60,
-      rangeMaxMins: coldRetardMax * 60,
+      rangeMinMins: FINAL_SHAPE_DURATION_MINS + coldRetardMin * 60,
+      rangeMaxMins: FINAL_SHAPE_DURATION_MINS + coldRetardMax * 60,
       notes: s.coldRetardNote(coldRetardMin, coldRetardMax)
     });
   }
   steps.push({
     label: s.score,
     durationMins: 2,
-    notes: s.scoreNote
+    notes: s.scoreNote(formatMins(2))
   });
   steps.push({
     label: s.bake,
@@ -1335,13 +1332,13 @@ function calcSchedule(inputs2, formula, timing, lang2) {
   steps.push({
     label: s.bakeCovered,
     durationMins: BAKE_COVERED_MINS,
-    notes: s.bakeCoveredNote,
+    notes: s.bakeCoveredNote(formatMins(BAKE_COVERED_MINS)),
     isSubStep: true
   });
   steps.push({
     label: s.bakeUncovered,
     durationMins: BAKE_UNCOVERED_MINS,
-    notes: s.bakeUncoveredNote,
+    notes: s.bakeUncoveredNote(formatMins(BAKE_UNCOVERED_MINS)),
     isSubStep: true
   });
   return steps;
@@ -3216,10 +3213,10 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push(`<!--]--></span></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-xs font-medium leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/80")}`)}>${escape_html(step.label)}</span> <div class="text-right shrink-0">`);
         if (scheduleMode === "clock" && clockTime) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(clockTime)}</div> `);
+          $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(t().clockStart)} ${escape_html(clockTime)}</div> `);
           if (endClockTime && endClockTime !== clockTime) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<div${attr_class(`text-[10px] tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/50")}`)}>→ ${escape_html(endClockTime)}</div>`);
+            $$renderer2.push(`<div${attr_class(`text-[10px] tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/50")}`)}>${escape_html(t().clockEnd)} ${escape_html(endClockTime)}</div>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
@@ -3276,10 +3273,10 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push(`<!--]--></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-sm font-semibold leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-base-content")}`)}>${escape_html(step.label)}</span> <div class="text-right shrink-0">`);
         if (scheduleMode === "clock" && clockTime) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-secondary")}`)}>${escape_html(clockTime)}</div> `);
+          $$renderer2.push(`<div${attr_class(`text-xs font-bold tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/50 line-through" : "text-secondary")}`)}>${escape_html(t().clockStart)} ${escape_html(clockTime)}</div> `);
           if (endClockTime && endClockTime !== clockTime) {
             $$renderer2.push("<!--[0-->");
-            $$renderer2.push(`<div${attr_class(`text-xs text-base-content/50 tabular-nums ${stringify(completedSteps.has(i) ? "line-through" : "")}`)}>→ ${escape_html(endClockTime)}</div>`);
+            $$renderer2.push(`<div${attr_class(`text-xs text-base-content/50 tabular-nums ${stringify(completedSteps.has(i) ? "line-through" : "")}`)}>${escape_html(t().clockEnd)} ${escape_html(endClockTime)}</div>`);
           } else {
             $$renderer2.push("<!--[-1-->");
           }
