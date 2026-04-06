@@ -86,6 +86,7 @@ declare module '$env/static/private' {
 	export const _: string;
 	export const GHOSTTY_SHELL_FEATURES: string;
 	export const CMUX_PORT: string;
+	export const LaunchInstanceID: string;
 	export const npm_config_userconfig: string;
 	export const npm_config_init_module: string;
 	export const __CFBundleIdentifier: string;
@@ -111,6 +112,7 @@ declare module '$env/static/private' {
 	export const PYENV_SHELL: string;
 	export const TERMINFO: string;
 	export const OSTYPE: string;
+	export const CLAUDE_CODE_EXECPATH: string;
 	export const HOMEBREW_PREFIX: string;
 	export const CMUX_PORT_RANGE: string;
 	export const npm_config_cache: string;
@@ -129,11 +131,11 @@ declare module '$env/static/private' {
 	export const OSLogRateLimit: string;
 	export const POSH_THEME: string;
 	export const CLAUDECODE: string;
+	export const SECURITYSESSIONID: string;
 	export const CMUX_SURFACE_ID: string;
 	export const npm_node_execpath: string;
 	export const npm_config_prefix: string;
 	export const COLORTERM: string;
-	export const NINJA_ENV: string;
 	export const NODE_ENV: string;
 }
 
@@ -269,6 +271,7 @@ declare module '$env/dynamic/private' {
 		_: string;
 		GHOSTTY_SHELL_FEATURES: string;
 		CMUX_PORT: string;
+		LaunchInstanceID: string;
 		npm_config_userconfig: string;
 		npm_config_init_module: string;
 		__CFBundleIdentifier: string;
@@ -294,6 +297,7 @@ declare module '$env/dynamic/private' {
 		PYENV_SHELL: string;
 		TERMINFO: string;
 		OSTYPE: string;
+		CLAUDE_CODE_EXECPATH: string;
 		HOMEBREW_PREFIX: string;
 		CMUX_PORT_RANGE: string;
 		npm_config_cache: string;
@@ -312,11 +316,11 @@ declare module '$env/dynamic/private' {
 		OSLogRateLimit: string;
 		POSH_THEME: string;
 		CLAUDECODE: string;
+		SECURITYSESSIONID: string;
 		CMUX_SURFACE_ID: string;
 		npm_node_execpath: string;
 		npm_config_prefix: string;
 		COLORTERM: string;
-		NINJA_ENV: string;
 		NODE_ENV: string;
 		[key: `PUBLIC_${string}`]: undefined;
 		[key: `${string}`]: string | undefined;

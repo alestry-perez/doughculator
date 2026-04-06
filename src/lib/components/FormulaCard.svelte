@@ -91,6 +91,16 @@
 			<div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center">
 				<div class="text-2xl font-bold tabular-nums text-base-content">{round(formula.mixFlourG)}g</div>
 				<div class="text-xs text-base-content/60 mt-1 font-medium">{t.mixFlour}</div>
+				{#if flourBlend.length > 1}
+					<div class="mt-2 space-y-0.5">
+						{#each flourBlend as entry (entry.type)}
+							<div class="flex items-center justify-between text-[11px] text-base-content/55 px-1">
+								<span class="truncate">{t.flourTypes[entry.type] ?? entry.type}</span>
+								<span class="tabular-nums font-medium ml-1">{round(formula.mixFlourG * entry.pct / 100)}g</span>
+							</div>
+						{/each}
+					</div>
+				{/if}
 			</div>
 			<div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center">
 				<div class="text-2xl font-bold tabular-nums text-base-content">{round(formula.mixWaterG)}g</div>

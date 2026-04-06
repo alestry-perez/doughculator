@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "lastScanned": 1775153355231,
+  "lastScanned": 1775476970229,
   "projectRoot": "/Users/alestry.perez/Desktop/projects/coding/doughculator",
   "techStack": {
     "languages": [
@@ -85,7 +85,7 @@
       "path": "build",
       "purpose": "Build output",
       "fileCount": 6,
-      "lastAccessed": 1775153355215,
+      "lastAccessed": 1775476970209,
       "keyFiles": [
         "404.html",
         "favicon.svg",
@@ -98,7 +98,7 @@
       "path": "src",
       "purpose": "Source code",
       "fileCount": 4,
-      "lastAccessed": 1775153355215,
+      "lastAccessed": 1775476970210,
       "keyFiles": [
         "app.css",
         "app.d.ts",
@@ -109,7 +109,7 @@
       "path": "static",
       "purpose": "Static files",
       "fileCount": 5,
-      "lastAccessed": 1775153355222,
+      "lastAccessed": 1775476970220,
       "keyFiles": [
         "favicon.svg",
         "icon-192.png",
@@ -122,7 +122,7 @@
       "path": "src/lib",
       "purpose": "Library code",
       "fileCount": 6,
-      "lastAccessed": 1775153355223,
+      "lastAccessed": 1775476970222,
       "keyFiles": [
         "calculator.test.ts",
         "calculator.ts",
@@ -133,7 +133,7 @@
       "path": "src/routes",
       "purpose": "Route handlers",
       "fileCount": 2,
-      "lastAccessed": 1775153355225,
+      "lastAccessed": 1775476970222,
       "keyFiles": [
         "+layout.svelte",
         "+page.svelte"
@@ -167,8 +167,8 @@
     },
     {
       "path": "src/lib/components/FormulaCard.svelte",
-      "accessCount": 10,
-      "lastAccessed": 1775215993502,
+      "accessCount": 12,
+      "lastAccessed": 1775477174066,
       "type": "file"
     },
     {
@@ -227,8 +227,8 @@
     },
     {
       "path": "src/lib",
-      "accessCount": 1,
-      "lastAccessed": 1775157641188,
+      "accessCount": 2,
+      "lastAccessed": 1775477139378,
       "type": "directory"
     },
     {

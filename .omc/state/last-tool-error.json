@@ -1,7 +1,0 @@
-{
-  "tool_name": "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
-  "tool_input_preview": "{\"commands\":\"[{\\\"label\\\": \\\"Layout File\\\", \\\"command\\\": \\\"cat /Users/alestry.perez/Desktop/projects/coding/doughculator/src/routes/+layout.svelte\\\"}, {\\\"label\\\": \\\"Main Page\\\", \\\"command\\\": \\\"head -10...",
-  "error": "MCP error -32602: Input validation error: Invalid arguments for tool ctx_batch_execute: [\n  {\n    \"code\": \"invalid_type\",\n    \"expected\": \"array\",\n    \"received\": \"string\",\n    \"path\": [\n      \"commands\"\n    ],\n    \"message\": \"Expected array, received string\"\n  }\n]",
-  "timestamp": "2026-04-03T15:21:19.843Z",
-  "retry_count": 1
-}
