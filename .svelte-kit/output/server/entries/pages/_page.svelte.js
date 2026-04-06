@@ -3,9 +3,9 @@ import { d as derived, w as writable } from "../../chunks/index.js";
 const scheduleStrings = {
   en: {
     autolyse: "Autolyse",
-    autolyseNote: (flourG, waterG) => `Mix ${Math.round(flourG)}g flour and ${Math.round(waterG)}g water (hold back all salt and all starter). Cover and rest.`,
+    autolyseNote: (flourG, waterG, restTime) => `Mix ${Math.round(flourG)}g flour and ${Math.round(waterG)}g water (hold back all salt and all starter). Cover and rest for ${restTime}.`,
     mix: "Mix",
-    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Add ${Math.round(starterG)}g starter and ${Math.round(saltG)}g salt to the autolysed dough. Mix until incorporated.` : `Combine ${Math.round(starterG)}g starter and ${Math.round(waterG)}g water, stir until dissolved. Add ${Math.round(flourG)}g flour and ${Math.round(saltG)}g salt to form a shaggy dough. Rest covered.`,
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG, restTime) => autolyseOn ? `Add ${Math.round(starterG)}g starter and ${Math.round(saltG)}g salt to the autolysed dough. Mix until incorporated.` : `Combine ${Math.round(starterG)}g starter and ${Math.round(waterG)}g water, stir until dissolved. Add ${Math.round(flourG)}g flour and ${Math.round(saltG)}g salt to form a shaggy dough. Rest covered for ${restTime}.`,
     stretchFold: "Stretch & Fold",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} sets, ${intervalMins} min apart.`,
     coilFolds: "Coil Folds",
@@ -34,9 +34,9 @@ const scheduleStrings = {
   },
   es: {
     autolyse: "Autólisis",
-    autolyseNote: (flourG, waterG) => `Mezcla ${Math.round(flourG)}g de harina y ${Math.round(waterG)}g de agua (reserva toda la sal e iniciador). Tapa y reposa.`,
+    autolyseNote: (flourG, waterG, restTime) => `Mezcla ${Math.round(flourG)}g de harina y ${Math.round(waterG)}g de agua (reserva toda la sal e iniciador). Tapa y reposa por ${restTime}.`,
     mix: "Mezclar",
-    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Añade ${Math.round(starterG)}g de iniciador y ${Math.round(saltG)}g de sal a la masa autolizada. Mezcla hasta incorporar.` : `Combina ${Math.round(starterG)}g de iniciador y ${Math.round(waterG)}g de agua, mezcla hasta disolver. Agrega ${Math.round(flourG)}g de harina y ${Math.round(saltG)}g de sal para formar una masa irregular. Reposa tapado.`,
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG, restTime) => autolyseOn ? `Añade ${Math.round(starterG)}g de iniciador y ${Math.round(saltG)}g de sal a la masa autolizada. Mezcla hasta incorporar.` : `Combina ${Math.round(starterG)}g de iniciador y ${Math.round(waterG)}g de agua, mezcla hasta disolver. Agrega ${Math.round(flourG)}g de harina y ${Math.round(saltG)}g de sal para formar una masa irregular. Reposa tapado por ${restTime}.`,
     stretchFold: "Estirado y Plegado",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} series, ${intervalMins} min de descanso entre cada una.`,
     coilFolds: "Pliegues en Espiral",
@@ -65,9 +65,9 @@ const scheduleStrings = {
   },
   sv: {
     autolyse: "Autolys",
-    autolyseNote: (flourG, waterG) => `Blanda ${Math.round(flourG)}g mjöl och ${Math.round(waterG)}g vatten (håll tillbaka allt salt och all surdeg). Täck och vila.`,
+    autolyseNote: (flourG, waterG, restTime) => `Blanda ${Math.round(flourG)}g mjöl och ${Math.round(waterG)}g vatten (håll tillbaka allt salt och all surdeg). Täck och vila i ${restTime}.`,
     mix: "Blanda",
-    mixNote: (autolyseOn, flourG, waterG, starterG, saltG) => autolyseOn ? `Tillsätt ${Math.round(starterG)}g surdeg och ${Math.round(saltG)}g salt till den autolyserade degen. Blanda tills inkorporerat.` : `Kombinera ${Math.round(starterG)}g surdeg och ${Math.round(waterG)}g vatten, rör tills upplöst. Tillsätt ${Math.round(flourG)}g mjöl och ${Math.round(saltG)}g salt och forma en grov deg. Vila täckt.`,
+    mixNote: (autolyseOn, flourG, waterG, starterG, saltG, restTime) => autolyseOn ? `Tillsätt ${Math.round(starterG)}g surdeg och ${Math.round(saltG)}g salt till den autolyserade degen. Blanda tills inkorporerat.` : `Kombinera ${Math.round(starterG)}g surdeg och ${Math.round(waterG)}g vatten, rör tills upplöst. Tillsätt ${Math.round(flourG)}g mjöl och ${Math.round(saltG)}g salt och forma en grov deg. Vila täckt i ${restTime}.`,
     stretchFold: "Sträck & Vik",
     stretchFoldNote: (intervalMins, sets) => `${sets ?? 3} omgångar, ${intervalMins} min mellan varje.`,
     coilFolds: "Spiralvikningar",
@@ -1249,13 +1249,13 @@ function calcSchedule(inputs2, formula, timing, lang2) {
     steps.push({
       label: s.autolyse,
       durationMins: scheduledAutolyse,
-      notes: s.autolyseNote(formula.mixFlourG, formula.mixWaterG) + userNote
+      notes: s.autolyseNote(formula.mixFlourG, formula.mixWaterG, formatMins(scheduledAutolyse)) + userNote
     });
   }
   steps.push({
     label: s.mix,
     durationMins: MIX_DURATION_MINS,
-    notes: s.mixNote(autolyseOn, formula.mixFlourG, formula.mixWaterG, formula.starterTotalG, formula.saltG)
+    notes: s.mixNote(autolyseOn, formula.mixFlourG, formula.mixWaterG, formula.starterTotalG, formula.saltG, formatMins(MIX_DURATION_MINS))
   });
   const sfSets = foldCount >= 2 ? Math.ceil(foldCount * 0.6) : Math.max(1, foldCount);
   const cfSets = Math.max(0, foldCount - sfSets) + 1;
@@ -3070,13 +3070,26 @@ function FormulaCard($$renderer, $$props) {
       }
       return `${f / a}:${w / a}`;
     }
-    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><div><div class="flex items-center gap-1.5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0"${attr("aria-label", t().ariaLabels.learnFormula)}><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">${escape_html(round(formula.totalDoughWeightG))}g</div></div> <div class="px-5 pb-4"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-3">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3"><div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixFlour)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixWater)}</div></div> <div class="rounded-xl bg-accent/10 ring-1 ring-accent/20 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-accent/70 mt-1 font-medium">${escape_html(t().starter)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.saltG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().saltRow)}</div></div></div> <p class="text-xs text-base-content/50 mt-2.5 italic">${escape_html(t().starterContains(round(formula.starterFlourG), round(formula.starterWaterG), ratio(formula.starterFlourG, formula.starterWaterG)))}</p></div> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fullFormula)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
-    if (store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula)) {
+    $$renderer2.push(`<div class="card bg-base-100 shadow-sm ring-1 ring-base-300/70 overflow-hidden"><div class="flex items-center justify-between px-5 pt-5 pb-3"><div><div class="flex items-center gap-1.5"><h2 class="text-base font-semibold text-base-content uppercase tracking-wide">${escape_html(t().formula)}</h2> <button type="button" class="btn btn-ghost btn-xs btn-circle flex-shrink-0"${attr("aria-label", t().ariaLabels.learnFormula)}><svg xmlns="http://www.w3.org/2000/svg" class="w-[1.14rem] h-[1.14rem]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg></button></div> <p class="text-xs text-base-content/50 mt-0.5">${escape_html(t().bakersPctSubtitle)}</p></div> <div class="badge badge-secondary badge-lg tabular-nums font-bold gap-1">${escape_html(round(formula.totalDoughWeightG))}g</div></div> <div class="px-5 pb-4"><p class="text-xs font-semibold text-base-content/70 uppercase tracking-wide mb-3">${escape_html(t().mixAdditions)}</p> <div class="grid grid-cols-2 gap-3"><div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixFlourG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixFlour)}</div> `);
+    if (flourBlend.length > 1) {
       $$renderer2.push("<!--[0-->");
-      $$renderer2.push(`<div class="px-5 pb-4"><table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><!--[-->`);
+      $$renderer2.push(`<div class="mt-2 space-y-0.5"><!--[-->`);
       const each_array = ensure_array_like(flourBlend);
       for (let $$index = 0, $$length = each_array.length; $$index < $$length; $$index++) {
         let entry = each_array[$$index];
+        $$renderer2.push(`<div class="flex items-center justify-between text-[11px] text-base-content/55 px-1"><span class="truncate">${escape_html(t().flourTypes[entry.type] ?? entry.type)}</span> <span class="tabular-nums font-medium ml-1">${escape_html(round(formula.mixFlourG * entry.pct / 100))}g</span></div>`);
+      }
+      $$renderer2.push(`<!--]--></div>`);
+    } else {
+      $$renderer2.push("<!--[-1-->");
+    }
+    $$renderer2.push(`<!--]--></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.mixWaterG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().mixWater)}</div></div> <div class="rounded-xl bg-accent/10 ring-1 ring-accent/20 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-accent">${escape_html(round(formula.starterTotalG))}g</div> <div class="text-xs text-accent/70 mt-1 font-medium">${escape_html(t().starter)}</div></div> <div class="rounded-xl bg-base-200/80 ring-1 ring-base-300/60 px-3 py-3 text-center"><div class="text-2xl font-bold tabular-nums text-base-content">${escape_html(round(formula.saltG))}g</div> <div class="text-xs text-base-content/60 mt-1 font-medium">${escape_html(t().saltRow)}</div></div></div> <p class="text-xs text-base-content/50 mt-2.5 italic">${escape_html(t().starterContains(round(formula.starterFlourG), round(formula.starterWaterG), ratio(formula.starterFlourG, formula.starterWaterG)))}</p></div> <div class="border-t border-base-200"><button type="button" class="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-base-200/50 transition-colors"><span class="text-xs font-semibold text-base-content/70 uppercase tracking-wide">${escape_html(t().fullFormula)}</span> <svg${attr_class(`w-4 h-4 text-base-content/40 transition-transform ${stringify(store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula) ? "rotate-180" : "")}`)} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"></path></svg></button> `);
+    if (store_get($$store_subs ??= {}, "$showFullFormula", showFullFormula)) {
+      $$renderer2.push("<!--[0-->");
+      $$renderer2.push(`<div class="px-5 pb-4"><table class="w-full text-sm"><thead><tr class="border-b border-base-200"><th class="text-left py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().ingredient)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().grams)}</th><th class="text-right py-2 text-xs font-semibold text-base-content/50 uppercase tracking-wide">${escape_html(t().bakersPct)}</th></tr></thead><tbody class="divide-y divide-base-200"><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().totalFlourRow)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalFlourG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">100%</td></tr><!--[-->`);
+      const each_array_1 = ensure_array_like(flourBlend);
+      for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+        let entry = each_array_1[$$index_1];
         $$renderer2.push(`<tr class="bg-base-200/30"><td class="py-1.5 text-base-content/70 text-xs pl-4">— ${escape_html(t().flourTypes[entry.type] ?? entry.type)}</td><td class="py-1.5 text-right tabular-nums text-base-content/70 text-xs">${escape_html(round(formula.totalFlourG * entry.pct / 100))}g</td><td class="py-1.5 text-right tabular-nums text-base-content/50 text-xs">${escape_html(entry.pct)}%</td></tr>`);
       }
       $$renderer2.push(`<!--]--><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().water)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.totalWaterG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">${escape_html(formula.finalHydrationPct.toFixed(1))}%</td></tr><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().saltRow)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.saltG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.saltG, formula.totalFlourG))}</td></tr><tr><td class="py-2.5 text-base-content font-medium">${escape_html(t().starter)}</td><td class="py-2.5 text-right tabular-nums text-base-content font-semibold">${escape_html(round(formula.starterTotalG))}g</td><td class="py-2.5 text-right tabular-nums text-base-content/70">${escape_html(pct(formula.starterFlourG, formula.totalFlourG))} <span class="text-[10px] text-base-content/40 block leading-tight">${escape_html(t().preFermentedFlour)}</span></td></tr></tbody><tfoot><tr class="border-t-2 border-secondary/30 bg-secondary/10"><td class="py-3 font-bold text-secondary">${escape_html(t().totalDough)}</td><td class="py-3 text-right tabular-nums font-bold text-secondary">${escape_html(round(formula.totalDoughWeightG))}g</td><td class="py-3 text-right"></td></tr></tfoot></table></div>`);
@@ -3156,13 +3169,26 @@ function ScheduleCard($$renderer, $$props) {
         });
       }
       let cumulativeMins = 0;
+      let parentStartCumulative = 0;
+      let subCumulative = 0;
       return steps.map((s) => {
         const topLevelIndex = s.isSubStep ? -1 : topLevelCounter++;
-        const clockTime = addMinsToTime(startTime, cumulativeMins);
-        const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
-        cumulativeMins += durMins;
-        const endClockTime = addMinsToTime(startTime, cumulativeMins);
-        return { step: s, clockTime, endClockTime, topLevelIndex };
+        if (s.isSubStep) {
+          const clockTime = addMinsToTime(startTime, parentStartCumulative + subCumulative);
+          const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
+          subCumulative += durMins;
+          const endClockTime = addMinsToTime(startTime, parentStartCumulative + subCumulative);
+          return { step: s, clockTime, endClockTime, topLevelIndex };
+        } else {
+          cumulativeMins = Math.max(cumulativeMins, parentStartCumulative + subCumulative);
+          parentStartCumulative = cumulativeMins;
+          subCumulative = 0;
+          const clockTime = addMinsToTime(startTime, cumulativeMins);
+          const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
+          cumulativeMins += durMins;
+          const endClockTime = addMinsToTime(startTime, cumulativeMins);
+          return { step: s, clockTime, endClockTime, topLevelIndex };
+        }
       });
     });
     function durationLabel(s) {
@@ -3190,7 +3216,14 @@ function ScheduleCard($$renderer, $$props) {
         $$renderer2.push(`<!--]--></span></div> <div${attr_class(`flex-1 min-w-0 transition-opacity ${stringify(completedSteps.has(i) ? "opacity-50" : "")}`)}><div class="flex items-start justify-between gap-2"><span${attr_class(`text-xs font-medium leading-tight transition-colors ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/80")}`)}>${escape_html(step.label)}</span> <div class="text-right shrink-0">`);
         if (scheduleMode === "clock" && clockTime) {
           $$renderer2.push("<!--[0-->");
-          $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(clockTime)}</div>`);
+          $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(clockTime)}</div> `);
+          if (endClockTime && endClockTime !== clockTime) {
+            $$renderer2.push("<!--[0-->");
+            $$renderer2.push(`<div${attr_class(`text-[10px] tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-base-content/50")}`)}>→ ${escape_html(endClockTime)}</div>`);
+          } else {
+            $$renderer2.push("<!--[-1-->");
+          }
+          $$renderer2.push(`<!--]-->`);
         } else {
           $$renderer2.push("<!--[-1-->");
           $$renderer2.push(`<div${attr_class(`text-xs tabular-nums ${stringify(completedSteps.has(i) ? "text-base-content/40 line-through" : "text-secondary/70")}`)}>${escape_html(durationLabel(step))}</div>`);
@@ -3199,6 +3232,26 @@ function ScheduleCard($$renderer, $$props) {
         if (step.notes) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<p${attr_class(`text-[11px] mt-0.5 leading-snug ${stringify(completedSteps.has(i) ? "text-base-content/25 line-through" : "text-base-content/55")}`)}>${escape_html(step.notes)}</p>`);
+        } else {
+          $$renderer2.push("<!--[-1-->");
+        }
+        $$renderer2.push(`<!--]--> `);
+        if (step.setCount && step.setCount > 0) {
+          $$renderer2.push("<!--[0-->");
+          $$renderer2.push(`<div class="flex gap-2 mt-1.5 flex-wrap"><!--[-->`);
+          const each_array_1 = ensure_array_like(Array(step.setCount));
+          for (let setIdx = 0, $$length2 = each_array_1.length; setIdx < $$length2; setIdx++) {
+            each_array_1[setIdx];
+            $$renderer2.push(`<button type="button"${attr_class(`w-5 h-5 rounded border-2 text-[10px] font-bold flex items-center justify-center transition-colors ${stringify(isSetDone(i, setIdx) ? "bg-success/15 border-success/40 text-success" : "border-base-300 hover:border-secondary/50")}`)}>`);
+            if (isSetDone(i, setIdx)) {
+              $$renderer2.push("<!--[0-->");
+              $$renderer2.push(`✓`);
+            } else {
+              $$renderer2.push("<!--[-1-->");
+            }
+            $$renderer2.push(`<!--]--></button>`);
+          }
+          $$renderer2.push(`<!--]--></div>`);
         } else {
           $$renderer2.push("<!--[-1-->");
         }
@@ -3246,9 +3299,9 @@ function ScheduleCard($$renderer, $$props) {
         if (step.setCount && !completedSteps.has(i)) {
           $$renderer2.push("<!--[0-->");
           $$renderer2.push(`<div class="flex flex-wrap items-center gap-2 mt-2"><!--[-->`);
-          const each_array_1 = ensure_array_like(Array.from({ length: step.setCount }, (_, si) => si));
-          for (let $$index = 0, $$length2 = each_array_1.length; $$index < $$length2; $$index++) {
-            let si = each_array_1[$$index];
+          const each_array_2 = ensure_array_like(Array.from({ length: step.setCount }, (_, si) => si));
+          for (let $$index_1 = 0, $$length2 = each_array_2.length; $$index_1 < $$length2; $$index_1++) {
+            let si = each_array_2[$$index_1];
             $$renderer2.push(`<button${attr_class(`w-7 h-7 rounded-full font-bold text-xs flex items-center justify-center transition-colors ${stringify(isSetDone(i, si) ? "bg-success/15 text-success" : "bg-secondary/15 text-secondary hover:bg-secondary/25")}`)}>`);
             if (isSetDone(i, si)) {
               $$renderer2.push("<!--[0-->");
@@ -3344,7 +3397,7 @@ function _page($$renderer, $$props) {
       GuidanceCard($$renderer2, {
         crumbGoal: store_get($$store_subs ??= {}, "$inputs", inputs).crumbGoal
       });
-      $$renderer2.push(`<!----> <div class="flex justify-center mt-4"><a href="https://www.reddit.com/r/Sourdough/s/AeZMGcjrV1" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-ghost gap-2 text-base-content/60 hover:text-[#FF4500]"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M14.238 15.348c.085.084.085.221 0 .306-.465.462-1.194.687-2.231.687l-.008-.002-.008.002c-1.036 0-1.766-.225-2.231-.688-.085-.084-.085-.221 0-.305.084-.084.222-.084.307 0 .379.377 1.008.561 1.924.561l.008.002.008-.002c.915 0 1.544-.184 1.924-.561.085-.084.223-.084.307 0zm-3.44-2.418c0-.507-.414-.919-.922-.919-.509 0-.922.412-.922.919 0 .506.414.918.922.918.508 0 .922-.412.922-.918zm4.04-.919c-.509 0-.922.412-.922.919 0 .506.414.918.922.918.508 0 .922-.412.922-.918 0-.507-.414-.919-.922-.919zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.492 13.612c.018.162.028.326.028.492 0 2.51-2.924 4.546-6.528 4.546-3.606 0-6.53-2.036-6.53-4.546 0-.166.012-.33.028-.492a1.252 1.252 0 0 1-.464-.993c0-.694.565-1.257 1.262-1.257.334 0 .637.134.857.353 1.063-.731 2.528-1.202 4.147-1.26l.786-3.693.003-.013a.282.282 0 0 1 .34-.208l2.614.591c.163-.36.534-.614.965-.614.585 0 1.06.474 1.06 1.057 0 .584-.475 1.058-1.06 1.058-.583 0-1.054-.472-1.058-1.052l-2.35-.531-.693 3.263c1.594.07 3.034.543 4.08 1.265.219-.218.521-.351.853-.351.698 0 1.262.563 1.262 1.257 0 .427-.214.805-.547.998z"></path></svg> ${escape_html(t().redditBadge)}</a></div>`);
+      $$renderer2.push(`<!---->`);
     } else {
       $$renderer2.push("<!--[-1-->");
       $$renderer2.push(`<div class="card bg-base-100/95 shadow-sm ring-1 ring-base-300/70"><div class="card-body items-center text-center"><div class="text-4xl mb-3" aria-hidden="true">⚖️</div> <p class="text-base-content/70 font-medium">${escape_html(t().emptyStateTitle)}</p> <p class="text-base-content/50 text-sm mt-1">${escape_html(t().emptyStateSubtitle)}</p></div></div>`);

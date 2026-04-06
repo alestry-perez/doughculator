@@ -621,7 +621,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 		steps.push({
 			label: s.autolyse,
 			durationMins: scheduledAutolyse,
-			notes: s.autolyseNote(formula.mixFlourG, formula.mixWaterG) + userNote
+			notes: s.autolyseNote(formula.mixFlourG, formula.mixWaterG, formatMins(scheduledAutolyse)) + userNote
 		});
 	}
 
@@ -629,7 +629,7 @@ function calcSchedule(inputs: Inputs, formula: FormulaResult, timing: TimingResu
 	steps.push({
 		label: s.mix,
 		durationMins: MIX_DURATION_MINS,
-		notes: s.mixNote(autolyseOn, formula.mixFlourG, formula.mixWaterG, formula.starterTotalG, formula.saltG)
+		notes: s.mixNote(autolyseOn, formula.mixFlourG, formula.mixWaterG, formula.starterTotalG, formula.saltG, formatMins(MIX_DURATION_MINS))
 	});
 
 	// L2: distribute foldCount proportionally — S&F gets ~60%, coil gets remainder

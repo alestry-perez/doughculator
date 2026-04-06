@@ -20,11 +20,11 @@ import {
 export const scheduleStrings = {
   en: {
     autolyse: 'Autolyse',
-    autolyseNote: (flourG: number, waterG: number) => `Mix ${Math.round(flourG)}g flour and ${Math.round(waterG)}g water (hold back all salt and all starter). Cover and rest.`,
+    autolyseNote: (flourG: number, waterG: number, restTime: string) => `Mix ${Math.round(flourG)}g flour and ${Math.round(waterG)}g water (hold back all salt and all starter). Cover and rest for ${restTime}.`,
     mix: 'Mix',
-    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number) => autolyseOn
+    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number, restTime: string) => autolyseOn
       ? `Add ${Math.round(starterG)}g starter and ${Math.round(saltG)}g salt to the autolysed dough. Mix until incorporated.`
-      : `Combine ${Math.round(starterG)}g starter and ${Math.round(waterG)}g water, stir until dissolved. Add ${Math.round(flourG)}g flour and ${Math.round(saltG)}g salt to form a shaggy dough. Rest covered.`,
+      : `Combine ${Math.round(starterG)}g starter and ${Math.round(waterG)}g water, stir until dissolved. Add ${Math.round(flourG)}g flour and ${Math.round(saltG)}g salt to form a shaggy dough. Rest covered for ${restTime}.`,
     stretchFold: 'Stretch & Fold',
     stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} sets, ${intervalMins} min apart.`,
     coilFolds: 'Coil Folds',
@@ -53,11 +53,11 @@ export const scheduleStrings = {
   },
   es: {
     autolyse: 'Autólisis',
-    autolyseNote: (flourG: number, waterG: number) => `Mezcla ${Math.round(flourG)}g de harina y ${Math.round(waterG)}g de agua (reserva toda la sal e iniciador). Tapa y reposa.`,
+    autolyseNote: (flourG: number, waterG: number, restTime: string) => `Mezcla ${Math.round(flourG)}g de harina y ${Math.round(waterG)}g de agua (reserva toda la sal e iniciador). Tapa y reposa por ${restTime}.`,
     mix: 'Mezclar',
-    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number) => autolyseOn
+    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number, restTime: string) => autolyseOn
       ? `Añade ${Math.round(starterG)}g de iniciador y ${Math.round(saltG)}g de sal a la masa autolizada. Mezcla hasta incorporar.`
-      : `Combina ${Math.round(starterG)}g de iniciador y ${Math.round(waterG)}g de agua, mezcla hasta disolver. Agrega ${Math.round(flourG)}g de harina y ${Math.round(saltG)}g de sal para formar una masa irregular. Reposa tapado.`,
+      : `Combina ${Math.round(starterG)}g de iniciador y ${Math.round(waterG)}g de agua, mezcla hasta disolver. Agrega ${Math.round(flourG)}g de harina y ${Math.round(saltG)}g de sal para formar una masa irregular. Reposa tapado por ${restTime}.`,
     stretchFold: 'Estirado y Plegado',
     stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} series, ${intervalMins} min de descanso entre cada una.`,
     coilFolds: 'Pliegues en Espiral',
@@ -86,11 +86,11 @@ export const scheduleStrings = {
   },
   sv: {
     autolyse: 'Autolys',
-    autolyseNote: (flourG: number, waterG: number) => `Blanda ${Math.round(flourG)}g mjöl och ${Math.round(waterG)}g vatten (håll tillbaka allt salt och all surdeg). Täck och vila.`,
+    autolyseNote: (flourG: number, waterG: number, restTime: string) => `Blanda ${Math.round(flourG)}g mjöl och ${Math.round(waterG)}g vatten (håll tillbaka allt salt och all surdeg). Täck och vila i ${restTime}.`,
     mix: 'Blanda',
-    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number) => autolyseOn
+    mixNote: (autolyseOn: boolean, flourG: number, waterG: number, starterG: number, saltG: number, restTime: string) => autolyseOn
       ? `Tillsätt ${Math.round(starterG)}g surdeg och ${Math.round(saltG)}g salt till den autolyserade degen. Blanda tills inkorporerat.`
-      : `Kombinera ${Math.round(starterG)}g surdeg och ${Math.round(waterG)}g vatten, rör tills upplöst. Tillsätt ${Math.round(flourG)}g mjöl och ${Math.round(saltG)}g salt och forma en grov deg. Vila täckt.`,
+      : `Kombinera ${Math.round(starterG)}g surdeg och ${Math.round(waterG)}g vatten, rör tills upplöst. Tillsätt ${Math.round(flourG)}g mjöl och ${Math.round(saltG)}g salt och forma en grov deg. Vila täckt i ${restTime}.`,
     stretchFold: 'Sträck & Vik',
     stretchFoldNote: (intervalMins: number, sets?: number) => `${sets ?? 3} omgångar, ${intervalMins} min mellan varje.`,
     coilFolds: 'Spiralvikningar',

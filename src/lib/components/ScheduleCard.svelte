@@ -87,13 +87,30 @@
     }
 
     let cumulativeMins = 0;
+    let parentStartCumulative = 0;
+    let subCumulative = 0;
+
     return steps.map((s) => {
       const topLevelIndex = s.isSubStep ? -1 : topLevelCounter++;
-      const clockTime = addMinsToTime(startTime, cumulativeMins);
-      const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
-      cumulativeMins += durMins;
-      const endClockTime = addMinsToTime(startTime, cumulativeMins);
-      return {step: s, clockTime, endClockTime, topLevelIndex} as StepDisplay;
+
+      if (s.isSubStep) {
+        // Sub-steps run WITHIN their parent — use offset from parent start
+        const clockTime = addMinsToTime(startTime, parentStartCumulative + subCumulative);
+        const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
+        subCumulative += durMins;
+        const endClockTime = addMinsToTime(startTime, parentStartCumulative + subCumulative);
+        return {step: s, clockTime, endClockTime, topLevelIndex} as StepDisplay;
+      } else {
+        // Reconcile: use the greater of parent's stated duration or sub-steps' actual total
+        cumulativeMins = Math.max(cumulativeMins, parentStartCumulative + subCumulative);
+        parentStartCumulative = cumulativeMins;
+        subCumulative = 0;
+        const clockTime = addMinsToTime(startTime, cumulativeMins);
+        const durMins = s.durationMins ?? (s.rangeMinMins != null ? s.rangeMinMins : 0);
+        cumulativeMins += durMins;
+        const endClockTime = addMinsToTime(startTime, cumulativeMins);
+        return {step: s, clockTime, endClockTime, topLevelIndex} as StepDisplay;
+      }
     });
   });
 
@@ -158,6 +175,9 @@
                 <div class="text-right shrink-0">
                   {#if scheduleMode === 'clock' && clockTime}
                     <div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{clockTime}</div>
+                    {#if endClockTime && endClockTime !== clockTime}
+                      <div class="text-[10px] tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-base-content/50'}">→ {endClockTime}</div>
+                    {/if}
                   {:else}
                     <div class="text-xs tabular-nums {completedSteps.has(i) ? 'text-base-content/40 line-through' : 'text-secondary/70'}">{durationLabel(step)}</div>
                   {/if}
@@ -165,6 +185,20 @@
               </div>
               {#if step.notes}
                 <p class="text-[11px] mt-0.5 leading-snug {completedSteps.has(i) ? 'text-base-content/25 line-through' : 'text-base-content/55'}">{step.notes}</p>
+              {/if}
+              {#if step.setCount && step.setCount > 0}
+                <div class="flex gap-2 mt-1.5 flex-wrap">
+                  {#each Array(step.setCount) as _, setIdx}
+                    <button
+                      type="button"
+                      onclick={(e) => { e.stopPropagation(); toggleSet(i, setIdx); }}
+                      class="w-5 h-5 rounded border-2 text-[10px] font-bold flex items-center justify-center transition-colors
+                        {isSetDone(i, setIdx) ? 'bg-success/15 border-success/40 text-success' : 'border-base-300 hover:border-secondary/50'}"
+                    >
+                      {#if isSetDone(i, setIdx)}&#10003;{/if}
+                    </button>
+                  {/each}
+                </div>
               {/if}
             </div>
           </li>
